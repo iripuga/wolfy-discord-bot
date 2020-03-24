@@ -2,6 +2,8 @@
 Modul za igro werewolfes preko discorda.
 '''
 
+some_change = 2;
+
 from random import shuffle, randint
 from numpy import linspace
 import json

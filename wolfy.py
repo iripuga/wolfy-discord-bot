@@ -1,6 +1,4 @@
-vic = "Sprehajala sem se po Hoferju, pa je en kurac pred menoj celo paleto wc papirja vleko!!! Pa sem ga natulila in mu rekla 'kaj vi samo serjete doma???' Pa mi je rekel: gospa jaz delam tukaj..."
-
-### Uvoz knjižnic
+global game #this will be my main game dict in which all will happen
 import discord
 from discord.ext import commands
 import os
@@ -10,26 +8,26 @@ from numpy import linspace
 import werewolfes as ww
 import json
 import time
+
+# init vars
+vic = "Sprehajala sem se po Hoferju, pa je en kurac pred menoj celo paleto wc papirja vleko!!! Pa sem ga natulila in mu rekla 'kaj vi samo serjete doma???' Pa mi je rekel: gospa jaz delam tukaj..."
+
+testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
+            #{'name': 'rok', 'user_id': 261105970548178944, 'status': 'on', 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
+            {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': "MINION - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win."}, 
+            #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
+            #{'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
+            {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, 
+            {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, 
+            {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
+
+
 """
 # Če bom hotu kake evente spreminjat moram bota definirat s tem razredom
-
 class Custom(discord.Client):
     async def overridden_fun():
         return
 """
-
-### FUNKCIJE
-def nameBuddies(buddies):
-    '''
-    Funkcija pretvori seznam id-jev v seznam ljudi z isto vlogo(seznam werewolfov recimo)
-    Input:
-        buddies...dict of players with same role {rolename: [ID of players with this role]}
-    Output:
-        msg_buddiess...message for buddies so that they can recognize each other in discord
-    '''
-    keyrole = buddies.keys()
-    listed = buddies[keyrole]
-    return
 
 ### BOT 
 load_dotenv()
@@ -76,7 +74,6 @@ async def on_ready():
 """   
 Enkrat mi bo ratal sporočilo za pozdrav - lahko je random nemška fraza iz seznama(http://streettalksavvy.com/street-talk-german-slang/german-slang-phrases/) 
 Ne rabi bit sporočilo na začetku logina, lohk je sam ena fora, ki je sprogramirana v bota. Kličeš z eno frazo in bot odgovori iz random knjižnice nemških fraz.    
-
 @wolfy.event
 async def on_connect():
     await wolfy.channel.send("Ich wünsche allen Durchfall, kurze Arme, und kein Klopapier") 
@@ -118,12 +115,13 @@ async def on_message(message):
     
     # werewolfes game
     #-------------------------------------------------------------------------------------------#
+    global game #aktualen seznam igralcev
     if message.content == "!w":
         await message.channel.send("...erewolfes?") 
         #Uvozim json podatke o igri in igralcih
         data = json.load(open(".game_data.json", "r"))
-         
-        game = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
+        
+        game = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
         justroles = ww.list_active_roles(game)
 
         #adding nicknames
@@ -135,65 +133,62 @@ async def on_message(message):
         for player in game:
             playerID = player['user_id']
             playersRole = player['role'].split(' ')[0]
+            #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
             if playerID == 1 or playerID == 2 or playerID == 3:
-                #skip tables
-                print('table #', playerID)
+                print('table #', playerID, player['role'])  #skip tables
             else:   
-                user = wolfy.get_user(playerID)       
-                print(playerID, user) #, user.name, user.id)
+                user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
                 init_msg = ww.msg4user(player)
-                await user.send(init_msg)
+                await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
 
-    ####################################  NIGHT GAME - for static roles(knowing each other) and for dynamic roles to know what to do  ###
-            if playersRole == 'VILLAGER':
-                pass
-            elif playersRole == 'WEREWOLF' or playersRole == 'MINION':
-                pass
-            elif playersRole == 'MASON':
-                pass
-            elif playersRole == 'ROBBER':
-                pass
-            elif playersRole == 'TROUBLEMAKER':
-                pass
-            elif playersRole == 'SEER':
-                pass
-            elif playersRole == 'INSOMNIAC':
-                pass
-            elif playersRole == 'DRUNK':
-                pass
-            elif playersRole == 'HUNTER':
-                pass
-            elif playersRole == 'TANNER':
-                pass
-            else:
-                raise ValueError('Role non existent in this guild!')
+                #######  NIGHT GAME - for static roles(knowing each other) and for dynamic roles to know what to do  ###
+                if playersRole == 'VILLAGER':
+                    pass
+                elif playersRole == 'WEREWOLF' or playersRole == 'MINION':      #barabe skup držijo
+                    for player_i in game:
+                        if player_i['role'].split(' ')[0] == 'WEREWOLF':
+                            werewolf = wolfy.get_user(player_i['user_id']);
+                            if werewolf != user:
+                                await user.send(f"{werewolf.name} is a WEREWOLF")  #POVEM KDO JE WEREWOLF
+                        elif player_i['role'].split(' ')[0] == 'MINION':
+                            minion = wolfy.get_user(player_i['user_id']);
+                            if minion != user:
+                                await user.send(f"{minion.name} is a MINION")   #POVEM KDO JE MINION
+                elif playersRole == 'MASON':
+                    pass
+                elif playersRole == 'ROBBER':
+                    pass
+                elif playersRole == 'TROUBLEMAKER':
+                    pass
+                elif playersRole == 'SEER':
+                    pass
+                elif playersRole == 'INSOMNIAC':
+                    pass
+                elif playersRole == 'DRUNK':
+                    pass
+                elif playersRole == 'HUNTER':
+                    pass
+                elif playersRole == 'TANNER':
+                    pass
+                else:
+                    raise ValueError('Role non existent in this guild!')
    
     ####################################  NIGHT GAME - for dynamic roles(changing cards in a game)  ##########
-
+    #Za vsako dinamično vlogo posebej...če igralec ni ta vloga ga Wolfy ignorira
 
     ####################################  MID GAME - Wolfy waits for players to discuss who to kill  #########
-
+    #detajli
 
     ####################################  VOTING - Players send private message to Wolfy  ####################
-
+    elif message.content == "!voting":
+        pass
 
     ####################################  END GAME - who died, Wolfy reveals all the cards  ##################
-    
-
-    elif message.content == "!s":
-        #Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
-        user_id = message.author.id
-        nickname = message.author.name
-        klik = ww.change_status(data, user_id)        #menjava statusa
-        #with open('.game_data.json', 'w', encoding='utf-8') as f:
-        #    json.dump(data, f, ensure_ascii=False, indent=4)
-        msg = nickname + ' status: ' + klik
-        await message.channel.send(str(msg))      
-    elif message.content == '!wolfy #iwannawin':
-        game = ww.assign_roles()  #dobim seznam igralcev, ki igrajo in njihove vloge
+    elif message.content == '!wolfy #iwannawin': #to bo na konc drugačen klic - GAME OVER
         loosers = ww.list_active_id(game)
         winner_name = message.author.name
         winner_id = message.author.id
+        #dobim aktualen seznam igralcev, ki igrajo in njihove vloge
         
         for looser in loosers:
             if looser == winner_id:
@@ -216,18 +211,29 @@ async def on_message(message):
         table_cards = ''
         for player in game:
             playerID = player['user_id']
+            user = wolfy.get_user(playerID)
             #show table cards
             if playerID == 1 or playerID == 2 or playerID == 3:
                 role_name = player['role'].split(' ')[0]
-                table_cards = table_cards + ', ' + role_name
+                table_cards = table_cards + '\n' + role_name
             else:
-                player_name = player['name']
+                player_name = user.name
                 role_name = player['role'].split(' ')[0]
-                msg = player_name + ' was ' + role_name
+                msg = ' - ' + player_name + ' was ' + role_name
                 await table.send(msg)
         
-        msg = '\nTable cards are: ' + table_cards
+        msg = '\nTable cards were: ' + table_cards
         await table.send(msg)
+    elif message.content == "!s":
+        #Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
+        user_id = message.author.id
+        nickname = message.author.name
+        klik = ww.change_status(data, user_id)        #menjava statusa
+        #with open('.game_data.json', 'w', encoding='utf-8') as f:
+        #    json.dump(data, f, ensure_ascii=False, indent=4)
+        msg = nickname + ' status: ' + klik
+        await message.channel.send(str(msg))      
+    
         
 #run everything
 wolfy.run(TOKEN)
@@ -262,14 +268,12 @@ async def nine_nine(ctx):
             "no doubt no doubt no doubt no doubt."
         ),
     ]
-
     response = random.choice(brooklyn_99_quotes)
     await ctx.send(response)
     
 @wolfy.command() #define the first command and set prefix to "!"
 async def testt(ctx):
     await ctx.send("Hello!!")
-
 # PRIVATE COMMUNICATION with members
         await message.author.send("👋")   #Tut dela, sam ni primerna za mojo aplikacijo
 """

@@ -2,8 +2,6 @@
 Modul za igro werewolfes preko discorda.
 '''
 
-some_change = 2;
-
 from random import shuffle, randint
 from numpy import linspace
 import json
@@ -119,15 +117,21 @@ def assign_roles(idata=data, desires=None):
     for mix in range(1351):   #every day i'm shuffling...premiksam, da je izbira vlog naključna
         shuffle(r_idx)  
     
-    if desires == None:
+    masons = 0;     #Števec MASONov poskrbim, da sta v igri dva MASONA al pa noben, ker drugač ta vloga nima smisla
+    if desires == None:     
         i = 0
         for member in members:
             for playerID in players:
                 if playerID == member['user_id']:
                     get_role = int(r_idx[i]) #poiščem vlogo glede na index v seznamu premešanih indeksov
                     i = i + 1
-                    ROLE = roles[get_role]['name'] + ' - ' + roles[get_role]['description']
+                    rolename = roles[get_role]['name']
+                    roledescription = roles[get_role]['description']
 
+                    if rolename == 'MASON': #preverim, če je vsaj eden v igri
+                        masons = masons + 1  
+                    
+                    ROLE =  rolename + ' - ' + roledescription  
                     member['role'] = ROLE
                     assigned_roles.append(member)
                 else:
@@ -135,6 +139,13 @@ def assign_roles(idata=data, desires=None):
     else:
         raise NotImplementedError('No desires!')
     
+    #ne sme bit samo en MASON...DVA al pa NIČ
+    if masons == 1:
+        for role in assigned_roles:
+            if role['role'].split(' ')[0] == 'VILLAGER':    
+                NEW_ROLE = 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'
+                role['role'] = NEW_ROLE
+                break
     return assigned_roles
 
 def list_active_roles(game_roles):
@@ -213,7 +224,7 @@ def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAV
 
 ### For testing
 game = assign_roles(data)    #dict of active player:roles
-msg1 = msg4user(game[0])
+#print(list_active_roles(game))
 
 
 '''
@@ -225,11 +236,6 @@ print(justroles)
 print(justid)
 #print(type(justid[0]),'\n')
 print(msg1, msg2)
-
-
-
-
-
 i = 0
 for player in active.keys():
     player = str(player)

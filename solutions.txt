@@ -1,1 +1,20 @@
+Konec in začetek igre se povezujeta, tako, da si lokalno shranim seznam aktivnih igralcev
+
+Implement roles:
+*VILLAGER
+*VILLAGER
+*VILLAGER
+*WEREWOLF
+*WEREWOLF
+*MASON
+*MASON
+SEER
+ROBBER
+TROUBLEMAKER
+DRUNK
+INSOMNIAC
+*MINION
+*HUNTER - če na koncu izpišem vse vloge je zrihtan
+*TANNER
+
 dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/using-discord-to-accept-input-and-execute-on-connected-clients

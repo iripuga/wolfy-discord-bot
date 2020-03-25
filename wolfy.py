@@ -1,4 +1,6 @@
 global game #this will be my main game dict in which all will happen
+global night_role #spremenljivka, ki hrani katera vloga je ponoči na vrsti
+
 import discord
 from discord.ext import commands
 import os
@@ -116,6 +118,7 @@ async def on_message(message):
     # werewolfes game
     #-------------------------------------------------------------------------------------------#
     global game #aktualen seznam igralcev
+    global night_role
     if message.content == "!w":
         await message.channel.send("...erewolfes?") 
         #Uvozim json podatke o igri in igralcih
@@ -143,7 +146,7 @@ async def on_message(message):
 
                 #######  NIGHT GAME - for static roles(knowing each other) and for dynamic roles to know what to do  ###
                 if playersRole == 'VILLAGER':
-                    pass
+                    pass #nothing happens
                 elif playersRole == 'WEREWOLF' or playersRole == 'MINION':      #barabe skup držijo
                     for player_i in game:
                         if player_i['role'].split(' ')[0] == 'WEREWOLF':
@@ -155,27 +158,41 @@ async def on_message(message):
                             if minion != user:
                                 await user.send(f"{minion.name} is a MINION")   #POVEM KDO JE MINION
                 elif playersRole == 'MASON':
-                    pass
-                elif playersRole == 'ROBBER':
-                    pass
-                elif playersRole == 'TROUBLEMAKER':
-                    pass
-                elif playersRole == 'SEER':
-                    pass
-                elif playersRole == 'INSOMNIAC':
-                    pass
-                elif playersRole == 'DRUNK':
-                    pass
-                elif playersRole == 'HUNTER':
-                    pass
-                elif playersRole == 'TANNER':
-                    pass
-                else:
-                    raise ValueError('Role non existent in this guild!')
+                    pass #Done in function ww.assigned_roles()
+        night_role = 3; #villager, werewolf, minion, mason
+        await message.channel.send('ROBBER, it\'s your turn.')
    
     ####################################  NIGHT GAME - for dynamic roles(changing cards in a game)  ##########
     #Za vsako dinamično vlogo posebej...če igralec ni ta vloga ga Wolfy ignorira
-
+    if message.content == "!robber":
+        user = wolfy.get_user(message.author.id)
+        print(user)
+        try:
+            for player in game:
+                playersRole = player['role'].split(' ')[0]
+                if playersRole == 'ROBBER':
+                    await user.send('Here is a list of players. Chose a number you want to switch with!')
+                    break
+                else:
+                    await user.send('You are not a ROBBER, so cut it out.\nDubmkopf!')
+                    break
+        except:
+            await user.send('The game hasn\'t started yet.')
+        
+        if playersRole == 'TROUBLEMAKER':
+            pass
+        elif playersRole == 'SEER':
+            pass
+        elif playersRole == 'INSOMNIAC':
+            pass
+        elif playersRole == 'DRUNK':
+            pass
+        elif playersRole == 'HUNTER':
+            pass
+        elif playersRole == 'TANNER':
+            pass
+        else:
+            raise ValueError('Role non existent in this guild!')
     ####################################  MID GAME - Wolfy waits for players to discuss who to kill  #########
     #detajli
 
@@ -193,7 +210,7 @@ async def on_message(message):
         for looser in loosers:
             if looser == winner_id:
                 #for the winner
-                user = wolfy.get_user(looser)
+                user = wolfy.get_user(winner_id)
                 await user.send('You win by cheating. Shame on you!!!')
                 time.sleep(1)
                 await user.send('Dumbkopf!')

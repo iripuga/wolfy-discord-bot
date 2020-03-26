@@ -1,5 +1,7 @@
 global game #this will be my main game dict in which all will happen
 global night_role #spremenljivka, ki hrani katera vloga je ponoči na vrsti
+global tableID 
+tableID = [1, 2, 3] #ID od table slotov
 
 import discord
 from discord.ext import commands
@@ -14,12 +16,12 @@ import time
 # init vars
 vic = "Sprehajala sem se po Hoferju, pa je en kurac pred menoj celo paleto wc papirja vleko!!! Pa sem ga natulila in mu rekla 'kaj vi samo serjete doma???' Pa mi je rekel: gospa jaz delam tukaj..."
 
-testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
+testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'MINION - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
             #{'name': 'rok', 'user_id': 261105970548178944, 'status': 'on', 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
-            {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': "MINION - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win."}, 
+            {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': "MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win."}, 
             #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
             #{'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
-            {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, 
+            {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.'}, 
             {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, 
             {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
 
@@ -119,12 +121,13 @@ async def on_message(message):
     #-------------------------------------------------------------------------------------------#
     global game #aktualen seznam igralcev
     global night_role
+    global tableID
     if message.content == "!w":
         await message.channel.send("...erewolfes?") 
         #Uvozim json podatke o igri in igralcih
         data = json.load(open(".game_data.json", "r"))
         
-        game = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
+        game = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
         justroles = ww.list_active_roles(game)
 
         #adding nicknames
@@ -137,7 +140,7 @@ async def on_message(message):
             playerID = player['user_id']
             playersRole = player['role'].split(' ')[0]
             #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
-            if playerID == 1 or playerID == 2 or playerID == 3:
+            if playerID in tableID:
                 print('table #', playerID, player['role'])  #skip tables
             else:   
                 user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
@@ -147,18 +150,35 @@ async def on_message(message):
                 #######  NIGHT GAME - for static roles(knowing each other) and for dynamic roles to know what to do  ###
                 if playersRole == 'VILLAGER':
                     pass #nothing happens
-                elif playersRole == 'WEREWOLF' or playersRole == 'MINION':      #barabe skup držijo
+                elif playersRole == 'WEREWOLF': 
+                    flag = False
                     for player_i in game:
                         if player_i['role'].split(' ')[0] == 'WEREWOLF':
                             werewolf = wolfy.get_user(player_i['user_id']);
                             if werewolf != user:
-                                await user.send(f"{werewolf.name} is a WEREWOLF")  #POVEM KDO JE WEREWOLF
-                        elif player_i['role'].split(' ')[0] == 'MINION':
-                            minion = wolfy.get_user(player_i['user_id']);
-                            if minion != user:
-                                await user.send(f"{minion.name} is a MINION")   #POVEM KDO JE MINION
-                elif playersRole == 'MASON':
-                    pass #Done in function ww.assigned_roles()
+                                flag = True
+                                await user.send(f"{werewolf.name} is a WEREWOLF")  #POVEM KDO JE WEREWOLF                       
+                    if not flag:
+                        await user.send("You are the only WEREWOLF") 
+                elif playersRole == 'MINION':
+                    flag = False
+                    for player_i in game:
+                        if player_i['role'].split(' ')[0] == 'WEREWOLF':
+                            flag = True
+                            werewolf = wolfy.get_user(player_i['user_id']);
+                            await user.send(f"{werewolf.name} is a WEREWOLF")  #POVEM KDO JE WEREWOLF
+                    if not flag:
+                        await user.send("You have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!")
+                elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
+                    flag = False
+                    for player_i in game:
+                        if (player_i['role'].split(' ')[0] == 'MASON') and (not (player_i['user_id'] in tableID)):
+                            mason = wolfy.get_user(player_i['user_id']);
+                            if mason != user:
+                                flag = True
+                                await user.send(f"{mason.name} is a MASON")
+                    if not flag:
+                        await user.send("You are the only MASON")
         night_role = 3; #villager, werewolf, minion, mason
         await message.channel.send('ROBBER, it\'s your turn.')
    
@@ -197,7 +217,7 @@ async def on_message(message):
     #detajli
 
     ####################################  VOTING - Players send private message to Wolfy  ####################
-    elif message.content == "!voting":
+    elif message.content == "!vote":
         pass
 
     ####################################  END GAME - who died, Wolfy reveals all the cards  ##################

@@ -10,7 +10,7 @@ import json
 data = json.load(open('.game_data.json', 'r'))
 
 ### Funkcije
-def activate(members):
+def find_active(members):
     '''
     Determine who is playing by checking users ''status'' in members dict and returning list od active 'user_id''s
     Input:
@@ -46,15 +46,16 @@ def activate(members):
 
 
 ####################################################### DUMP #####################################################
+'''
 def _assign_roles0(idata=data, desires=None):   
-    '''
+    
     Shuffle new roles for another game of werewolfes
     Input:
         idata...role and members data dictionary(look up)
         desires...list of desired roles which must match len(players)
     Output:
         assigned...dict of reshuffled 'roles with ther description' in one string. Format is {'user_id': 'role-description'}.
-    '''
+    
     #init variables
     assigned = {}
     playersID = activate(data['members']) #get list of active player id's which need role assignment
@@ -79,6 +80,7 @@ def _assign_roles0(idata=data, desires=None):
         raise NotImplementedError('No desires!') #Tukaj pridejo želje
         
     return assigned  #dodeljene vloge
+'''
 ################################################################################################################
 
 
@@ -108,7 +110,7 @@ def assign_roles(idata=data, desires=None):
     #init variables
     assigned_roles = []
     roles = idata['roles']; members = idata['members']
-    players = activate(members) #get list of active player id's which need role assignment
+    players = find_active(members) #get list of active player id's which need role assignment
     
     #RANDOM SHUFFLE - določim indexe za vloge iz seznama members. samo toliko kot je igralcev v igri
     r_idx = []
@@ -120,7 +122,7 @@ def assign_roles(idata=data, desires=None):
     masons = 0;     #Števec MASONov poskrbim, da sta v igri dva MASONA al pa noben, ker drugač ta vloga nima smisla
     if desires == None:     
         i = 0
-        for member in members:
+        for member in members:  #določam vloge
             for playerID in players:
                 if playerID == member['user_id']:
                     get_role = int(r_idx[i]) #poiščem vlogo glede na index v seznamu premešanih indeksov
@@ -206,21 +208,7 @@ def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAV
         json.dump(data, f, ensure_ascii=False, indent=4)
         
     return klik #to je trenutno stanje za vhodni user_id
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 
 ### For testing
 game = assign_roles(data)    #dict of active player:roles

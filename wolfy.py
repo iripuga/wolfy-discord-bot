@@ -5,7 +5,7 @@ global players4role #number coded list of players for quicker game with dynamic 
 tableID = [1, 2, 3] #ID od table slotov
 
 import discord
-from discord.ext import commands
+from discord.ext.commands import Bot
 import os
 from dotenv import load_dotenv
 from random import shuffle
@@ -37,7 +37,7 @@ class Custom(discord.Client):
 ### BOT 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN") #password to get acces to login bot into discord
-wolfy = commands.Bot(command_prefix="!") #connection to discord bot, same and more than Client
+wolfy = Bot(command_prefix='.') #connection to discord bot, same and more than Client
 
 
 # Which GUILD to use??? Guild je server v discord jeziku.
@@ -57,8 +57,11 @@ GUILD = int(GUILD)
 
 
 
-
-
+#nč ne dela to
+@wolfy.command()
+async def ping(ctx, *, message):
+    #await wolfy.process_commands(message)
+    await ctx.send(message)
 
 ### LOGIN into guild
 @wolfy.event   #@ je event handler - ko se vzpostavi povezava se izvede ta funkcija
@@ -118,7 +121,7 @@ async def on_message(message):
     
     # werewolfes game
     #-------------------------------------------------------------------------------------------#
-    global game #aktualen seznam igralcev
+     #aktualen seznam igralcev
     global night_role
     global tableID
     global players4role
@@ -128,6 +131,7 @@ async def on_message(message):
         #Uvozim json podatke o igri in igralcih
         data = json.load(open(".game_data.json", "r"))
         
+        global game
         game = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
         justroles = ww.list_active_roles(game)
 
@@ -194,8 +198,7 @@ async def on_message(message):
     ####################################  NIGHT GAME - for dynamic roles(changing cards in a game)  ##########
     #Za vsako dinamično vlogo posebej...če igralec ni ta vloga ga Wolfy ignorira
     if message.content.startswith("robber"):
-        user = wolfy.get_user(message.author.id)
-
+        user = wolfy.get_user(message.author.id);
         #TEŽAVE z globalnimi spremenljivkami
         try:
             a = message.content[8]; 

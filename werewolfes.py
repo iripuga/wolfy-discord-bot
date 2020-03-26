@@ -227,22 +227,6 @@ def find_role(game, rolename, wolfy):
             break
     return role_user
 
-def get_id(players4role, number):
-    '''
-    function returns player ID from number coded dict of active players
-    Input
-        players4role...dict of numbered players and their IDs
-        number...players number
-    Output
-        id...players id represented by number in players4role
-        msg...in case player fucks up input numbers
-    '''
-    if number in players4role.keys():
-        id = players4role[number]
-    else:
-        msg='ERROR: Player numbers incorrect.'
-    return id
-
 def switch(igame, idA, idB):
     '''
     Function switches roles of player A and player B and returns refreshed game 
@@ -254,7 +238,7 @@ def switch(igame, idA, idB):
         switched...string with a message who was switched
     '''
     ogame = igame
-    switched = "Switched "
+    switched = "switched "
     #saving in temp variables
     for player in igame:
         if player['user_id'] == idA:
@@ -306,9 +290,13 @@ testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', '
 ida = 689399469090799848
 idb = 593722710706749441
 g = testgame#assign_roles(data)    #dict of active player:roles
+global ga
 ga, msg = switch(g, ida, idb)
-print(msg)
 
+for i in range(len(ga)):
+    tmp = ga.pop()
+    #ga[i] = {}
+print(ga)
 '''
 justroles = list_active_roles(game)
 justid = list_active_id(game)

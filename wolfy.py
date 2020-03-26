@@ -18,16 +18,6 @@ import time
 # init vars
 vic = "Sprehajala sem se po Hoferju, pa je en kurac pred menoj celo paleto wc papirja vleko!!! Pa sem ga natulila in mu rekla 'kaj vi samo serjete doma???' Pa mi je rekel: gospa jaz delam tukaj..."
 
-testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
-            #{'name': 'rok', 'user_id': 261105970548178944, 'status': 'on', 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
-            {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': "MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win."}, 
-            #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
-            #{'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
-            {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.'}, 
-            {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, 
-            {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
-
-
 """
 # Če bom hotu kake evente spreminjat moram bota definirat s tem razredom
 class Custom(discord.Client):
@@ -95,6 +85,15 @@ async def on_message(message):
     global players4role
     global night_role
 
+    testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
+                #{'name': 'rok', 'user_id': 261105970548178944, 'status': 'on', 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, 
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': "MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win."}, 
+                #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
+                #{'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'on', 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, 
+                {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.'}, 
+                {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, 
+                {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
+
     #other shit
     #-------------------------------------------------------------------------------------------#
     if message.author == wolfy.user:    # ignore bot messages in chat - tko se bot ne bo pogovarjal sam s sabo!
@@ -126,7 +125,12 @@ async def on_message(message):
         #Uvozim json podatke o igri in igralcih
         data = json.load(open(".game_data.json", "r"))
         
+        #for i in range(len(game)):
+        #    game.pop()
+        print(game)
         game = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
+        print(game)
+        night_role = 0   #ni še noč
         justroles = ww.list_active_roles(game)
 
         #adding nicknames
@@ -187,36 +191,46 @@ async def on_message(message):
             list4msg, players4role = ww.list_players(game, 'ROBBER', wolfy) #določim med kom lahko robber izbira
             print(players4role)
             print(list4msg)
-            msg = 'Your turn! Do you want to steal from someone\nEnter: robber-number\n' + list4msg;
+            msg = 'Your turn! Do you want to steal from someone\nCommand: robber-number\n' + list4msg;
             await message.channel.send('ROBBER, open your 👀.')
             await robber.send(msg)
    
     ####################################  NIGHT GAME - for dynamic roles(changing cards in a game)  ##########
     #Za vsako dinamično vlogo posebej...če igralec ni ta vloga ga Wolfy ignorira
-    if message.content.startswith("robber"):
-        user = wolfy.get_user(message.author.id);
-
-        
-        try:
-            for player in game:
-                playersRole = player['role'].split(' ')[0]
-                if (playersRole == 'ROBBER') and (night_role == 4):
-                    victim = message.content[8]; 
-                    id_victim = ww.get_id(players4role, victim); 
-                    id_robber = message.author.id;
-                    #print(victim, id_victim)
-                    game = ww.switchAB(game, id_victim, id_robber)
-                    #print(players4role)
-                    night_role = 5 #next 
-                    break
-                elif (playersRole == 'ROBBER') and (night_role != 4):
-                    await user.send('Not your turn buddy!')
-                    break
-                else:
-                    await user.send('You are not a ROBBER, so cut it out.\nDumbkopf!')
-                    break
-        except:
-            await user.send('The game hasn\'t started yet.')
+    if message.content.startswith("robber"):                                                                                ### ROBBER
+        id_robber = message.author.id
+        robber = wolfy.get_user(id_robber);
+        #print(robber)
+        #print(game)
+        if not game:
+            await robber.send('The game hasn\'t started yet.')
+        for player in game:
+            victim = int(message.content.split('-')[1]);
+            print(victim) 
+            if victim == 0:
+                await robber.send('It\'s your choice')
+                night_role = 5
+                break
+            id_victim = players4role[victim]
+            #print(id_victim)
+            playersRole = player['role'].split(' ')[0]
+            if (playersRole == 'ROBBER') and (night_role == 4):
+                game, switch_msg = ww.switch(game, id_robber, id_victim)
+                game = list(game)
+                for player_i in game:
+                    if player_i['user_id'] == id_robber:
+                        new_role = player['role']
+                        msg = 'Great! You are now ' + new_role
+                print('ROBBER', switch_msg)
+                await robber.send(msg)
+                night_role = 5 #next 
+                break
+            elif (playersRole == 'ROBBER') and (night_role != 4):
+                await robber.send('Not your turn buddy!')
+                break
+            else:
+                await robber.send('You are not a ROBBER, so cut it out.\nDumbkopf!')
+                break
         '''
         if playersRole == 'TROUBLEMAKER':
             pass

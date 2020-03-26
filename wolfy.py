@@ -172,6 +172,7 @@ async def on_message(message):
                 elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
                     flag = False
                     for player_i in game:
+                        
                         if (player_i['role'].split(' ')[0] == 'MASON') and (not (player_i['user_id'] in tableID)):
                             mason = wolfy.get_user(player_i['user_id']);
                             if mason != user:

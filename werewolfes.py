@@ -243,7 +243,7 @@ def get_id(players4role, number):
         msg='ERROR: Player numbers incorrect.'
     return id
 
-def switchAB(igame, idA, idB):
+def switch(igame, idA, idB):
     '''
     Function switches roles of player A and player B and returns refreshed game 
     Input:
@@ -251,19 +251,28 @@ def switchAB(igame, idA, idB):
         idA, idB...ID numbers of players being switched
     Output:
         ogame...refreshed igame ro should I say reshuffled
+        switched...string with a message who was switched
     '''
     ogame = igame
+    switched = "Switched "
+    #saving in temp variables
     for player in igame:
         if player['user_id'] == idA:
-            tmpB = player['role']
-        elif player['user_id'] == idB:
             tmpA = player['role']
+            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
+        elif player['user_id'] == idB:
+            tmpB = player['role']
+            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
+    switched = switched + 'to '
+    #switching roles
     for player in ogame:
         if player['user_id'] == idA:
             player['role'] = tmpB
+            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
         elif player['user_id'] == idB:
             player['role'] = tmpA
-    return ogame
+            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
+    return ogame, switched
 
 
 def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAVA SE NE UPOŠTEVA PRI !w
@@ -293,9 +302,12 @@ def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAV
     
 
 ### For testing
-game = assign_roles(data)    #dict of active player:roles
-#print(list_active_roles(game))
-
+testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.'}, {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
+ida = 689399469090799848
+idb = 593722710706749441
+g = testgame#assign_roles(data)    #dict of active player:roles
+ga, msg = switch(g, ida, idb)
+print(msg)
 
 '''
 justroles = list_active_roles(game)

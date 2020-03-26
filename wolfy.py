@@ -1,7 +1,8 @@
 global game #this will be my main game dict in which all will happen
+game = []
 global night_role #spremenljivka, ki hrani katera vloga je ponoči na vrsti
-global tableID 
 global players4role #number coded list of players for quicker game with dynamic roles
+global tableID 
 tableID = [1, 2, 3] #ID od table slotov
 
 import discord
@@ -87,14 +88,13 @@ async def on_connect():
     
 
 
-
-
-
-
-
 ### MAIN
 @wolfy.event
 async def on_message(message):
+    global game
+    global players4role
+    global night_role
+
     #other shit
     #-------------------------------------------------------------------------------------------#
     if message.author == wolfy.user:    # ignore bot messages in chat - tko se bot ne bo pogovarjal sam s sabo!
@@ -121,17 +121,11 @@ async def on_message(message):
     
     # werewolfes game
     #-------------------------------------------------------------------------------------------#
-     #aktualen seznam igralcev
-    global night_role
-    global tableID
-    global players4role
-
     if message.content == "!w":
         await message.channel.send("...erewolfes?") 
         #Uvozim json podatke o igri in igralcih
         data = json.load(open(".game_data.json", "r"))
         
-        global game
         game = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
         justroles = ww.list_active_roles(game)
 
@@ -146,14 +140,14 @@ async def on_message(message):
             playersRole = player['role'].split(' ')[0]
             #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
             if playerID in tableID:
-                print('table #' + str(playerID))  #skip tables
+                print('table#' + str(playerID)+ ' ' +str(player['role'].split(' ')[0]))  #skip tables
             else:   
                 user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
-                
+                print(user.name, player['role'].split(' ')[0])
                 init_msg = ww.msg4user(player) #lovrič me je blokiral!!! no_hello ne morem pošiljat
                 await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
 
-                #######  NIGHT GAME - for static roles(knowing each other) and for dynamic roles to know what to do  ###
+    ################################  NIGHT GAME - for static roles(knowing each other) and for dynamic roles to know what to do  ###
                 if playersRole == 'VILLAGER':
                     pass #nothing happens
                 elif playersRole == 'WEREWOLF': 
@@ -165,7 +159,7 @@ async def on_message(message):
                                 flag = True
                                 await user.send(f" - {werewolf.name} is a WEREWOLF")  #POVEM KDO JE WEREWOLF                       
                     if not flag:
-                        await user.send("You are the only WEREWOLF") 
+                        await user.send("\nYou are the only WEREWOLF") 
                 elif playersRole == 'MINION':
                     flag = False
                     for player_i in game:
@@ -174,7 +168,7 @@ async def on_message(message):
                             werewolf = wolfy.get_user(player_i['user_id']);
                             await user.send(f" - {werewolf.name} is a WEREWOLF")  #POVEM KDO JE WEREWOLF
                     if not flag:
-                        await user.send("You have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!")
+                        await user.send("\nYou have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!")
                 elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
                     flag = False
                     for player_i in game:
@@ -184,14 +178,16 @@ async def on_message(message):
                                 flag = True
                                 await user.send(f" - {mason.name} is a MASON")
                     if not flag:
-                        await user.send("You are the only MASON")
-        night_role = 4; #villager, werewolf, minion, mason, next ROBBER
+                        await user.send("\nYou are the only MASON")
+        night_role = 4; #villager, werewolf, minion, mason, next SEER with night_role = 4
 
-        #send message to robber - his turn
+        #send message to robber - his turn  #TO GRE V "SEER" del kode
         robber = ww.find_role(game, 'ROBBER', wolfy)
         if robber != None:
-            list4msg, players4role = ww.list_players(game, 'ROBBER', wolfy)
-            msg = 'Your turn! Do you want to steal something\nEnter: robber-number\n' + list4msg;
+            list4msg, players4role = ww.list_players(game, 'ROBBER', wolfy) #določim med kom lahko robber izbira
+            print(players4role)
+            print(list4msg)
+            msg = 'Your turn! Do you want to steal from someone\nEnter: robber-number\n' + list4msg;
             await message.channel.send('ROBBER, open your 👀.')
             await robber.send(msg)
    
@@ -199,18 +195,19 @@ async def on_message(message):
     #Za vsako dinamično vlogo posebej...če igralec ni ta vloga ga Wolfy ignorira
     if message.content.startswith("robber"):
         user = wolfy.get_user(message.author.id);
-        #TEŽAVE z globalnimi spremenljivkami
+
+        
         try:
-            a = message.content[8]; 
-            ida = ww.get_id(players4role, a); 
-            idb = message.author.id;
-            print(a, ida)
             for player in game:
                 playersRole = player['role'].split(' ')[0]
                 if (playersRole == 'ROBBER') and (night_role == 4):
-                    print(game)
-                    game = switchAB(game, ida, idb)
-                    print(game)
+                    victim = message.content[8]; 
+                    id_victim = ww.get_id(players4role, victim); 
+                    id_robber = message.author.id;
+                    #print(victim, id_victim)
+                    game = ww.switchAB(game, id_victim, id_robber)
+                    #print(players4role)
+                    night_role = 5 #next 
                     break
                 elif (playersRole == 'ROBBER') and (night_role != 4):
                     await user.send('Not your turn buddy!')
@@ -298,7 +295,6 @@ async def on_message(message):
         msg = nickname + ' status: ' + klik
         await message.channel.send(str(msg))      
     
-        
 #run everything
 wolfy.run(TOKEN)
 

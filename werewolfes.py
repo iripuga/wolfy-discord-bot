@@ -180,10 +180,92 @@ def msg4user(player):
     '''
     role = player['role']
     role_name = role.split(' ')[0]
-    msg_role = f"👀\n{role}\nGo get \'em! 👋"
+    msg_role = f"👀\n{role} Go get \'em! 👋\n"
     
     return msg_role
     
+def list_players(game, rolename, wolfy):
+    '''
+    creates a number coded list of players for rober, troublemaker and others to use
+    Input:
+        game...active game data list, in dict form
+        rolename...for which role are we listing players
+        wolfy...my bot object
+    Output:
+        list4msg...string formated list for easier output
+        players4role...number coded dictionary of users for a specific role to chose from 
+    '''
+    rolename.upper()
+    tableID = [1, 2, 3]
+    list4msg = '0 - pass\n'
+    players4role = {0: "pass"}
+    i = 1
+    for player in game:
+        if (player['user_id'] not in tableID) and (player['role'].split(' ')[0] != rolename):
+            user = wolfy.get_user(player['user_id'])
+            list4msg = list4msg + str(i) + ' - '+ str(user.name) + '\n'
+            players4role[i] = user.id  #samo id je dovolj za pošiljat
+            i = i + 1
+    return list4msg, players4role
+
+def find_role(game, rolename, wolfy):
+    '''
+    Finds role in active game data, by searching for its rolename
+    Input:
+        game...game data in list, each element is a dict
+        rolename...name of a role
+        wolfy...ma bot
+    Output:
+        role_user...player who has this role assigned
+    '''
+    tableID = [1, 2, 3]
+    rolename.upper();
+    role_user = None;
+    for player in game:
+        if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
+            role_user = wolfy.get_user(player['user_id'])
+            break
+    return role_user
+
+def get_id(players4role, number):
+    '''
+    function returns player ID from number coded dict of active players
+    Input
+        players4role...dict of numbered players and their IDs
+        number...players number
+    Output
+        id...players id represented by number in players4role
+        msg...in case player fucks up input numbers
+    '''
+    if number in players4role.keys():
+        id = players4role[number]
+    else:
+        msg='ERROR: Player numbers incorrect.'
+    return id
+
+def switchAB(igame, idA, idB):
+    '''
+    Function switches roles of player A and player B and returns refreshed game 
+    Input:
+        igame...list of players each in dict format
+        idA, idB...ID numbers of players being switched
+    Output:
+        ogame...refreshed igame ro should I say reshuffled
+    '''
+    ogame = igame
+    for player in igame:
+        if player['user_id'] == idA:
+            tmpB = player['role']
+        elif player['user_id'] == idB:
+            tmpA = player['role']
+    for player in ogame:
+        if player['user_id'] == idA:
+            player['role'] = tmpB
+        elif player['user_id'] == idB:
+            player['role'] = tmpA
+    return ogame
+
+
 def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAVA SE NE UPOŠTEVA PRI !w
     '''
     Function changes status of current user to on/off. Updated dictionary is then written to hidden file .game_data.json from which this game runs

@@ -22,4 +22,6 @@ INSOMNIAC
 dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/using-discord-to-accept-input-and-execute-on-connected-clients
 
 Troubles:
-    - safety net zorca ne spusti čez!
+    - safety net zorca in nobenga druzga ne spusti čez!
+    - dodaj troublemaker, insomniac, DRUNK
+    - pisanje mora biti v kanal iz katerega izhaja ukaz '.w'

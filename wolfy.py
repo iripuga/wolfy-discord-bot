@@ -103,27 +103,6 @@ async def msg4whos_next(message, game, wolfy, nightRole):
         await msg4robber(message, game, wolfy)         
     else:
         raise ValueError(str(nightRole) + ' is not awake at night.')
-
-    '''
-                            DUMP
-    #flags for function to know which roles were already inspected in dictionary order
-    #print('msg4whos_next', night_role, order)
-    villager = False;
-    werewolf = False;
-    minion = False;
-    mason = False;
-    seer = False;
-    robber = False;
-    
-    #neccessary role numbers
-    seerrole = 4
-    robberrole = 5
-    troublerole = 6
-    drunkrole = 7
-    insomniacrole = 8
-
-    for role in order:
-    '''
     return
 
 async def safetyNet(player, user, nextRole, rolename):
@@ -149,17 +128,6 @@ async def safetyNet(player, user, nextRole, rolename):
     return issafe
 
 ##################################################################################################
-
-
-'''
-#nč ne dela to!!!
-@wolfy.command()
-async def ping(ctx, *, message):
-    #await wolfy.process_commands(message)
-    await ctx.send(message)
-'''
-
-
 
 
 ### LOGIN into guild ################################################################################
@@ -201,8 +169,8 @@ async def on_message(message):
     global next_one
 
     testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'WEREWOLF - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'SEER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+                #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'off', 'role': 'WEREWOLF - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+                #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'role': 'SEER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
                 {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
                 {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
                 {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
@@ -359,7 +327,7 @@ async def on_message(message):
         id_robber = message.author.id
         robber = wolfy.get_user(id_robber);
         _bljak, players4role = ww.list4role(game, 'ROBBER', wolfy)
-        if not game:                 
+        if not game:               
             await robber.send('The game hasn\'t started yet.')
         else:
             for player in game:
@@ -369,12 +337,11 @@ async def on_message(message):
                     break
                 else:   #past the safetyNet
                     victim = int(message.content.split('-')[1]);  #koga bomo oropal
-                    if (playersRole == 'ROBBER') and (victim == 0) and (next_one == robberatnight):
+                    if (playersRole == 'ROBBER') and (victim == 0):
                         await robber.send('It\'s your choice') #robber-pass
-                    elif (playersRole == 'ROBBER') and (next_one == robberatnight):
+                    elif (playersRole == 'ROBBER'):
                         if victim not in players4role.keys():
-                            next_one = 6
-                            await seer.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
+                            await robber.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
                             break
                         else:
                             id_victim = players4role[victim] #določim kdo je to v igri
@@ -390,7 +357,7 @@ async def on_message(message):
                                 break
                         
                     next_one = ww.whos_next(game, data);
-                    await msg4whos_next(message, game, wolfy, order, next_one)  
+                    await msg4whos_next(message, game, wolfy, next_one)  
                     break
         print('robber',next_one)
         '''
@@ -435,9 +402,11 @@ async def on_message(message):
 
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
     elif message.content == '.end':
-        try:
+        if not game:
+            table = wolfy.get_channel(TABLE)
+            await table.send('The game hasn\'t started yet.')
+        else:
             ### glavno sporočilo za vse ###
-            stupid_test = game[0]   #just to call game before sending any message
             table = wolfy.get_channel(TABLE)
             await table.send('GAME OVER\n\n')
             
@@ -456,11 +425,10 @@ async def on_message(message):
                     msg = ' - ' + player_name + ' was ' + role_name
                     await table.send(msg)
             
+            game = [] #reset
             msg = '\nTable cards were: ' + table_cards
             await table.send(msg)
-        except:
-            table = wolfy.get_channel(TABLE)
-            await table.send('The game hasn\'t started yet.')
+            
 
 ###  CHEAT CODES ###
     elif message.content == '.wolfy #iwannawin': #to bo na konc drugačen klic - GAME OVER

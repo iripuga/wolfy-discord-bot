@@ -1,5 +1,5 @@
 '''
-Edit and update .json data for werewolfes game
+Edit and update .json data for werewolfes game - ZORC wass hier
 '''
 import json
 

@@ -200,8 +200,9 @@ async def on_message(message):
     global tableID
     global next_one
 
-    testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+    testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'WEREWOLF - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'SEER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
                 {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
                 {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
                 {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
@@ -249,7 +250,7 @@ async def on_message(message):
         
         #for i in range(len(game)):
         #    game.pop()
-        game = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
+        game = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
         #print(game)
         nextRole = None   #ni še noč, villager itak spi
         
@@ -357,7 +358,6 @@ async def on_message(message):
         print('robber', next_one)                                                                            
         id_robber = message.author.id
         robber = wolfy.get_user(id_robber);
-        robberatnight = 5
         _bljak, players4role = ww.list4role(game, 'ROBBER', wolfy)
         if not game:                 
             await robber.send('The game hasn\'t started yet.')

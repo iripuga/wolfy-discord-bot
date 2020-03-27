@@ -8,7 +8,7 @@ data = {
     'members':
         [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on'}, 
          {'name': 'rok', 'user_id': 261105970548178944, 'status': 'off'},
-         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'off'},
+         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on'},
          {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off'},
          {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off'},
          {'name': 'lovric', 'user_id': 548304226988720149, 'status': 'off'},
@@ -36,5 +36,10 @@ data = {
 with open('.game_data.json', 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
 
+print('\nActive players:')
+for player in data['members']:
+    if (player['status'] == 'on') and (player['user_id'] not in [1,2,3]):
+        print(player['name'])
+print('\nCards:')
 for role in data['roles']:
     print(role['name'])

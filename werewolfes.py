@@ -10,7 +10,11 @@ import collections
 #Uvozim json podatke o igri in igralcih
 data = json.load(open('.game_data.json', 'r'))
 
-### Funkcije
+
+
+
+
+### Funkcije #####################################################################################
 def find_active(members):
     '''
     Determine who is playing by checking users ''status'' in members dict and returning list od active 'user_id''s
@@ -50,7 +54,7 @@ def assign_roles(idata=data, desires=None):
         shuffle(r_idx)  
     
     masons = 0;     #Števec MASONov poskrbim, da sta v igri dva MASONA al pa noben, ker drugač ta vloga nima smisla
-    if desires == None:     
+    if desires == None:    #vloge so določene glede na index, ki se generira na podlagi števila igralcev. Ene vloge nikoli ne pridejo na vrsto! 
         i = 0
         for member in members:  #določam vloge
             for playerID in players:
@@ -59,16 +63,27 @@ def assign_roles(idata=data, desires=None):
                     i = i + 1
                     rolename = roles[get_role]['name']
                     roledescription = roles[get_role]['description']
-
                     if rolename == 'MASON': #preverim, če je vsaj eden v igri
                         masons = masons + 1  
                     
+                    #prepisovanje v member seznam
                     ROLE =  rolename + ' - ' + roledescription  
                     member['role'] = ROLE
+                    if (rolename in ['VILLAGER', 'WEREWOLF', 'MINION', 'MASON']):
+                        member['played'] = True #teli itak špilajo že v .w
+                    else:
+                        member['played'] = False #Za dinamičen del igre - če vloga še ni bila na vrsti je to False
                     assigned_roles.append(member)
                 else:
                     pass
     else:
+        '''
+        Vloge določam glede na index v seznamu roles. 
+        Ker nas je samo 9 igralcev(z mizami vred) ne moremo nikoli 
+        dobiti vloge od Troublemakerja naprej. 
+        Nekaj za razmislit, ko bom uvajal desires.
+        ...definitivno bo to potrebno
+        '''
         raise NotImplementedError('No desires!')
     
     #ne sme bit samo en MASON...DVA al pa NIČ
@@ -98,18 +113,16 @@ def list_active_id(game_roles):
         else:
             justid.append(int(key))
     return justid
+    
 
-def msg4user(player):
-    #Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem uporabniku
-    role = player['role']
-    role_name = role.split(' ')[0]
-    msg_role = f"👀\n{role} Go get \'em! 👋\n"
-    
-    return msg_role
-    
-def next_role(game, rolename, wolfy):
+
+
+
+
+### DYNAMIC stuff with wolfy and users ##################################################################
+def list4role(game, rolename, wolfy):
     '''
-    creates a number coded list of players for seer, rober, troublemaker and others to use
+    creates a number coded list of players for seer, rober, troublemaker to use\n
     Input:
         game...active game data list, in dict form
         rolename...for which role are we listing players
@@ -137,7 +150,7 @@ def next_role(game, rolename, wolfy):
     
     return msg, players4role
 
-def find_role(game, rolename, wolfy):
+def find_role_user(game, rolename, wolfy):
     '''
     Finds role in active game data, by searching for its rolename. Returns discord object User
     Input:
@@ -187,27 +200,7 @@ def switch(igame, idA, idB):
             switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
     return ogame, switched
 
-def at_night(game, data): #lahko bi dodal, da samo vprašam kdo je naslednji
-    '''
-    vrne seznam vlog, ki se po vrsti prebujajo ponoči
-    Input:
-        game...list igralcev in njihovih vlog
-        data...podatki o vlogah
-    Output:
-        roles_order...seznam vlog za ponoč
-    '''
-    unsorted = {}
-    cards = data['roles'] #role cards
-    for player in game:
-        active_role = player['role'].split(' ')[0]
-        for card in cards:
-            if card['night_order'] != None:
-                if card['name'] == active_role:
-                    unsorted[card['name']] = card['night_order']
-    night_order = collections.OrderedDict(sorted(unsorted.items()))
-    return night_order
-
-def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAVA SE NE UPOŠTEVA PRI !w
+def change_status(data, user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
     '''
     Function changes status of current user to on/off. Updated dictionary is then written to hidden file .game_data.json from which this game runs
     Input:
@@ -231,7 +224,49 @@ def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAV
         json.dump(data, f, ensure_ascii=False, indent=4)
         
     return klik #to je trenutno stanje za vhodni user_id
-        
+
+def whos_next(game, data):
+    '''
+    Vrne next_role, ki je naslednji na vrsti ob upoštevanju prejšnjih vlog.
+    Vsakič, ko se ta funkcija kliče se tudi premakne eno vlogo naprej. Če jo kličem 5x preskočim 5 vlog.
+    Določim seznam vlog, ki se po vrsti prebujajo ponoči. Izpustim, tiste ki
+    so že porihtane ob začetku igre(villager-None, werewolf-1, minion-2 in mason-3) 
+    Deluje le za dinamične vloge, ker so statične zrihtane v .w\n
+    Input:
+        game, data...current game, data about roles(json)
+    Important vars:
+        active_roles_order...seznam vlog, za ponoč v vrstnem redu
+        night...slovar {'rolename':'night_order'}
+    Output:
+        next_role...naslednji night_role, tip int
+    '''
+    night = {}; active_roles_order = [] #hranim iste podatke samo na drugačen način
+    cards = data['roles'] #role cards
+    for player in game:
+        if player['played'] == False:   #samo če še ni igral bo v končnem seznamu
+            active_role = player['role'].split(' ')[0]
+            for card in cards: #izpuščam statične vloge in sestavljam slovar vlog {'rolename':night_order}
+                if (card['night_order'] != None) and (card['night_order'] > 3): #spustim prve 4
+                    if card['name'] == active_role:
+                        night[card['name']] = card['night_order'] #dodam aktivno, še neigrano vlogo
+    
+    nightOrder = collections.OrderedDict(sorted(night.items(), key=lambda t:t[1]))
+    
+    for active in nightOrder:
+        active_roles_order.append(active)
+    #print('b', night)
+    #print('a', active_roles_order)
+
+    #ta prva dinamična vloga je SEER 
+    #active, active_roles_order = at_night(game, data) #slovar, urejen seznam vseh aktivnih vlog
+    next_rolename = active_roles_order[0]   #noben od teh še ni igral
+    for player in game:
+        playersRole = player['role'].split(' ')[0]
+        if playersRole == next_rolename:
+            next_role = playersRole #tuki dobim številko, ki pove katera vloga je na vrsti
+            player['played'] = True #ta igralec je zdaj zabeležen, kot da je že odigral
+        #od zdaj naprej KODIRAM direkt z imeni, saj so že po vrsti urejena v seznam
+    return next_role
 
 
 
@@ -247,62 +282,22 @@ def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAV
 
 
 ### For testing
-testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.'}, {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
+testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
+            {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+            {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
+            {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
+            {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
 ida = 689399469090799848
 idb = 593722710706749441
 game = testgame#assign_roles(data)    #dict of active player:roles
-night = at_night(game, data)
-#print(night)
+#nightrole = int(input('which role turn? '))
+#for playa in game:
+    #print(playa['role'].split(' ')[0], playa['played'])
+nextrole = whos_next(game, data)
+#print('\n',nextrole,'\n')
 
-#print('SEER' in night.keys())
-'''
-justroles = list_active_roles(game)
-justid = list_active_id(game)
-print(game)
-print()
-print(justroles)
-print(justid)
-#print(type(justid[0]),'\n')
-print(msg1, msg2)
-i = 0
-for player in active.keys():
-    player = str(player)
-    print(f'{player} is #{active[player]}')
-'''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#for playa in game:
+    #print(playa['role'].split(' ')[0], playa['played'])
 
 ####################################################### DUMP #####################################################
 '''
@@ -339,5 +334,26 @@ def _assign_roles0(idata=data, desires=None):
         raise NotImplementedError('No desires!') #Tukaj pridejo želje
         
     return assigned  #dodeljene vloge
+
+def at_night(game, data): #lahko bi dodal, da samo vprašam kdo je naslednji
+    Vrne seznam vlog, ki se po vrsti prebujajo ponoči. Izpustim, tiste ki
+    so že porihtane ob začetku igre(villager-None, werewolf-1, minion-2 in mason-3) 
+    Vars:
+        active_roles_order...seznam vlog, za ponoč v vrstnem redu
+        night...slovar {'rolename':'night_order'}
+    night = {}
+    active_roles_order = []
+    cards = data['roles'] #role cards
+    for player in game:
+        if player['played'] == False:   #samo če še ni igral bo v končnem seznamu
+            active_role = player['role'].split(' ')[0]
+            for card in cards: #izpuščam statične vloge in sestavljam slovar vlog {'rolename':night_order}
+                if (card['night_order'] != None) and (card['night_order'] > 3):# and (card['night_order'] != 1) and (card['night_order'] != 2) and (card['night_order'] != 3):
+                    if card['name'] == active_role:
+                        night[card['name']] = card['night_order']
+    nightOrder = collections.OrderedDict(sorted(night.items(), key=lambda t:t[1]))
+    for active in nightOrder:
+        active_roles_order.append(active)
+    return night, active_roles_order
 '''
 ################################################################################################################

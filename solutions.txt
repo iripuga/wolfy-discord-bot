@@ -8,8 +8,8 @@ Implement roles:
 *WEREWOLF
 *MASON
 *MASON
-SEER
-ROBBER
+*SEER
+*ROBBER
 TROUBLEMAKER
 DRUNK
 INSOMNIAC
@@ -17,4 +17,9 @@ INSOMNIAC
 *HUNTER - če na koncu izpišem vse vloge je zrihtan
 *TANNER
 
+
+
 dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/using-discord-to-accept-input-and-execute-on-connected-clients
+
+Troubles:
+    - safety net zorca ne spusti čez!

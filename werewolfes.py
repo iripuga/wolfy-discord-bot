@@ -5,6 +5,7 @@ Modul za igro werewolfes preko discorda.
 from random import shuffle, randint
 from numpy import linspace
 import json
+import collections
 
 #Uvozim json podatke o igri in igralcih
 data = json.load(open('.game_data.json', 'r'))
@@ -26,78 +27,7 @@ def find_active(members):
             pass        #tisti, ki se nočjo igrat jih izpustim
             
     return players
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-####################################################### DUMP #####################################################
-'''
-def _assign_roles0(idata=data, desires=None):   
-    
-    Shuffle new roles for another game of werewolfes
-    Input:
-        idata...role and members data dictionary(look up)
-        desires...list of desired roles which must match len(players)
-    Output:
-        assigned...dict of reshuffled 'roles with ther description' in one string. Format is {'user_id': 'role-description'}.
-    
-    #init variables
-    assigned = {}
-    playersID = activate(data['members']) #get list of active player id's which need role assignment
-    roles = data['roles']
-    r_idx = []
-    
-    #določim indexe za vloge iz seznama members. samo toliko kot je igralcev v igri
-    for num in range(len(playersID)):   
-        r_idx.append(num)
-    for i in range(1351):   #every day i'm shuffling...premiksam, da je izbira vlog naključna
-        shuffle(r_idx)  
-        
-    #Če ma kdo kake želje katere vloge naj bodo v igri, je zdaj čas, da pove    
-    if desires == None:
-        i = 0
-        for playerID in playersID:
-            get_role = int(r_idx[i]) #poiščem vlogo glede na index v seznamu premešanih indeksov
-            i = i + 1
-            ROLE = roles[get_role]['name'] + ' - ' + roles[get_role]['description']
-            assigned[str(playerID)] =  ROLE    #sproti dodajam nove elemente v slovar 
-    else:
-        raise NotImplementedError('No desires!') #Tukaj pridejo želje
-        
-    return assigned  #dodeljene vloge
-'''
-################################################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 def assign_roles(idata=data, desires=None):
     '''
     Shuffle new roles for another game of werewolfes. Append roles to dictionary 'members'.
@@ -170,34 +100,27 @@ def list_active_id(game_roles):
     return justid
 
 def msg4user(player):
-    '''
-    Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem uporabniku
-    Input:
-        player...slovar - podatki o igralcu
-    Output:
-        msg_role...sporočilo, ki gre direkt v await user.send()
-        sameRoles...dict of players with same role {rolename: [ID of players with this role]}
-    '''
+    #Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem uporabniku
     role = player['role']
     role_name = role.split(' ')[0]
     msg_role = f"👀\n{role} Go get \'em! 👋\n"
     
     return msg_role
     
-def list_players(game, rolename, wolfy):
+def next_role(game, rolename, wolfy):
     '''
-    creates a number coded list of players for rober, troublemaker and others to use
+    creates a number coded list of players for seer, rober, troublemaker and others to use
     Input:
         game...active game data list, in dict form
         rolename...for which role are we listing players
         wolfy...my bot object
     Output:
-        list4msg...string formated list for easier output
+        msg...for our user(depends on rolename)
         players4role...number coded dictionary of users for a specific role to chose from 
     '''
     rolename.upper()
     tableID = [1, 2, 3]
-    list4msg = '0 - pass\n'
+    list4msg = '0 - pass\n'         #list4msg...string formated list for easier output
     players4role = {0: "pass"}
     i = 1
     for player in game:
@@ -206,17 +129,23 @@ def list_players(game, rolename, wolfy):
             list4msg = list4msg + str(i) + ' - '+ str(user.name) + '\n'
             players4role[i] = user.id  #samo id je dovolj za pošiljat
             i = i + 1
-    return list4msg, players4role
+
+    if rolename == 'SEER':
+        msg = 'Your turn! Who\'s card shall we peak? For table enter two numbers.\nCommand: seer-number\n' + list4msg
+    elif rolename == 'ROBBER':
+        msg = 'Your turn! Do you want to steal from someone\nCommand: robber-number\n' + list4msg            #send message to robber - his turn 
+    
+    return msg, players4role
 
 def find_role(game, rolename, wolfy):
     '''
-    Finds role in active game data, by searching for its rolename
+    Finds role in active game data, by searching for its rolename. Returns discord object User
     Input:
         game...game data in list, each element is a dict
         rolename...name of a role
         wolfy...ma bot
     Output:
-        role_user...player who has this role assigned
+        role_user...discord object User - player who has this role assigned
     '''
     tableID = [1, 2, 3]
     rolename.upper();
@@ -258,6 +187,25 @@ def switch(igame, idA, idB):
             switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
     return ogame, switched
 
+def at_night(game, data): #lahko bi dodal, da samo vprašam kdo je naslednji
+    '''
+    vrne seznam vlog, ki se po vrsti prebujajo ponoči
+    Input:
+        game...list igralcev in njihovih vlog
+        data...podatki o vlogah
+    Output:
+        roles_order...seznam vlog za ponoč
+    '''
+    unsorted = {}
+    cards = data['roles'] #role cards
+    for player in game:
+        active_role = player['role'].split(' ')[0]
+        for card in cards:
+            if card['night_order'] != None:
+                if card['name'] == active_role:
+                    unsorted[card['name']] = card['night_order']
+    night_order = collections.OrderedDict(sorted(unsorted.items()))
+    return night_order
 
 def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAVA SE NE UPOŠTEVA PRI !w
     '''
@@ -283,20 +231,30 @@ def change_status(data, user_id): #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MENJAV
         json.dump(data, f, ensure_ascii=False, indent=4)
         
     return klik #to je trenutno stanje za vhodni user_id
-    
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### For testing
-testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.'}, {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
+testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.'}, {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}, {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.'}]
 ida = 689399469090799848
 idb = 593722710706749441
-g = testgame#assign_roles(data)    #dict of active player:roles
-global ga
-ga, msg = switch(g, ida, idb)
+game = testgame#assign_roles(data)    #dict of active player:roles
+night = at_night(game, data)
+#print(night)
 
-for i in range(len(ga)):
-    tmp = ga.pop()
-    #ga[i] = {}
-print(ga)
+#print('SEER' in night.keys())
 '''
 justroles = list_active_roles(game)
 justid = list_active_id(game)
@@ -311,3 +269,75 @@ for player in active.keys():
     player = str(player)
     print(f'{player} is #{active[player]}')
 '''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####################################################### DUMP #####################################################
+'''
+def _assign_roles0(idata=data, desires=None):   
+    
+    Shuffle new roles for another game of werewolfes
+    Input:
+        idata...role and members data dictionary(look up)
+        desires...list of desired roles which must match len(players)
+    Output:
+        assigned...dict of reshuffled 'roles with ther description' in one string. Format is {'user_id': 'role-description'}.
+    
+    #init variables
+    assigned = {}
+    playersID = activate(data['members']) #get list of active player id's which need role assignment
+    roles = data['roles']
+    r_idx = []
+    
+    #določim indexe za vloge iz seznama members. samo toliko kot je igralcev v igri
+    for num in range(len(playersID)):   
+        r_idx.append(num)
+    for i in range(1351):   #every day i'm shuffling...premiksam, da je izbira vlog naključna
+        shuffle(r_idx)  
+        
+    #Če ma kdo kake želje katere vloge naj bodo v igri, je zdaj čas, da pove    
+    if desires == None:
+        i = 0
+        for playerID in playersID:
+            get_role = int(r_idx[i]) #poiščem vlogo glede na index v seznamu premešanih indeksov
+            i = i + 1
+            ROLE = roles[get_role]['name'] + ' - ' + roles[get_role]['description']
+            assigned[str(playerID)] =  ROLE    #sproti dodajam nove elemente v slovar 
+    else:
+        raise NotImplementedError('No desires!') #Tukaj pridejo želje
+        
+    return assigned  #dodeljene vloge
+'''
+################################################################################################################

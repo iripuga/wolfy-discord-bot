@@ -1,7 +1,6 @@
 '''
 Modul za igro werewolfes preko discorda.
 '''
-
 from random import shuffle, randint
 from numpy import linspace
 import json
@@ -9,10 +8,6 @@ import collections
 
 #Uvozim json podatke o igri in igralcih
 data = json.load(open('.game_data.json', 'r'))
-
-
-
-
 
 ### Funkcije #####################################################################################
 def find_active(members):
@@ -114,11 +109,6 @@ def list_active_id(game_roles):
             justid.append(int(key))
     return justid
     
-
-
-
-
-
 ### DYNAMIC stuff with wolfy and users ##################################################################
 def list4role(game, rolename, wolfy):
     '''
@@ -144,10 +134,17 @@ def list4role(game, rolename, wolfy):
             i = i + 1
 
     if rolename == 'SEER':
-        msg = 'Your turn! Who\'s card shall we peak? For table enter two numbers.\nCommand: seer-number\n' + list4msg
+        msg1 = 'Your turn! Who\'s card shall we peak? For table enter two numbers.\n' + list4msg + '\n'
+        msg2 = '\nCOMMAND: w.seer <players number>\n'
     elif rolename == 'ROBBER':
-        msg = 'Your turn! Do you want to steal from someone\nCommand: robber-number\n' + list4msg            #send message to robber - his turn 
-    
+        msg1 = 'Your turn! Do you want to steal from someone\n' + list4msg + '\n'       #send message to robber - his turn 
+        msg2 = '\nCOMMAND: w.robber <players number>\n'
+    elif rolename == 'TROUBLEMAKER':
+        msg1 = 'Your turn! Let\'s make some mess and switch two players.\n' + list4msg + '\n'
+        msg2 = '\nCOMMAND: w.troublemaker <player number 1> <player number 2>\n'
+
+
+    msg = [msg1, msg2]
     return msg, players4role
 
 def find_role_user(game, rolename, wolfy):

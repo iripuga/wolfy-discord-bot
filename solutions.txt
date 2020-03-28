@@ -23,5 +23,8 @@ dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/u
 
 Troubles:
     - safety net zorca in nobenga druzga ne spusti čez!
+        - odvisno od zaporedja v game pa ne bi smelo bit
+
     - dodaj troublemaker, insomniac, DRUNK
     - pisanje mora biti v kanal iz katerega izhaja ukaz '.w'
+    - dvakrat pošlje sporočilo vlogi, ko jo igraš

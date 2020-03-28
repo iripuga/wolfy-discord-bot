@@ -95,7 +95,7 @@ def list_active_roles(game_roles):
     justroles=''
     for player in game_roles:
         role = player['role'].split(' ')[0]
-        justroles = justroles + role + '\n'
+        justroles = justroles + ' - ' + role + '\n'
     return justroles
     
 def list_active_id(game_roles):
@@ -123,33 +123,51 @@ def list4role(game, rolename, wolfy):
     '''
     rolename.upper()
     tableID = [1, 2, 3]
-    list4msg = '0 - pass\n'         #list4msg...string formated list for easier output
+    list4msg = ' - Abstain from your power: <w.rolename abstain>\n'         #list4msg...string formated list for easier output
     players4role = {0: "pass"}
     i = 1
     for player in game:
         if (player['user_id'] not in tableID) and (player['role'].split(' ')[0] != rolename):
             user = wolfy.get_user(player['user_id'])
-            list4msg = list4msg + str(i) + ' - '+ str(user.name) + '\n'
+            list4msg = list4msg + ' - '+ str(user.name) + '\n'
             players4role[i] = user.id  #samo id je dovolj za pošiljat
             i = i + 1
 
+    #prettier output 
+    #nice = '```yaml\n---------------------------------------------------------------------------------------\n```' 
     if rolename == 'SEER':
-        msg1 = 'Your turn! Who\'s card shall we peak? For table enter two numbers.\n' + list4msg + '\n'
-        msg2 = '\nCOMMAND: w.seer <players number>\n'
+        nice = 'Your turn! Which cards shall we peek? Card from one player or two cards from table.\n' + list4msg
+        msg1 = f'```nice\n{nice}\n```'
+        command = 'COMMAND: w.seer <player> or w.seer <table#> <table#>'
+        msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'ROBBER':
-        msg1 = 'Your turn! Do you want to steal from someone\n' + list4msg + '\n'       #send message to robber - his turn 
-        msg2 = '\nCOMMAND: w.robber <players number>\n'
+        nice = 'Your turn! Do you want to steal from someone\n' + list4msg     #send message to robber - his turn 
+        msg1 = f'```nice\n{nice}\n```'
+        command = 'COMMAND: w.robber <player>'
+        msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'TROUBLEMAKER':
-        msg1 = 'Your turn! Let\'s make some mess and switch two players.\n' + list4msg + '\n'
-        msg2 = '\nCOMMAND: w.troublemaker <player number 1> <player number 2>\n'
+        nice = 'Your turn! Let\'s make some mess and switch two players.\n' + list4msg
+        msg1 = f'```nice\n{nice}\n```'
+        command = 'COMMAND: w.troublemaker <player1> <player2>'
+        msg2 = f'```yaml\n{command}\n```'
+    elif rolename == 'DRUNK':
+        nice = 'Your\'re too drunk to do anything really, but you can take one table card.\n' + list4msg
+        msg1 = f'```nice\n{nice}\n```'
+        command = 'COMMAND: w.drunk'
+        msg2 = f'```yaml\n{command}\n```'
+    elif rolename == 'INSOMNIAC':
+        nice = 'Your turn! Check if you still have trouble sleeping.\n' + list4msg
+        msg1 = f'```nice\n{nice}\n```'
+        command = 'COMMAND: w.drunk'
+        msg2 = f'```yaml\n{command}\n```'
 
 
-    msg = [msg1, msg2]
+    msg = msg1 + msg2
     return msg, players4role
 
 def find_role_user(game, rolename, wolfy):
     '''
-    Finds role in active game data, by searching for its rolename. Returns discord object User
+    Finds role in active game data, by searching for its rolename. Returns discord object User\n
     Input:
         game...game data in list, each element is a dict
         rolename...name of a role
@@ -353,4 +371,4 @@ def at_night(game, data): #lahko bi dodal, da samo vprašam kdo je naslednji
         active_roles_order.append(active)
     return night, active_roles_order
 '''
-################################################################################################################
+##################################################################################################################

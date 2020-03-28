@@ -56,9 +56,35 @@ GUILD = int(GUILD)
 ### FUNKCIJE #####################################################################################
 def msg4user(player):
     #Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem vsakemu uporabniku
+    playername = player['name']
     role = player['role']
-    role_name = role.split(' ')[0]
-    msg_role = f"👀\n{role} Go get \'em! 👋\n"
+    rolename = role.split(' ')[0]
+    if playername == 'zorkoporko':
+        emoji = {'villager':':neutral_face:',
+                'werewolf':':wolf:',
+                'minion':':smiling_imp:',
+                'mason':':police_officer:',
+                'seer':':eye:',
+                'robber':':detective:',
+                'troublemaker':':performing_arts:',
+                'drunk':':tumbler_glass:',
+                'insomniac':':man_in_manual_wheelchair:',
+                'hunter':':gun:',
+                'tanner':':poop:'}
+    else:
+        emoji = {'villager':':neutral_face:',
+                'werewolf':':wolf:',
+                'minion':':smiling_imp:',
+                'mason':':police_officer:',
+                'seer':':eye:',
+                'robber':':detective:',
+                'troublemaker':':performing_arts:',
+                'drunk':':beers:',
+                'insomniac':':sleeping_accommodation:',
+                'hunter':':gun:',
+                'tanner':':poop:'}
+
+    msg_role = f"{emoji[rolename.lower()]} {role} Go get \'em! :muscle:\n"
     
     return msg_role
 
@@ -67,9 +93,8 @@ async def msg4seer(message, game, wolfy):
     table = wolfy.get_channel(TABLE)
     if seer != None:
         msg, _bljak = ww.list4role(game, 'SEER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
-        await table.send('SEER, open your 👀.')
-        await seer.send(msg[0])
-        await seer.send(msg[1])
+        await table.send('SEER, open your  👀')
+        await seer.send(msg)
 
 
 async def msg4robber(message, game, wolfy):
@@ -77,9 +102,8 @@ async def msg4robber(message, game, wolfy):
     table = wolfy.get_channel(TABLE)
     if robber != None:
         msg, _bljak = ww.list4role(game, 'ROBBER', wolfy) #določim med kom lahko robber izbira
-        await table.send('ROBBER, open your 👀.')
-        await robber.send(msg[0])
-        await robber.send(msg[1])
+        await table.send('ROBBER, open your  👀')
+        await robber.send(msg)
 
 async def msg4whos_next(message, game, wolfy, nightRole):
     '''
@@ -129,7 +153,7 @@ async def safetyNet(game, user, currentRole, rolename):
             playersRole = player['role'].split(' ')[0]
 
     #the net
-    print('playersRole: ', playersRole, ' <> ','currentRole:', currentRole, ' <> ','role2protect:', rolename, end='')
+    print('playersRole: ', playersRole, ' <> ','currentRole:', currentRole, ' <> ','role2protect:', rolename, '\n', end='')
     if (playersRole == rolename) and (currentRole == rolename):
         issafe = True   #če se nič zgoraj ne zgodi pol ukaz uporablja ta prava vloga, takrat ko je na vrsti
     elif (playersRole == rolename) and (currentRole != rolename):  #če nisi na vrsti drugi pogoj ne velja
@@ -182,9 +206,19 @@ async def on_message(message):
     global tableID
     global next_one
 
+                                            ### TODO - rabim funkcijo errorHandler ###
+                                            ### TODO - ko zajebe mu vrnem error message
+    errors = ['Mission failed succesfully!',  #za tiste, ki ne znajo vnašat wolfy ukaze - izbiram random
+              'Well done! Somehow you fucked up...',
+              'As\' si mau duška dau?!',
+              'Ma goni se!',
+              'Bemti nanule, kristusove opanke...',
+              'Pišuka Polde, ni to prava komanda']
+    specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ne znaš komandirat, jarane."']  #najprej prvi msg, počakam 3s, pošljem drugi error
+
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'WEREWOLF - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
                 #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'role': 'SEER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
                 {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
                 {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
@@ -239,8 +273,9 @@ async def on_message(message):
         
         #adding nicknames
         justroles = ww.list_active_roles(game)  #katere vloge so v igri
-        msg = 'New game - active roles:\n' + justroles + '\nassigning roles...\n'
-        await message.channel.send(msg) 
+        msg = 'NewGame:\n' + justroles + '\nassigning roles...'
+        beautifulmsg = f'```yaml\n{msg}\n```'
+        await message.channel.send(beautifulmsg) 
         time.sleep(1);
 
         for player in game:
@@ -318,14 +353,20 @@ async def on_message(message):
                         await seer.send('Well done! Somehow you fucked up...'); #če ni številka - NI TOK NUJNO TO MET
                     else:
                         looknum = int(message.content.split(' ')[1])    #kjero cifro si zbral
-                        if looknum == 0: 
-                            await seer.send('It\'s your choice') #seer-pass
+                        if looknum == 7350: 
+                            await seer.send('Abstinence is your choice.') #seer-pass
 
                         elif len(str(looknum)) == 1: #ko vpišeš eno številko - to je če hočeš videt playerja
                             if looknum not in players4seer.keys():
                                 await seer.send('Well done! Somehow you fucked up...'); #If you fuck up the seer number we move on
                             else:
-                                await seer.send('You will see in a minute ;) - ' + str(looknum))
+                                hiddenPlayerID = players4seer[looknum]        #get hidden players id
+                                user = wolfy.get_user(hiddenPlayerID)
+                                hiddenPlayer = user.name #ime tistga, ki ima vlogo lookatrole
+                                for playa in game:
+                                    if playa['user_id'] == user.id:
+                                        hiddenRole = playa['role']
+                                await seer.send(hiddenPlayer + ' is a ' + hiddenRole)   #show hiddenPlayer
                         elif len(str(looknum)) == 2:#dve številki za mizo
                             await seer.send('You will see two table cards in a minute ;)')
                         else:
@@ -354,29 +395,29 @@ async def on_message(message):
                     break
                 else:   #past the safetyNet
                     victim = int(message.content.split(' ')[1]);  #koga bomo oropal
-                    if (playersRole == 'ROBBER') and (victim == 0):
-                        await robber.send('It\'s your choice') #robber-pass
+                    if (playersRole == 'ROBBER') and (victim == 7350):
+                        await robber.send('Abstinence is your choice.') #robber-pass
                     elif (playersRole == 'ROBBER'):
                         if victim not in players4role.keys():
                             await robber.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
                             break
                         else:
                             id_victim = players4role[victim] #določim kdo je to v igri
-
+                            print(id_victim)
                             game, switch_msg = ww.switch(game, id_robber, id_victim)   #rob the victim
                             print('ROBBER', switch_msg) #v terminalu vidim kdo je koga zamenjal
                             #game = list(game) in case game becomes tuple somehow???
                             for player_i in game:
-                                if player_i['user_id'] == id_robber:
+                                if player_i['user_id'] == robber.id:
                                     new_role = player['role']
                                     msg = 'Great! You are now ' + new_role
                                     await robber.send(msg)
                                     break
                         
-                    next_one = ww.whos_next(game, data);
-                    print('robber-end',next_one, '\n')
-                    await msg4whos_next(message, game, wolfy, next_one)  
-                    break
+                            next_one = ww.whos_next(game, data);
+                            print('robber-end',next_one, '\n')
+                            await msg4whos_next(message, game, wolfy, next_one)  
+                            break
 
     if message.content.startswith('.troublemaker'):
         pass
@@ -421,26 +462,27 @@ async def on_message(message):
         else:
             ### glavno sporočilo za vse ###
             table = wolfy.get_channel(TABLE)
-            await table.send('GAME OVER\n\n')
+            
             
             #v channel #table prikažem kdo je bil kdo 
-            table_cards = ''
+            msg = 'GameOver:\n'
+            table_cards = '\nTable cards were\n'
             for player in game:
                 playerID = player['user_id']
                 user = wolfy.get_user(playerID)
                 #show table cards
                 if playerID in tableID:
                     role_name = player['role'].split(' ')[0]
-                    table_cards = ' - ' + table_cards + '\n' + role_name
+                    table_cards = table_cards + ' - ' + role_name + '\n'
                 else:
                     player_name = user.name
                     role_name = player['role'].split(' ')[0]
-                    msg = ' - ' + player_name + ' was ' + role_name
-                    await table.send(msg)
-            
-            game = [] #reset
-            msg = '\nTable cards were:\n' + table_cards
-            await table.send(msg)
+                    msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'
+            game = [] #reset game
+
+            msg = msg + table_cards
+            beautifulmsg = f'```yaml\n{msg}\n```'
+            await table.send(beautifulmsg)
             
 
 ###  CHEAT CODES ###

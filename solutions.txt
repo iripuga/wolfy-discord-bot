@@ -18,13 +18,15 @@ INSOMNIAC
 *TANNER
 
 
-
+colorful messages -> https://www.techuntold.com/colorful-rainbow-text-discord/
 dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/using-discord-to-accept-input-and-execute-on-connected-clients
 
-Troubles:
-    - safety net zorca in nobenga druzga ne spusti čez!
-        - odvisno od zaporedja v game pa ne bi smelo bit
+Bugs and TODO:
+    *- BUG <safety net zorca in nobenga druzga ne spusti čez! - odvisno od zaporedja v game pa ne bi smelo bit>
 
     - dodaj troublemaker, insomniac, DRUNK
     - pisanje mora biti v kanal iz katerega izhaja ukaz '.w'
-    - dvakrat pošlje sporočilo vlogi, ko jo igraš
+    - BUG <dvakrat pošlje sporočilo vlogi, ko jo igraš>
+    - ROBBER, če se zamenjaš z vlogo, ti pošlje command msg tudi od nove vloge
+    - SEER ni še narjen za namizne karte
+    - ne uporabljam številk ampak kar imena uporabnikov povsod(lažje za uporabljat), odstrani kodiranje s številkami

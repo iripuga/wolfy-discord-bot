@@ -165,7 +165,7 @@ def list4role(game, rolename, wolfy):
     msg = msg1 + msg2
     return msg, players4role
 
-def findUser(game, wolfy, searchPar, method='byRolename'):
+def findUser(game, wolfy, searchPar, method='by_rolename'):
     '''
     Finds role in active game data, by searching for its rolename. Returns discord object User\n
     Input:
@@ -173,13 +173,14 @@ def findUser(game, wolfy, searchPar, method='byRolename'):
         searchPar...search parameter to help me find my user. Possible combinations:\n
          - par2find = rolename, method='byRolename'
          - par2find = discord username, method='byUsername'
+         - par2find = 'tableCard#', method='onTable' !!!Tukaj izjemoma vrnem kar id, ker ne morem narest wolfy objekta!!!
         wolfy...ma bot
         method...na kakšen način iščem uporabnika
     Output:
         user...discord object User - player who we are looking for by searchPar
     '''
     tableID = [1, 2, 3]
-    if method == 'byRolename':
+    if method == 'by_rolename':
         rolename = searchPar
         rolename.upper();
         user = None;
@@ -187,12 +188,20 @@ def findUser(game, wolfy, searchPar, method='byRolename'):
             if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
                 user = wolfy.get_user(player['user_id'])
                 break
-    elif method == 'byUsername':
+    elif method == 'by_username':
         username = searchPar
         for player in game:
             if (player['name'] == username) and (player['user_id'] not in tableID):
                 user = wolfy.get_user(player['user_id'])
                 break
+    elif method == 'on_table':
+        tableCard = searchPar #tista karta, s katero moram neki ponoč narest
+        for player in game:
+            if player['user_id'] in tableID:
+                if player['name'] == tableCard:
+                    card_id = player['user_id']
+                    break
+        return card_id
     else:
         raise NotImplementedError('Method unknown in findUser().')
     return user

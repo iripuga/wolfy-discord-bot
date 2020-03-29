@@ -10,9 +10,9 @@ Implement roles:
 *MASON
 *SEER
 *ROBBER
-TROUBLEMAKER
-DRUNK
-INSOMNIAC
+*TROUBLEMAKER
+*DRUNK
+*INSOMNIAC
 *MINION
 *HUNTER - če na koncu izpišem vse vloge je zrihtan
 *TANNER
@@ -24,9 +24,9 @@ dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/u
 Bugs and TODO:
     *- BUG <safety net zorca in nobenga druzga ne spusti čez! - odvisno od zaporedja v game pa ne bi smelo bit>
 
-    - dodaj troublemaker, insomniac, DRUNK
-    - pisanje mora biti v kanal iz katerega izhaja ukaz '.w'
+    - dodaj troublemaker, insomniac, drunk komande v on_message()
+    *- pisanje mora biti v kanal iz katerega izhaja ukaz '.w'
     - BUG <dvakrat pošlje sporočilo vlogi, ko jo igraš>
     - ROBBER, če se zamenjaš z vlogo, ti pošlje command msg tudi od nove vloge
-    - SEER ni še narjen za namizne karte
-    - ne uporabljam številk ampak kar imena uporabnikov povsod(lažje za uporabljat), odstrani kodiranje s številkami
+    *- SEER ni še narjen za namizne karte
+    *- ne uporabljam številk ampak kar imena uporabnikov povsod(lažje za uporabljat), odstrani kodiranje s številkami

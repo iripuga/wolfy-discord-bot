@@ -1,9 +1,13 @@
-global data
+###   TODO  ###
+# - ko zajebe mu vrnem error message
+# - rabim funkcijo errorHandler
+# # # # # # # #
+
+global data #.game_data.json
 global game #this will be my main game dict in which all will happen - TA JE NUJNA, ostale niti ne tolk
+global next_one #hranim ime vloge, ki je naslednja na vrsti - tut nujno
+global CHANNEL #kanal v katerem igralci igrajo
 game = []
-global tableID 
-tableID = [1, 2, 3] #ID od table slotov
-global next_one #hranim ime vloge, ki je naslednja na vrsti
 next_one = ''
 
 import discord
@@ -16,7 +20,7 @@ import werewolfes as ww
 import json
 import time
 
-# heci
+### heci... ################################################################################
 vic = 'Sprehajala sem se po Hoferju, pa je en kurac pred menoj celo paleto wc papirja vleko!!! Pa sem ga natulila in mu rekla "kaj vi samo serjete doma???" Pa mi je rekel: gospa jaz delam tukaj...'
 '''
 # Če bom hotu kake evente spreminjat moram bota definirat s tem razredom
@@ -24,7 +28,22 @@ class Custom(discord.Client):
     async def overridden_fun():
         return
 '''
+errors = ['Mission failed succesfully!',  #za tiste, ki ne znajo vnašat wolfy ukaze - izbiram random
+            'Well done! Somehow you fucked up...',
+            'As\' si mau duška dau?!',
+            'Ma goni se!',
+            'Bemti nanule, kristusove opanke...',
+            'Pišuka Polde, ni to prava komanda']
+specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ne znaš komandirat, jarane."']  #najprej prvi msg, počakam 3s, pošljem drugi error
 
+'''   
+Enkrat mi bo ratal sporočilo za pozdrav - lahko je random nemška fraza iz seznama(http://streettalksavvy.com/street-talk-german-slang/german-slang-phrases/) 
+Ne rabi bit sporočilo na začetku logina, lohk je sam ena fora, ki je sprogramirana v bota. Kličeš z eno frazo in bot odgovori iz random knjižnice nemških fraz.    
+@wolfy.event
+async def on_connect():
+    await wolfy.channel.send('Ich wünsche allen Durchfall, kurze Arme, und kein Klopapier') 
+''' 
+#############################################################################################
 
 
 
@@ -82,28 +101,29 @@ def msg4user(player):
     
     return msg_role
 
-async def msg4seer(message, game, wolfy):
-    seer = ww.find_role_user(game, 'SEER', wolfy)
-    table = wolfy.get_channel(TABLE)
+async def msg4seer(message, game, channel, wolfy):
+    seer = ww.findUser(game, wolfy, 'SEER', method='byRolename')
+    table = wolfy.get_channel(channel)
     if seer != None:
         msg, _bljak = ww.list4role(game, 'SEER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
         await table.send('SEER, open your  👀')
         await seer.send(msg)
 
-async def msg4robber(message, game, wolfy):
-    robber = ww.find_role_user(game, 'ROBBER', wolfy)
-    table = wolfy.get_channel(TABLE)
+async def msg4robber(message, game, channel, wolfy):
+    robber = ww.findUser(game, wolfy, 'ROBBER', method='byRolename')
+    table = wolfy.get_channel(channel)
     if robber != None:
         msg, _bljak = ww.list4role(game, 'ROBBER', wolfy) #določim med kom lahko robber izbira
         await table.send('ROBBER, open your  👀')
         await robber.send(msg)
 
-async def msg4whos_next(message, game, wolfy, nightRole):
+async def msg4whos_next(message, game, channel, wolfy, nightRole):
     '''
     Pošlje sporočilo igralcu, ki je naslednji na vrsti. Nič ne vrne zaenkrat.\n
     Input:
         message...objekt od uporabnika, ko pošlej sporočilo v kanal
         game...aktualna igra
+        channel...kanal v katerem se igra. Tja grejo sporočila za vse.
         wolfy...ma bot
         nightRole...ime vloge, ki bi trenutno mogla bit na vrsti, type string
     '''
@@ -114,9 +134,9 @@ async def msg4whos_next(message, game, wolfy, nightRole):
     elif nightRole == 'MASON':
         pass    #zrihtano v .w
     elif nightRole == 'SEER':
-        await msg4seer(message, game, wolfy)
+        await msg4seer(message, game, channel, wolfy)
     elif nightRole == 'ROBBER':
-        await msg4robber(message, game, wolfy)
+        await msg4robber(message, game, channel, wolfy)
     elif nightRole == 'TROUBLEMAKER':
         pass#await msg4robber(message, game, wolfy)
     elif nightRole == 'DRUNK':
@@ -179,14 +199,7 @@ async def on_ready():
     )
     show_members = '\n - '.join([member.name for member in guild.members])
     print(f'Guild Members:\n - {show_members}')
-    #await wolfy.channel.send('Hallo')
-'''   
-Enkrat mi bo ratal sporočilo za pozdrav - lahko je random nemška fraza iz seznama(http://streettalksavvy.com/street-talk-german-slang/german-slang-phrases/) 
-Ne rabi bit sporočilo na začetku logina, lohk je sam ena fora, ki je sprogramirana v bota. Kličeš z eno frazo in bot odgovori iz random knjižnice nemških fraz.    
-@wolfy.event
-async def on_connect():
-    await wolfy.channel.send('Ich wünsche allen Durchfall, kurze Arme, und kein Klopapier') 
-'''     
+    #await wolfy.channel.send('Hallo')    
 ##################################################################################################
 
 
@@ -202,26 +215,16 @@ async def on_connect():
 async def on_message(message):
     global data
     global game
-    global tableID
     global next_one
-
-                                            ### TODO - rabim funkcijo errorHandler ###
-                                            ### TODO - ko zajebe mu vrnem error message
-    errors = ['Mission failed succesfully!',  #za tiste, ki ne znajo vnašat wolfy ukaze - izbiram random
-              'Well done! Somehow you fucked up...',
-              'As\' si mau duška dau?!',
-              'Ma goni se!',
-              'Bemti nanule, kristusove opanke...',
-              'Pišuka Polde, ni to prava komanda']
-    specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ne znaš komandirat, jarane."']  #najprej prvi msg, počakam 3s, pošljem drugi error
+    global CHANNEL
 
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
                 {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'WEREWOLF - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
                 #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'role': 'SEER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-                {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-                {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
+                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
 
 ### other COM stuff
     #-------------------------------------------------------------------------------------------#
@@ -267,7 +270,7 @@ async def on_message(message):
         #for i in range(len(game)):
         #    game.pop()
         game = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
-        TABLE = message.channel.id #tam kjer začnem igro, tam se bo končala
+        CHANNEL = message.channel.id #tam kjer začnem igro, tam se bo končala
         nextRole = None   #ni še noč, villager itak spi
         
         #adding nicknames
@@ -281,11 +284,12 @@ async def on_message(message):
             playerID = player['user_id']
             playersRole = player['role'].split(' ')[0]
             #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
-            if playerID in tableID:
-                print('table#' + str(playerID)+ ' ' +str(player['role'].split(' ')[0]))  #skip tables
+            if playerID in [(n+1) for n in range(3)]:
+                print(player['name'] + ' ' +str(player['role'].split(' ')[0]))  #don't send message to tableCards
             else:   
                 user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
                 print(user.name, player['role'].split(' ')[0])
+                player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
                 init_msg = msg4user(player) #lovrič me je blokiral!!! no_hello ne morem pošiljat
                 await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
 
@@ -295,7 +299,7 @@ async def on_message(message):
                 elif playersRole == 'WEREWOLF': 
                     flag = False
                     for player_i in game:
-                        if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in tableID)):
+                        if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
                             werewolf = wolfy.get_user(player_i['user_id']);
                             if werewolf != user:
                                 flag = True
@@ -306,7 +310,7 @@ async def on_message(message):
                 elif playersRole == 'MINION':
                     flag = False #da vem, če sem našel kakega volkodlaka
                     for player_i in game:
-                        if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in tableID)):
+                        if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
                             flag = True
                             werewolf = wolfy.get_user(player_i['user_id']);
                             await user.send(f' - {werewolf.name} is a WEREWOLF')  #POVEM KDO JE WEREWOLF
@@ -316,7 +320,7 @@ async def on_message(message):
                 elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
                     flag = False #davem, če sem našel kakega masona
                     for player_i in game:
-                        if (player_i['role'].split(' ')[0] == 'MASON') and (not (player_i['user_id'] in tableID)):
+                        if (player_i['role'].split(' ')[0] == 'MASON') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
                             mason = wolfy.get_user(player_i['user_id']);
                             if mason != user:
                                 flag = True
@@ -327,7 +331,7 @@ async def on_message(message):
 
         #send message to next role - his turn 
         next_one = ww.whos_next(game, data); #0-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
-        await msg4whos_next(message, game, wolfy, next_one)
+        await msg4whos_next(message, game, CHANNEL, wolfy, next_one)
         print('.w',next_one)
 
 ###  NIGHT GAME - for dynamic roles to change game cards
@@ -347,34 +351,47 @@ async def on_message(message):
                 if not safe:
                     break
                 else:   #past the safetyNet - user je definitivno seer
-                    last = message.content[-1]
-                    if last not in ['0','1','2','3','4','5','6','7','8','9']:    #če je sploh vnesena številka
-                        await seer.send('Well done! Somehow you fucked up...'); #če ni številka - NI TOK NUJNO TO MET
-                    else:
-                        looknum = int(message.content.split(' ')[1])    #kjero cifro si zbral
-                        if looknum == 7350: 
+                    look = message.content.split(' ')[1::] #spustim prvi element
+                    if len(look) == 1:    #če hoče videt igralca
+                        if look[0] == 'abstain': 
                             await seer.send('Abstinence is your choice.') #seer-pass
-
-                        elif len(str(looknum)) == 1: #ko vpišeš eno številko - to je če hočeš videt playerja
-                            if looknum not in players4seer.keys():
-                                await seer.send('Well done! Somehow you fucked up...'); #If you fuck up the seer number we move on
-                            else:
-                                hiddenPlayerID = players4seer[looknum]        #get hidden players id
-                                user = wolfy.get_user(hiddenPlayerID)
-                                hiddenPlayer = user.name #ime tistga, ki ima vlogo lookatrole
-                                for playa in game:
-                                    if playa['user_id'] == user.id:
-                                        hiddenRole = playa['role']
-                                await seer.send(hiddenPlayer + ' is a ' + hiddenRole)   #show hiddenPlayer
-                        elif len(str(looknum)) == 2:#dve številki za mizo
-                            await seer.send('You will see two table cards in a minute ;)')
+                            #send message to robber - his turn 
+                            next_one = ww.whos_next(game, data);
+                            print('seer-end:', next_one, '\n')
+                            await msg4whos_next(message, game, CHANNEL, wolfy, next_one)
+                            break
                         else:
-                            await seer.send('Well done! Somehow you fucked up...'); #If you fuck up input number we move on
-                    #send message to robber - his turn 
-                    next_one = ww.whos_next(game, data);
-                    print('seer-end:', next_one, '\n')
-                    await msg4whos_next(message, game, wolfy, next_one)
-                    break
+                            hiddenPlaya = look[0];  
+                            hiddenUser = ww.findUser(game, wolfy, hiddenPlaya, method='byUsername')
+                            for playa in game:
+                                if playa['user_id'] == hiddenUser.id:
+                                    hiddenRole = playa['role']
+                            await seer.send(hiddenPlaya + ' is a ' + hiddenRole)   #show hiddenPlayer
+                            #send message to robber - his turn 
+                            next_one = ww.whos_next(game, data);
+                            print('seer-end:', next_one, '\n')
+                            await msg4whos_next(message, game, CHANNEL, wolfy, next_one)
+                            break
+                    elif len(look) == 2: #če hoče videt karti na mizi
+                        first = ''; second = ''; #sporočila za posamezne karte
+                        for card in look:
+                            for tableCard in game:
+                                if tableCard['name'] == card:
+                                    if first == '':
+                                        first = card + ' is a ' + tableCard['role']
+                                    else:
+                                        second = card + ' is a ' + tableCard['role']
+                                        break
+                        await seer.send(first + '\n' + second);
+                        #send message to robber - his turn 
+                        next_one = ww.whos_next(game, data);
+                        print('seer-end:', next_one, '\n')
+                        await msg4whos_next(message, game, CHANNEL, wolfy, next_one)
+                        break
+                    else:   #če zajebe in neki ni prov vnesel
+                        await seer.send('Well done! Somehow you fucked up...'); #If you fuck up the seer number we move on
+                        break
+                       
           
     elif message.content.startswith('w.robber'):    ### ROBBER
         #varovala gredo lohk v funkcijo safety_net(message, game, next_one), napisana tko da se lohk večkrat uporabijo
@@ -455,25 +472,26 @@ async def on_message(message):
 
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
     elif message.content == '.end':
+        try:
+            table = wolfy.get_channel(CHANNEL)
+        except:
+            CHANNEL = 691400770557444096 #table v NoFunAllowed
+            table = wolfy.get_channel(CHANNEL)
         if not game:
-            table = wolfy.get_channel(TABLE)
             await table.send('The game hasn\'t started yet.')
         else:
             ### glavno sporočilo za vse ###
-            table = wolfy.get_channel(TABLE)
-            
-            
             #v channel #table prikažem kdo je bil kdo 
             msg = 'GameOver:\n'
             table_cards = '\nTable cards were\n'
             for player in game:
                 playerID = player['user_id']
-                user = wolfy.get_user(playerID)
                 #show table cards
-                if playerID in tableID:
+                if playerID in [(n+1) for n in range(3)]:
                     role_name = player['role'].split(' ')[0]
                     table_cards = table_cards + ' - ' + role_name + '\n'
                 else:
+                    user = wolfy.get_user(playerID)
                     player_name = user.name
                     role_name = player['role'].split(' ')[0]
                     msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'

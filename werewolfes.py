@@ -121,44 +121,43 @@ def list4role(game, rolename, wolfy):
         msg...for our user(depends on rolename)
         players4role...dict {user.name: user.id} of users for a specific role to chose from 
     '''
-    rolename.upper()
     tableID = [1, 2, 3]
-    list4msg = ' - Abstain from your power: w.<rolename> abstain\n'         #list4msg...string formated list for easier output
-    players4role = {0: "pass"}
-    i = 1
+    list4msg = f' - To abstain from your power type: <w.{rolename.lower()} abstain>\n'  #list4msg...string formated list for easier output
+    players4role = {}
     for player in game:
-        if player['role'].split(' ')[0] != rolename:  #vloga, ki je na vrsti ne sme bit na tem seznamu
-            user = wolfy.get_user(player['user_id'])
-            list4msg = list4msg + ' - '+ str(user.name) + '\n'
-            players4role[user.name] = user.id  #samo ime je dovolj za pošiljat
-            i = i + 1
-        
-
+        if player['name'] in ['tableCard' + str(n+1) for n in range(3)]:    #za tableCards ne morem narest wolfy objekta user
+            list4msg = list4msg + ' - '+ player['name'] + '\n'
+            players4role[player['name']] = player['user_id']
+        else:
+            if player['role'].split(' ')[0] != rolename:  #vloga, ki je na vrsti ne sme bit na tem seznamu
+                user = wolfy.get_user(player['user_id'])
+                list4msg = list4msg + ' - '+ str(user.name) + '\n'
+                players4role[user.name] = user.id  #samo ime je dovolj za pošiljat
     #prettier output 
     #nice = '```yaml\n---------------------------------------------------------------------------------------\n```' 
     if rolename == 'SEER':
         nice = 'Your turn! Which cards shall we peek? Card from one player or two cards from table.\n' + list4msg
-        msg1 = f'```nice\n{nice}\n```'
+        msg1 = f'```\n{nice}\n```'
         command = 'COMMAND: w.seer <player> or w.seer <tableCard#> <tableCard#>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'ROBBER':
         nice = 'Your turn! Do you want to steal from someone?\n' + list4msg     #send message to robber - his turn 
-        msg1 = f'```nice\n{nice}\n```'
+        msg1 = f'```\n{nice}\n```'
         command = 'COMMAND: w.robber <player>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'TROUBLEMAKER':
         nice = 'Your turn! Let\'s make some mess and switch two players.\n' + list4msg
-        msg1 = f'```nice\n{nice}\n```'
+        msg1 = f'```\n{nice}\n```'
         command = 'COMMAND: w.troublemaker <player1> <player2>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'DRUNK':
         nice = 'Your\'re too drunk to do anything really, but you can play you role. You might become someone else...\n' + list4msg
-        msg1 = f'```nice\n{nice}\n```'
+        msg1 = f'```\n{nice}\n```'
         command = 'COMMAND: w.drunk'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'INSOMNIAC':
         nice = 'Your turn! Check if you still have trouble sleeping.\n' + list4msg
-        msg1 = f'```nice\n{nice}\n```'
+        msg1 = f'```\n{nice}\n```'
         command = 'COMMAND: w.drunk'
         msg2 = f'```yaml\n{command}\n```'
 
@@ -166,24 +165,37 @@ def list4role(game, rolename, wolfy):
     msg = msg1 + msg2
     return msg, players4role
 
-def find_role_user(game, rolename, wolfy):
+def findUser(game, wolfy, searchPar, method='byRolename'):
     '''
     Finds role in active game data, by searching for its rolename. Returns discord object User\n
     Input:
         game...game data in list, each element is a dict
-        rolename...name of a role
+        searchPar...search parameter to help me find my user. Possible combinations:\n
+         - par2find = rolename, method='byRolename'
+         - par2find = discord username, method='byUsername'
         wolfy...ma bot
+        method...na kakšen način iščem uporabnika
     Output:
-        role_user...discord object User - player who has this role assigned
+        user...discord object User - player who we are looking for by searchPar
     '''
     tableID = [1, 2, 3]
-    rolename.upper();
-    role_user = None;
-    for player in game:
-        if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
-            role_user = wolfy.get_user(player['user_id'])
-            break
-    return role_user
+    if method == 'byRolename':
+        rolename = searchPar
+        rolename.upper();
+        user = None;
+        for player in game:
+            if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
+                user = wolfy.get_user(player['user_id'])
+                break
+    elif method == 'byUsername':
+        username = searchPar
+        for player in game:
+            if (player['name'] == username) and (player['user_id'] not in tableID):
+                user = wolfy.get_user(player['user_id'])
+                break
+    else:
+        raise NotImplementedError('Method unknown in findUser().')
+    return user
 
 def switch(igame, idA, idB):
     '''

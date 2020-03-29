@@ -129,7 +129,7 @@ def list4role(game, rolename, wolfy):
             list4msg = list4msg + ' - '+ player['name'] + '\n'
             players4role[player['name']] = player['user_id']
         else:
-            if player['role'].split(' ')[0] != rolename:  #vloga, ki je na vrsti ne sme bit na tem seznamu
+            if (player['role'].split(' ')[0] != rolename) and (rolename != 'DRUNK'):  #vloga, ki je na vrsti ne sme bit na tem seznamu
                 user = wolfy.get_user(player['user_id'])
                 list4msg = list4msg + ' - '+ str(user.name) + '\n'
                 players4role[user.name] = user.id  #samo ime je dovolj za pošiljat
@@ -153,12 +153,12 @@ def list4role(game, rolename, wolfy):
     elif rolename == 'DRUNK':
         nice = 'Your\'re too drunk to do anything really, but you can play you role. You might become someone else...\n' + list4msg
         msg1 = f'```\n{nice}\n```'
-        command = 'COMMAND: w.drunk'
+        command = 'COMMAND: w.drunk <tableCard#>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'INSOMNIAC':
-        nice = 'Your turn! Check if you still have trouble sleeping.\n' + list4msg
+        nice = 'Your turn! Check your card, if you still have trouble sleeping.\n'
         msg1 = f'```\n{nice}\n```'
-        command = 'COMMAND: w.drunk'
+        command = 'COMMAND: w.insomniac'
         msg2 = f'```yaml\n{command}\n```'
 
 
@@ -290,7 +290,9 @@ def whos_next(game, data):
     nightOrder = collections.OrderedDict(sorted(night.items(), key=lambda t:t[1]))
     
     for active in nightOrder:
-        active_roles_order.append(active)
+        active_roles_order.append(active)   
+    if active_roles_order == []:
+        return None #Noben več ni na vrsti
     #print('b', night)
     #print('a', active_roles_order)
 

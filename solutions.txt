@@ -21,6 +21,7 @@ Implement roles:
 colorful messages -> https://www.techuntold.com/colorful-rainbow-text-discord/
 dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/using-discord-to-accept-input-and-execute-on-connected-clients
 change online status of players -> https://www.programcreek.com/python/example/107416/discord.Status
+format messages -> https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
 
 Bugs and TODO:
     *- BUG <safety net zorca in nobenga druzga ne spusti čez! - odvisno od zaporedja v game pa ne bi smelo bit>

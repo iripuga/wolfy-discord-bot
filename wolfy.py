@@ -411,6 +411,7 @@ async def on_message(message):
                     await seer.send('Well done! Somehow you fucked up...'); #If you fuck up the seer number we move on
                     break
         print('seer-end:', next_one, '\n')
+    
     elif message.content.startswith('w.robber'):    ### ROBBER
         print('\nrobber-start', next_one)                                                                            
         id_robber = message.author.id
@@ -428,7 +429,6 @@ async def on_message(message):
                 if choice == 'abstain':
                     await robber.send('Abstinence is your choice.') #robber-pass
                     next_one = ww.whos_next(game, data);
-                    print('robber-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
                 elif choice in players4robber.keys():
@@ -445,7 +445,6 @@ async def on_message(message):
                                 break
                         print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         next_one = ww.whos_next(game, data);
-                        print('robber-end',next_one, '\n')
                         await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                         break
                     else:
@@ -460,12 +459,12 @@ async def on_message(message):
                                 break
                         print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         next_one = ww.whos_next(game, data);
-                        print('robber-end',next_one, '\n')
                         await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                         break
                 else:
                     await robber.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
                     break
+        print('robber-end',next_one, '\n')
 
     if message.content.startswith('w.troublemaker'):       ### TROUBLEMAKER
         print('\ntroublemaker-start', next_one)                                                                            
@@ -483,7 +482,6 @@ async def on_message(message):
                 if trouble[0] == 'abstain':
                     await troublemaker.send('Abstinence is your choice.') #trouble pass
                     next_one = ww.whos_next(game, data);
-                    print('troublemaker-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
                 else:
@@ -510,13 +508,13 @@ async def on_message(message):
                         print('troublemaker -',troublemaker.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         await troublemaker.send('> Well done! You switched **`' + first_name + '`** and **`' + second_name + '`**.')
                         next_one = ww.whos_next(game, data);
-                        print('troublemaker-end',next_one, '\n')
                         await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                         break
                     else:
                         await troublemaker.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
                         break
-        
+        print('troublemaker-end',next_one, '\n')
+
     if message.content.startswith('w.drunk'):   ### DRUNK
         print('\ndrunk-start', next_one)                                                                            
         id_drunk = message.author.id
@@ -532,7 +530,6 @@ async def on_message(message):
                 if drunk_choice == 'abstain':
                     await drunk.send('> Abstinence is your choice, good for you.') #drunk-pass
                     next_one = ww.whos_next(game, data);
-                    print('drunk-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
                 else:
@@ -542,14 +539,14 @@ async def on_message(message):
                         print('drunk -',drunk.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         await drunk.send('> In the morning you won\'t know who you are...')
                         next_one = ww.whos_next(game, data);
-                        print('drunk-end',next_one, '\n')
                         await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                         break
                     else:
                         await drunk.send('> Off course you screwed up. Your\'re drunk!')
                         break
+        print('drunk-end',next_one, '\n')
 
-    if message.content.startswith('w.insomniac'):
+    if message.content.startswith('w.insomniac'):   ### INSOMNIAC
         print('\ninsomniac-start', next_one)                                                                            
         id_insomniac = message.author.id
         insomniac = wolfy.get_user(id_insomniac);
@@ -560,30 +557,29 @@ async def on_message(message):
             #print('user:', insomniac, insomniac.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
             playersRole = player['role'].split(' ')[0]
             if safe:  #past the safetyNet
-                choice = message.content.split(' ')[1]  #če hočeš pogledat svojo karto pusti prazno
-                if choice == 'abstain':
+                choice = message.content  #če hočeš pogledat svojo karto pusti prazno
+                if choice == 'w.insomniac abstain':
                     await insomniac.send('> Abstinence is your choice.') #insomniac-pass
                     next_one = ww.whos_next(game, data);
-                    print('insomniac-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
-                elif choice = '':
+                elif choice == 'w.insomniac':
                     if player['user_id'] == insomniac.id:
                         whoami = player['role'].split(' ')[0]
                         if whoami == 'INSOMNIAC':
                             await insomniac.send('> At the end of the night you are still INSOMNIAC.')
                             next_one = ww.whos_next(game, data);
-                            print('insomniac-end',next_one, '\n')
                             await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                             break
                         else:
                             await insomniac.send('> At the dawn you wake up as ' + player['role'] + '.')
                             next_one = ww.whos_next(game, data);
-                            print('insomniac-end',next_one, '\n')
                             await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                             break
                 else:
                     await insomniac.send('> Dude, you had one job!')
+                    break
+        print('insomniac-end',next_one, '\n')
 
 ### JOKE commands for roles with no dynamic night function ###
     if message.content.startswith('hunter'):

@@ -123,6 +123,7 @@ def list4role(game, rolename, wolfy):
     '''
     tableID = [1, 2, 3]
     list4msg = f' - To abstain from your power type: <w.{rolename.lower()} abstain>\n'  #list4msg...string formated list for easier output
+    list4insomniac = list4msg
     players4role = {}
     for player in game:
         if player['name'] in ['tableCard' + str(n+1) for n in range(3)]:    #za tableCards ne morem narest wolfy objekta user
@@ -156,7 +157,7 @@ def list4role(game, rolename, wolfy):
         command = 'COMMAND: w.drunk <tableCard#>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'INSOMNIAC':
-        nice = 'Your turn! Check your card, if you still have trouble sleeping.\n'
+        nice = 'Your turn! Check your card, if you still have trouble sleeping.\n' + list4insomniac
         msg1 = f'```\n{nice}\n```'
         command = 'COMMAND: w.insomniac'
         msg2 = f'```yaml\n{command}\n```'

@@ -26,7 +26,7 @@ format messages -> https://support.discordapp.com/hc/en-us/articles/210298617-Ma
 Bugs and TODO:
     *- BUG <safety net zorca in nobenga druzga ne spusti čez! - odvisno od zaporedja v game pa ne bi smelo bit>
 
-    - dodaj troublemaker, insomniac, drunk komande v on_message()
+    *- dodaj troublemaker, insomniac, drunk komande v on_message()
     *- pisanje mora biti v kanal iz katerega izhaja ukaz '.w'
     - BUG <dvakrat pošlje sporočilo vlogi, ko jo igraš>
     - ROBBER, če se zamenjaš z vlogo, ti pošlje command msg tudi od nove vloge

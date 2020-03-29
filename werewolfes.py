@@ -171,9 +171,9 @@ def findUser(game, wolfy, searchPar, method='by_rolename'):
     Input:
         game...game data in list, each element is a dict
         searchPar...search parameter to help me find my user. Possible combinations:\n
-         - par2find = rolename, method='byRolename'
-         - par2find = discord username, method='byUsername'
-         - par2find = 'tableCard#', method='onTable' !!!Tukaj izjemoma vrnem kar id, ker ne morem narest wolfy objekta!!!
+         - par2find = rolename, method='by_rolename'
+         - par2find = discord username, method='by_username'
+         - par2find = 'tableCard#', method='on_table' !!!Tukaj izjemoma vrnem kar id, ker ne morem narest wolfy objekta!!!
         wolfy...ma bot
         method...na kakšen način iščem uporabnika
     Output:

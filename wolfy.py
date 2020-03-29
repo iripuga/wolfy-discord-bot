@@ -117,6 +117,30 @@ async def msg4robber(message, game, channel, wolfy):
         await table.send('ROBBER, open your  👀')
         await robber.send(msg)
 
+async def msg4troublemaker(message, game, channel, wolfy):
+    troublemaker = ww.findUser(game, wolfy, 'TROUBLEMAKER', method='by_rolename')
+    table = wolfy.get_channel(channel)
+    if troublemaker != None:
+        msg, _bljak = ww.list4role(game, 'TROUBLEMAKER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
+        await table.send('TROUBLEMAKER, open your  👀')
+        await troublemaker.send(msg)
+
+async def msg4drunk(message, game, channel, wolfy):
+    drunk = ww.findUser(game, wolfy, 'DRUNK', method='by_rolename')
+    table = wolfy.get_channel(channel)
+    if drunk != None:
+        msg, _bljak = ww.list4role(game, 'DRUNK', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
+        await table.send('DRUNK, open your  👀')
+        await drunk.send(msg)
+
+async def msg4insomniac(message, game, channel, wolfy):
+    insomniac = ww.findUser(game, wolfy, 'INSOMNIAC', method='by_rolename')
+    table = wolfy.get_channel(channel)
+    if insomniac != None:
+        msg, _bljak = ww.list4role(game, 'INSOMNIAC', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
+        await table.send('INSOMNIAC, open your  👀')
+        await insomniac.send(msg)
+
 async def msg4whos_next(message, game, channel, wolfy, nightRole):
     '''
     Pošlje sporočilo igralcu, ki je naslednji na vrsti. Nič ne vrne zaenkrat.\n
@@ -138,23 +162,23 @@ async def msg4whos_next(message, game, channel, wolfy, nightRole):
     elif nightRole == 'ROBBER':
         await msg4robber(message, game, channel, wolfy)
     elif nightRole == 'TROUBLEMAKER':
-        pass#await msg4robber(message, game, wolfy)
+        await msg4troublemaker(message, game, channel, wolfy)  #await msg4robber(message, game, wolfy)
     elif nightRole == 'DRUNK':
-        pass#await msg4robber(message, game, wolfy)
+        await msg4drunk(message, game, channel, wolfy)
     elif nightRole == 'INSOMNIAC':
-        pass#await msg4robber(message, game, wolfy)         
+        await msg4insomniac(message, game, channel, wolfy)         
     else:
         raise ValueError(str(nightRole) + ' is not awake at night.')
     return
 
-async def safetyNet(game, user, currentRole, rolename):
+async def safetyNet(game, user, currentRole, role2protect):
     '''
     varovala, da samo igralci z vlogo dostopajo do ukazov vloge - e.g. samo robber lahko uporablja ukaze robberja\n
     Input:
         game...list aktualne 
         user...discord objekt, ki ga določim z role_id, in ga uporabim za DM komunikacijo z uporabnikom
         nextRole...ime vloge, ki je trenutno na vrsti(string)
-        rolename...katero vlogo varuje ta safetyNet
+        role2protect...katero vlogo varuje ta safetyNet
     Output:
         issafe...bool, ki pove če je user pravi in lahko uporablja ukaze vloge rolename
     '''
@@ -165,13 +189,13 @@ async def safetyNet(game, user, currentRole, rolename):
             if player['user_id'] == user.id:
                 playersRole = player['role'].split(' ')[0]
         #the net
-        print('playersRole: ', playersRole, ' <> ','currentRole:', currentRole, ' <> ','role2protect:', rolename, '\n', end='')
-        if (playersRole == rolename) and (currentRole == rolename):
+        print('playersRole: ', playersRole, ' <> ','currentRole:', currentRole, ' <> ','role2protect:', role2protect, '\n', end='')
+        if (playersRole == role2protect) and (currentRole == role2protect):
             issafe = True   #če se nič zgoraj ne zgodi pol ukaz uporablja ta prava vloga, takrat ko je na vrsti
-        elif (playersRole == rolename) and (currentRole != rolename):  #če nisi na vrsti drugi pogoj ne velja
+        elif (playersRole == role2protect) and (currentRole != role2protect):  #če nisi na vrsti drugi pogoj ne velja
             await user.send('Not your turn buddy!')
-        elif playersRole != rolename:                   #varovalni pogoji so na začetku
-            await user.send('You are not ' + rolename + ', so cut it out.\nDumbkopf!')
+        elif playersRole != role2protect:                   #varovalni pogoji so na začetku
+            await user.send('You are not ' + role2protect + ', so cut it out.\nDumbkopf!')
         else:
             pass
     except:
@@ -219,12 +243,12 @@ async def on_message(message):
     global CHANNEL
 
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'WEREWOLF - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'TROUBLEMAKER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
                 #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'role': 'SEER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
                 {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
 
 ### other COM stuff
     #-------------------------------------------------------------------------------------------#
@@ -361,7 +385,7 @@ async def on_message(message):
                         for playa in game:
                             if playa['user_id'] == hiddenUser.id:
                                 hiddenRole = playa['role']
-                        await seer.send(hiddenPlaya + ' is a ' + hiddenRole)   #show hiddenPlayer
+                        await seer.send(hiddenPlaya + ' is a ' + hiddenRole + '.')   #show hiddenPlayer
                         #send message to robber - his turn 
                         next_one = ww.whos_next(game, data);
                         print('seer-end:', next_one, '\n')
@@ -411,12 +435,12 @@ async def on_message(message):
                     if choice in ['tableCard' + str(n+1) for n in range(3)]:
                         card_id = ww.findUser(game, wolfy, choice, method='on_table')
                         game, switch_msg = ww.switch(game, robber.id, card_id)
-                        print(game)
+                        #print(game)
                         print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         for playa in game:   #robberju je treba povedat kaj je njegova nova vloga
                             if playa['user_id'] == robber.id:
                                 new_role = playa['role']
-                                msg = 'Great! You are now ' + new_role
+                                msg = 'Great! You are now ' + new_role + '.'
                                 await robber.send(msg)
                                 break
                         print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
@@ -443,44 +467,73 @@ async def on_message(message):
                     await robber.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
                     break
 
-    if message.content.startswith('.troublemaker'):
-        print('\ntrouble-start', next_one)                                                                            
+    if message.content.startswith('w.troublemaker'):       ### TROUBLEMAKER
+        print('\ntroublemaker-start', next_one)                                                                            
         id_trouble = message.author.id
         troublemaker = wolfy.get_user(id_trouble);
         _bljak, players4trouble = ww.list4role(game, 'TROUBLEMAKER', wolfy)
+        firstID = None; secondID = None #id-ja ki ju moram zamenjat
 
         safe = await safetyNet(game, troublemaker, next_one, 'TROUBLEMAKER') #da še kdo drug kot robber ne izvaja ukazov              
         for player in game:
             #print('user:', troublemaker, troublemaker.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
             playersRole = player['role'].split(' ')[0]
             if safe:  #past the safetyNet
-                trouble = message.content.split(' ')[1]  #koga bomo oropal
-                if trouble == 'abstain':
-                    await troublemaker.send('Abstinence is your trouble.') #robber-pass
+                trouble = message.content.split(' ')[1::]  #koga bomo menjal
+                if trouble[0] == 'abstain':
+                    await troublemaker.send('Abstinence is your choice.') #trouble pass
                     next_one = ww.whos_next(game, data);
-                    print('robber-end',next_one, '\n')
+                    print('troublemaker-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
                 else:
-                    pass
+                    if len(trouble) == 2: #tukaj zamenjam dve karti
+                        for playa in trouble:
+                            if firstID == None:  #zapišem ID v ta pravo/prosto spremenljivko
+                                if playa in ['tableCard' + str(n+1) for n in range(3)]: #Določim ID igralca, ki ga menjam
+                                    firstID = ww.findUser(game, wolfy, playa, method='on_table') 
+                                    first_name = playa
+                                else:
+                                    user = ww.findUser(game, wolfy, playa, method='by_username') 
+                                    firstID = user.id
+                                    first_name = user.name
+                            else:
+                                if playa in ['tableCard' + str(n+1) for n in range(3)]: #Določim ID igralca, ki ga menjam
+                                    secondID = ww.findUser(game, wolfy, playa, method='on_table') 
+                                    second_name = playa
+                                else:
+                                    user = ww.findUser(game, wolfy, playa, method='by_username') 
+                                    secondID = user.id
+                                    second_name = user.name
+
+                        game, switch_msg = ww.switch(game, firstID, secondID)   #menjam
+                        print('troublemaker -',troublemaker.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
+                        await troublemaker.send('> Well done! You switched **`' + first_name + '`** and **`' + second_name + '`**.')
+                        next_one = ww.whos_next(game, data);
+                        print('troublemaker-end',next_one, '\n')
+                        await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
+                        break
+                    else:
+                        await troublemaker.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
+                        break
         
 
     if message.content.startswith('.drunk'):
         print('\ndrunk-start', next_one)                                                                            
         id_drunk = message.author.id
-        drunkmaker = wolfy.get_user(id_drunk);
-        _bljak, players4drunk = ww.list4role(game, 'TROUBLEMAKER', wolfy)
+        drunk = wolfy.get_user(id_drunk);
+        _bljak, players4drunk = ww.list4role(game, 'DRUNK', wolfy)
 
-        safe = await safetyNet(game, drunkmaker, next_one, 'TROUBLEMAKER') #da še kdo drug kot robber ne izvaja ukazov              
+        safe = await safetyNet(game, drunk, next_one, 'DRUNK') #da še kdo drug kot robber ne izvaja ukazov              
         for player in game:
             #print('user:', drunk, drunk.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
             playersRole = player['role'].split(' ')[0]
             if safe:  #past the safetyNet
                 drunk_choice = message.content.split(' ')[1]  #koga bomo oropal
                 if drunk_choice == 'abstain':
-                    await drunk.send('Abstinence is your drunk_choice.') #robber-pass
+                    await drunk.send('Abstinence is your choice, good for you.') #robber-pass
                     next_one = ww.whos_next(game, data);
-                    print('robber-end',next_one, '\n')
+                    print('drunk-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
                 else:
@@ -489,19 +542,19 @@ async def on_message(message):
     if message.content.startswith('.insomniac'):
         print('\ninsomniac-start', next_one)                                                                            
         id_insomniac = message.author.id
-        insomniacmaker = wolfy.get_user(id_insomniac);
-        _bljak, players4insomniac = ww.list4role(game, 'TROUBLEMAKER', wolfy)
+        insomniac = wolfy.get_user(id_insomniac);
+        _bljak, players4insomniac = ww.list4role(game, 'INSOMNIAC', wolfy)
 
-        safe = await safetyNet(game, insomniacmaker, next_one, 'TROUBLEMAKER') #da še kdo drug kot robber ne izvaja ukazov              
+        safe = await safetyNet(game, insomniac, next_one, 'INSOMNIAC') #da še kdo drug kot robber ne izvaja ukazov              
         for player in game:
             #print('user:', insomniac, insomniac.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
             playersRole = player['role'].split(' ')[0]
             if safe:  #past the safetyNet
                 choice = message.content.split(' ')[1]  #koga bomo oropal
                 if choice == 'abstain':
-                    await insomniac.send('Abstinence is your drunk_choice.') #robber-pass
+                    await insomniac.send('Abstinence is your choice.') #robber-pass
                     next_one = ww.whos_next(game, data);
-                    print('robber-end',next_one, '\n')
+                    print('insomniac-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
                 else:

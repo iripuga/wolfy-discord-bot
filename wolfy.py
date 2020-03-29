@@ -327,9 +327,9 @@ async def on_message(message):
                             werewolf = wolfy.get_user(player_i['user_id']);
                             if werewolf != user:
                                 flag = True
-                                await user.send(f' - {werewolf.name} is a WEREWOLF')  #POVEM KDO JE WEREWOLF                       
+                                await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF                       
                     if not flag:
-                        await user.send('\nYou are the only WEREWOLF') 
+                        await user.send('> You are the only WEREWOLF') 
                     player['played'] = True
                 elif playersRole == 'MINION':
                     flag = False #da vem, če sem našel kakega volkodlaka
@@ -337,9 +337,9 @@ async def on_message(message):
                         if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
                             flag = True
                             werewolf = wolfy.get_user(player_i['user_id']);
-                            await user.send(f' - {werewolf.name} is a WEREWOLF')  #POVEM KDO JE WEREWOLF
+                            await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF
                     if not flag:
-                        await user.send('\nYou have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!')
+                        await user.send('> You have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!')
                     player['played'] = True
                 elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
                     flag = False #davem, če sem našel kakega masona
@@ -348,9 +348,9 @@ async def on_message(message):
                             mason = wolfy.get_user(player_i['user_id']);
                             if mason != user:
                                 flag = True
-                                await user.send(f' - {mason.name} is a MASON')
+                                await user.send(f'> - **`{mason.name}`** is a MASON')
                     if not flag:
-                        await user.send('\nYou are the only MASON')
+                        await user.send('> You are the only MASON')
                     #player['played'] = True  #to se bo zgodilo v funkciji whos_next
 
         #send message to next role - his turn 
@@ -385,7 +385,7 @@ async def on_message(message):
                         for playa in game:
                             if playa['user_id'] == hiddenUser.id:
                                 hiddenRole = playa['role']
-                        await seer.send(hiddenPlaya + ' is a ' + hiddenRole + '.')   #show hiddenPlayer
+                        await seer.send('> **`' + hiddenPlaya + '`** is a ' + hiddenRole + '.')   #show hiddenPlayer
                         #send message to robber - his turn 
                         next_one = ww.whos_next(game, data);
                         print('seer-end:', next_one, '\n')
@@ -440,7 +440,7 @@ async def on_message(message):
                         for playa in game:   #robberju je treba povedat kaj je njegova nova vloga
                             if playa['user_id'] == robber.id:
                                 new_role = playa['role']
-                                msg = 'Great! You are now ' + new_role + '.'
+                                msg = '> Great! You are now ' + new_role.split('-')[0] + ' - ' + new_role.split('-')[1] + '.'
                                 await robber.send(msg)
                                 break
                         print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal

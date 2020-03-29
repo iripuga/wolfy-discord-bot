@@ -391,7 +391,7 @@ async def on_message(message):
         print('\nrobber-start', next_one)                                                                            
         id_robber = message.author.id
         robber = wolfy.get_user(id_robber);
-        _bljak, players4role = ww.list4role(game, 'ROBBER', wolfy)
+        _bljak, players4robber = ww.list4role(game, 'ROBBER', wolfy)
 
         safe = await safetyNet(game, robber, next_one, 'ROBBER') #da še kdo drug kot robber ne izvaja ukazov              
         for player in game:
@@ -399,15 +399,15 @@ async def on_message(message):
             playersRole = player['role'].split(' ')[0]
             if safe:  #past the safetyNet
                 choice = message.content.split(' ')[1]  #koga bomo oropal
-                print(type(choice), choice)
-                print(playersRole)
+                #print(type(choice), choice)
+                #print(playersRole)
                 if choice == 'abstain':
                     await robber.send('Abstinence is your choice.') #robber-pass
                     next_one = ww.whos_next(game, data);
                     print('robber-end',next_one, '\n')
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
-                elif choice in players4role.keys():
+                elif choice in players4robber.keys():
                     if choice in ['tableCard' + str(n+1) for n in range(3)]:
                         card_id = ww.findUser(game, wolfy, choice, method='on_table')
                         game, switch_msg = ww.switch(game, robber.id, card_id)
@@ -444,13 +444,68 @@ async def on_message(message):
                     break
 
     if message.content.startswith('.troublemaker'):
-        pass
+        print('\ntrouble-start', next_one)                                                                            
+        id_trouble = message.author.id
+        troublemaker = wolfy.get_user(id_trouble);
+        _bljak, players4trouble = ww.list4role(game, 'TROUBLEMAKER', wolfy)
+
+        safe = await safetyNet(game, troublemaker, next_one, 'TROUBLEMAKER') #da še kdo drug kot robber ne izvaja ukazov              
+        for player in game:
+            #print('user:', troublemaker, troublemaker.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
+            playersRole = player['role'].split(' ')[0]
+            if safe:  #past the safetyNet
+                trouble = message.content.split(' ')[1]  #koga bomo oropal
+                if trouble == 'abstain':
+                    await troublemaker.send('Abstinence is your trouble.') #robber-pass
+                    next_one = ww.whos_next(game, data);
+                    print('robber-end',next_one, '\n')
+                    await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
+                    break
+                else:
+                    pass
+        
 
     if message.content.startswith('.drunk'):
-        pass
+        print('\ndrunk-start', next_one)                                                                            
+        id_drunk = message.author.id
+        drunkmaker = wolfy.get_user(id_drunk);
+        _bljak, players4drunk = ww.list4role(game, 'TROUBLEMAKER', wolfy)
+
+        safe = await safetyNet(game, drunkmaker, next_one, 'TROUBLEMAKER') #da še kdo drug kot robber ne izvaja ukazov              
+        for player in game:
+            #print('user:', drunk, drunk.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
+            playersRole = player['role'].split(' ')[0]
+            if safe:  #past the safetyNet
+                drunk_choice = message.content.split(' ')[1]  #koga bomo oropal
+                if drunk_choice == 'abstain':
+                    await drunk.send('Abstinence is your drunk_choice.') #robber-pass
+                    next_one = ww.whos_next(game, data);
+                    print('robber-end',next_one, '\n')
+                    await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
+                    break
+                else:
+                    pass
 
     if message.content.startswith('.insomniac'):
-        pass
+        print('\ninsomniac-start', next_one)                                                                            
+        id_insomniac = message.author.id
+        insomniacmaker = wolfy.get_user(id_insomniac);
+        _bljak, players4insomniac = ww.list4role(game, 'TROUBLEMAKER', wolfy)
+
+        safe = await safetyNet(game, insomniacmaker, next_one, 'TROUBLEMAKER') #da še kdo drug kot robber ne izvaja ukazov              
+        for player in game:
+            #print('user:', insomniac, insomniac.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
+            playersRole = player['role'].split(' ')[0]
+            if safe:  #past the safetyNet
+                choice = message.content.split(' ')[1]  #koga bomo oropal
+                if choice == 'abstain':
+                    await insomniac.send('Abstinence is your drunk_choice.') #robber-pass
+                    next_one = ww.whos_next(game, data);
+                    print('robber-end',next_one, '\n')
+                    await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
+                    break
+                else:
+                    pass
 
 ### JOKE commands for roles with no dynamic night function ###
     if message.content.startswith('hunter'):

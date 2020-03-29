@@ -38,16 +38,10 @@ print('Which guild? ', end=' ')
 server = input()
 if server == 'NFA':
     GUILD = os.getenv('NFA')
-    #CHANNEL = 688744586293936296 #general
-    TABLE = 691400770557444096  #table
 elif server == 'w':
     GUILD = os.getenv('WoofServer')
-    TABLE = 693252601835159646 #general na W
 else:
-    #print('MG')
     GUILD = os.getenv('MaGuilt') #default GUILD is MG
-    #CHANNEL = 690010969438421006  #general!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TOLE JE TREBA ŠE DAT V .env!!!
-    TABLE = 690141479666188334  #table
 GUILD = int(GUILD)
 ##################################################################################################
 
@@ -95,7 +89,6 @@ async def msg4seer(message, game, wolfy):
         msg, _bljak = ww.list4role(game, 'SEER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
         await table.send('SEER, open your  👀')
         await seer.send(msg)
-
 
 async def msg4robber(message, game, wolfy):
     robber = ww.find_role_user(game, 'ROBBER', wolfy)
@@ -165,6 +158,12 @@ async def safetyNet(game, user, currentRole, rolename):
         
     return issafe
 
+async def throwError(errors):
+    '''
+    Randomly returns one error from collection of errors.
+    '''
+    error='no error'
+    return error
 ##################################################################################################
 
 ### LOGIN into guild ################################################################################
@@ -268,7 +267,7 @@ async def on_message(message):
         #for i in range(len(game)):
         #    game.pop()
         game = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
-        #print(game)
+        TABLE = message.channel.id #tam kjer začnem igro, tam se bo končala
         nextRole = None   #ni še noč, villager itak spi
         
         #adding nicknames

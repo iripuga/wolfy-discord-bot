@@ -12,9 +12,9 @@ data = {
          {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off'},
          {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off'},
          {'name': 'lovric', 'user_id': 548304226988720149, 'status': 'off'},
-         {'name': 'table_slot1', 'user_id': 1, 'status': 'on'},  #tri karte na sredini mize
-         {'name': 'table_slot2', 'user_id': 2, 'status': 'on'},
-         {'name': 'table_slot3', 'user_id': 3, 'status': 'on'}],
+         {'name': 'tableCard1', 'user_id': 1, 'status': 'on'},  #tri karte na sredini mize
+         {'name': 'tableCard2', 'user_id': 2, 'status': 'on'},
+         {'name': 'tableCard3', 'user_id': 3, 'status': 'on'}],
     'roles':
        [{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},  #lohk jih kr tuki razporediš po zaporednih številkah. Če se nč z vlogo ne zgodi je order 0
        	{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},

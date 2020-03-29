@@ -112,36 +112,37 @@ def list_active_id(game_roles):
 ### DYNAMIC stuff with wolfy and users ##################################################################
 def list4role(game, rolename, wolfy):
     '''
-    creates a number coded list of players for seer, rober, troublemaker to use\n
+    creates a dict of players for dynamic roles (seer, robber, troublemaker) to use\n
     Input:
         game...active game data list, in dict form
         rolename...for which role are we listing players
         wolfy...my bot object
     Output:
         msg...for our user(depends on rolename)
-        players4role...number coded dictionary of users for a specific role to chose from 
+        players4role...dict {user.name: user.id} of users for a specific role to chose from 
     '''
     rolename.upper()
     tableID = [1, 2, 3]
-    list4msg = ' - Abstain from your power: <w.rolename abstain>\n'         #list4msg...string formated list for easier output
+    list4msg = ' - Abstain from your power: w.<rolename> abstain\n'         #list4msg...string formated list for easier output
     players4role = {0: "pass"}
     i = 1
     for player in game:
-        if (player['user_id'] not in tableID) and (player['role'].split(' ')[0] != rolename):
+        if player['role'].split(' ')[0] != rolename:  #vloga, ki je na vrsti ne sme bit na tem seznamu
             user = wolfy.get_user(player['user_id'])
             list4msg = list4msg + ' - '+ str(user.name) + '\n'
-            players4role[i] = user.id  #samo id je dovolj za pošiljat
+            players4role[user.name] = user.id  #samo ime je dovolj za pošiljat
             i = i + 1
+        
 
     #prettier output 
     #nice = '```yaml\n---------------------------------------------------------------------------------------\n```' 
     if rolename == 'SEER':
         nice = 'Your turn! Which cards shall we peek? Card from one player or two cards from table.\n' + list4msg
         msg1 = f'```nice\n{nice}\n```'
-        command = 'COMMAND: w.seer <player> or w.seer <table#> <table#>'
+        command = 'COMMAND: w.seer <player> or w.seer <tableCard#> <tableCard#>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'ROBBER':
-        nice = 'Your turn! Do you want to steal from someone\n' + list4msg     #send message to robber - his turn 
+        nice = 'Your turn! Do you want to steal from someone?\n' + list4msg     #send message to robber - his turn 
         msg1 = f'```nice\n{nice}\n```'
         command = 'COMMAND: w.robber <player>'
         msg2 = f'```yaml\n{command}\n```'
@@ -151,7 +152,7 @@ def list4role(game, rolename, wolfy):
         command = 'COMMAND: w.troublemaker <player1> <player2>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'DRUNK':
-        nice = 'Your\'re too drunk to do anything really, but you can take one table card.\n' + list4msg
+        nice = 'Your\'re too drunk to do anything really, but you can play you role. You might become someone else...\n' + list4msg
         msg1 = f'```nice\n{nice}\n```'
         command = 'COMMAND: w.drunk'
         msg2 = f'```yaml\n{command}\n```'
@@ -299,9 +300,9 @@ def whos_next(game, data):
 ### For testing
 testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
             {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-            {'name': 'table_slot1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-            {'name': 'table_slot2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-            {'name': 'table_slot3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
+            {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
+            {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
+            {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
 ida = 689399469090799848
 idb = 593722710706749441
 game = testgame#assign_roles(data)    #dict of active player:roles

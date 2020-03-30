@@ -126,9 +126,12 @@ def list4role(game, rolename, wolfy):
     list4insomniac = list4msg
     players4role = {}
     for player in game:
-        if player['name'] in ['tableCard' + str(n+1) for n in range(3)]:    #za tableCards ne morem narest wolfy objekta user
-            list4msg = list4msg + ' - '+ player['name'] + '\n'
-            players4role[player['name']] = player['user_id']
+        if player['name'] in ['tableCard' + str(n+1) for n in range(3)]:    #za tableCards ne morem narest wolfy objekta user - samo SEER lahko gleda karte ki so na mizi
+            if rolename == 'SEER':
+                list4msg = list4msg + ' - '+ player['name'][0] + player['name'][-1] + '\n'
+                players4role[player['name']] = player['user_id']
+            else:
+                pass
         else:
             if (player['role'].split(' ')[0] != rolename) and (rolename != 'DRUNK'):  #vloga, ki je na vrsti ne sme bit na tem seznamu
                 user = wolfy.get_user(player['user_id'])
@@ -149,7 +152,7 @@ def list4role(game, rolename, wolfy):
     elif rolename == 'TROUBLEMAKER':
         nice = 'Your turn! Let\'s make some mess and switch two players.\n' + list4msg
         msg1 = f'```\n{nice}\n```'
-        command = 'COMMAND: w.troublemaker <player1> <player2>'
+        command = 'COMMAND: w.trouble <player1> <player2>'
         msg2 = f'```yaml\n{command}\n```'
     elif rolename == 'DRUNK':
         nice = 'Your\'re too drunk to do anything really, but you can play you role. You might become someone else...\n' + list4msg

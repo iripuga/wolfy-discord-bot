@@ -22,6 +22,7 @@ colorful messages -> https://www.techuntold.com/colorful-rainbow-text-discord/
 dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/using-discord-to-accept-input-and-execute-on-connected-clients
 change online status of players -> https://www.programcreek.com/python/example/107416/discord.Status
 format messages -> https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
+diamond problem(static and dynamic) -> https://towardsdatascience.com/how-to-connect-objects-with-each-other-in-different-situations-with-pythonic-ways-d3aaf4c89553
 
 Bugs and TODO:
     *- BUG <safety net zorca in nobenga druzga ne spusti čez! - odvisno od zaporedja v game pa ne bi smelo bit>
@@ -39,5 +40,6 @@ Bugs and TODO:
      - timing 10 min -> po tem času vsak lahko konča igro
      - troublemaker in robber, ko zamejata vloge v igri, ne sme klicat starih vlog -> torej rabim dve igri oz. slovarja(static/dynamic)
      - tableCard1 gre v t1
-     - static in dynamic rabita ločeni definiciji slovarja igre kar pa ni izvedljivo -> kako narest ločene pointerje
-     - ROBBER ti ne napiše pravega imena zamenjane vloge
+     *- static in dynamic rabita ločeni definiciji slovarja igre kar pa ni izvedljivo -> kako narest ločene pointerje -> pointerjev ni v python, rabim ločene id-je. Preverim z id(var_name).
+     - static in dynamic sta po zamenjavi še vedno ista, kljub različnim object id-jem
+     *- ROBBER ti ne napiše pravega imena zamenjane vloge

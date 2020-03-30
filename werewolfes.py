@@ -90,6 +90,22 @@ def assign_roles(idata=data, desires=None):
                 break
     return assigned_roles
 
+def transcribe(igame):
+    '''
+    Just to transcribe object igame into new NOT CONNECTED object ogame
+    \nSolution for "static is dynamic == True" problem, is to copy content by steps.
+    This happens because every time an object is assigned to variable 
+    it gets specific id(var_name). If id() of two objects are the same, 
+    then objects are connected. 
+    Yet I want static to be disconected to dynamic...
+    
+    \n...e.g. transcribe to get different id()
+    '''
+    ogame = []
+    for playa in igame:
+        ogame.append(playa)
+    return ogame
+
 def list_active_roles(game_roles):
     #Dobim seznam imen vlog iz slovarja {id: role}. Samo imena vlog
     justroles=''

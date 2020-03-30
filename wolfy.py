@@ -305,7 +305,17 @@ async def on_message(message):
         #for i in range(len(game)):
         #    game.pop()
         static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
-        dynamic = testgame1 #ta se bo spreminjala
+        dynamic = ww.transcribe(static) #ta se bo spreminjala
+        #print('static >>>', id(static))
+        #print('dynamic >>>', id(dynamic))
+        print('>>> .w-start NEW GAME: static is dynamic?', static is dynamic)
+        #static[0] = {'IamEmptyInside': None}
+        #dynamic = ww.transcribe(static) #vsakič, ko var na novo definiram se spremeni id
+        #print('static >>>', id(static), static, '\n')
+        #print('dynamic >>>', id(dynamic), dynamic)
+
+
+
         CHANNEL = message.channel.id #tam kjer začnem igro, tam se bo končala
         nextRole = None   #ni še noč, villager itak spi
         
@@ -368,7 +378,7 @@ async def on_message(message):
         #send message to next role - his turn 
         next_one = ww.whos_next(static, data); #0-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
         await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
-        print('.w',next_one)
+        print('>>> .w-end',next_one)
 
 ###  NIGHT GAME - for dynamic roles to change game cards
     #Za vsako dinamično vlogo posebej glede na night_order...če igralec ni ta vloga ga Wolfy ignorira
@@ -422,7 +432,7 @@ async def on_message(message):
         print('seer-end:', next_one, '\n')
     
     elif message.content.startswith('w.robber'):    ### ROBBER
-        print('\nrobber-start', next_one)                                                                            
+        print('\n>>> robber-start', next_one)                                                                            
         id_robber = message.author.id
         robber = wolfy.get_user(id_robber);
         _bljak, players4robber = ww.list4role(static, 'ROBBER', wolfy)
@@ -441,27 +451,13 @@ async def on_message(message):
                     await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
                     break
                 elif choice in players4robber.keys():
-                    if choice in ['tableCard' + str(n+1) for n in range(3)]:
-                        card_id = ww.findUser(static, wolfy, choice, method='on_table')
-                        dynamic, switch_msg = ww.switch(dynamic, robber.id, card_id)
-                        
-                        print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
-                        for playa in dynamic:   #robberju je treba povedat kaj je njegova nova vloga
-                            if playa['user_id'] == robber.id:
-                                new_role = playa['role']
-                                print(new_role, robber.name)
-                                msg = '> Great! You are now ' + new_role.split('-')[0] + ' - ' + new_role.split('-')[1] + '.'
-                                await robber.send(msg)
-                                break
-                        print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
-                        next_one = ww.whos_next(static, data);
-                        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
-                        break
-                    else:
-                        victim = ww.findUser(static, wolfy, choice, method='by_username')
-                        dynamic, switch_msg = ww.switch(dynamic, robber.id, victim.id)   #rob the victim
-                        print('\nstatic >>>\n', static)
-                        print('\ndynamic >>>\n', dynamic)
+                    if choice not in ['tableCard' + str(n+1) for n in range(3)]:
+                        print('\nstatic >>>\n', id(static), static)
+                        print('\ndynamic >>>\n', id(dynamic), dynamic)
+                        victim = ww.findUser(ww.transcribe(static), wolfy, choice, method='by_username')
+                        dynamic, switch_msg = ww.transcribe(ww.switch(dynamic, robber.id, victim.id))   #rob the victim
+                        print('\nstatic >>>\n', id(static), static)
+                        print('\ndynamic >>>\n', id(dynamic), dynamic)
                         #print(game)#game = list(game) in case game becomes tuple somehow???
                         for playa in dynamic:   #robberju je treba povedat kaj je njegova nova vloga
                             if playa['user_id'] == robber.id:
@@ -476,7 +472,7 @@ async def on_message(message):
                 else:
                     await robber.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
                     break
-        print('robber-end',next_one, '\n')
+        print('>>> robber-end',next_one, '\n')
 
     if message.content.startswith('w.trouble'):       ### TROUBLEMAKER
         print('\ntroublemaker-start', next_one)                                                                            
@@ -631,14 +627,14 @@ async def on_message(message):
         except:
             CHANNEL = 691400770557444096 #table v NoFunAllowed
             table = wolfy.get_channel(CHANNEL)
-        if not game:
+        if not static:
             await table.send('The game hasn\'t started yet.')
         else:
             ### glavno sporočilo za vse ###
             #v channel #table prikažem kdo je bil kdo 
             msg = 'GameOver:\n'
             table_cards = '\nTable cards were\n'
-            for player in game:
+            for player in dynamic:          #končni rezultat igre
                 playerID = player['user_id']
                 #show table cards
                 if playerID in [(n+1) for n in range(3)]:
@@ -649,7 +645,7 @@ async def on_message(message):
                     player_name = user.name
                     role_name = player['role'].split(' ')[0]
                     msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'
-            game = [] #reset game
+            static = [] #reset game
 
             msg = msg + table_cards
             beautifulmsg = f'```yaml\n{msg}\n```'

@@ -4,10 +4,13 @@
 # # # # # # # #
 
 global data #.game_data.json
-global game #this will be my main game dict in which all will happen - TA JE NUJNA, ostale niti ne tolk
+global static #ta se definira na začetku in po njej vloge igrajo
+global dynamic #v tej se odražajo dejanja vlog - this will be my main game dict in which all will happen - TA JE NUJNA, ostale niti ne tolk
 global next_one #hranim ime vloge, ki je naslednja na vrsti - tut nujno
 global CHANNEL #kanal v katerem igralci igrajo
-game = []
+global ADMIN #samo tist, ki začne igro jo lohk predčasno konča
+#global t_start #čas začetka igre - na konc pogledam t_end in gledam kdaj je 10 min
+#static = []
 next_one = ''
 
 import discord
@@ -211,6 +214,7 @@ async def throwError(errors):
     '''
     error='no error'
     return error
+
 ##################################################################################################
 
 ### LOGIN into guild ################################################################################
@@ -230,7 +234,7 @@ async def on_ready():
 ##################################################################################################
 
 
-
+#testrole = input('ROLE >>> ')
 
 
 
@@ -244,14 +248,15 @@ async def on_message(message):
     global game
     global next_one
     global CHANNEL
+    global ADMIN
 
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'MASON - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'INSOMNIAC - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'TROUBLEMAKER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
                 #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'role': 'SEER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'MASON - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'VILLAGER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':True}, 
+                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - The Villager has no special ability, but he is definitely not a werewolf.', 'played':True}, 
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':True}]
 
 ### other COM stuff
     #-------------------------------------------------------------------------------------------#
@@ -296,7 +301,7 @@ async def on_message(message):
         
         #for i in range(len(game)):
         #    game.pop()
-        game = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri
+        game = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
         CHANNEL = message.channel.id #tam kjer začnem igro, tam se bo končala
         nextRole = None   #ni še noč, villager itak spi
         
@@ -581,6 +586,15 @@ async def on_message(message):
                     break
         print('insomniac-end',next_one, '\n')
 
+    if message.content.startswith('w.abstain'):
+        print('\nabstain-start', next_one)                                                                            
+        id_abstain = message.author.id
+        abstain = wolfy.get_user(id_abstain)
+        await abstain.send('> Abstinence is your choice.') #role-pass
+        next_one = ww.whos_next(game, data);
+        await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
+        print('troublemaker-end',next_one, '\n')
+
 ### JOKE commands for roles with no dynamic night function ###
     if message.content.startswith('hunter'):
         pass
@@ -604,11 +618,11 @@ async def on_message(message):
     #detajli
 
 ###  VOTING - Players send private message to Wolfy  ####################
-    elif message.content == '.vote':
+    elif message.content == 'w.vote':
         pass
 
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
-    elif message.content == '.end':
+    elif message.content == 'w.end':
         try:
             table = wolfy.get_channel(CHANNEL)
         except:

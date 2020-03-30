@@ -8,7 +8,7 @@ data = {
     'members':
         [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on'}, 
          {'name': 'rok', 'user_id': 261105970548178944, 'status': 'off'},
-         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on'},
+         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'off'},
          {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off'},
          {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off'},
          {'name': 'lovric', 'user_id': 548304226988720149, 'status': 'off'},

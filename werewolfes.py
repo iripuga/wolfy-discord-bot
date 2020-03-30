@@ -184,10 +184,10 @@ def findUser(game, wolfy, searchPar, method='by_rolename'):
         user...discord object User - player who we are looking for by searchPar
     '''
     tableID = [1, 2, 3]
+    user = None
     if method == 'by_rolename':
         rolename = searchPar
         rolename.upper();
-        user = None;
         for player in game:
             if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
                 user = wolfy.get_user(player['user_id'])

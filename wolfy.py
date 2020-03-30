@@ -10,8 +10,8 @@ global next_one #hranim ime vloge, ki je naslednja na vrsti - tut nujno
 global CHANNEL #kanal v katerem igralci igrajo
 global ADMIN #samo tist, ki začne igro jo lohk predčasno konča
 #global t_start #čas začetka igre - na konc pogledam t_end in gledam kdaj je 10 min
-static = []
-dynamic = []
+static = [{}]
+dynamic = [{}]
 next_one = ''
 
 import discord
@@ -245,13 +245,21 @@ async def on_message(message):
     global CHANNEL
     global ADMIN
 
+    #Če nista dve definiciji sta static in dynamic skos isti - neki s pointerji
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'TROUBLEMAKER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False},
-                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':True}, 
-                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - The Villager has no special ability, but he is definitely not a werewolf.', 'played':True}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':True}]
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - ', 'played':False},
+                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
+                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
+    testgame1 = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - ', 'played':False},
+                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
+                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
 
 ### other COM stuff
     #-------------------------------------------------------------------------------------------#
@@ -296,8 +304,8 @@ async def on_message(message):
         
         #for i in range(len(game)):
         #    game.pop()
-        static = testgame #ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
-        dynamic = static #ta se bo spreminjala
+        static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
+        dynamic = testgame1 #ta se bo spreminjala
         CHANNEL = message.channel.id #tam kjer začnem igro, tam se bo končala
         nextRole = None   #ni še noč, villager itak spi
         
@@ -436,11 +444,12 @@ async def on_message(message):
                     if choice in ['tableCard' + str(n+1) for n in range(3)]:
                         card_id = ww.findUser(static, wolfy, choice, method='on_table')
                         dynamic, switch_msg = ww.switch(dynamic, robber.id, card_id)
-                        #print(game)
+                        
                         print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
-                        for playa in static:   #robberju je treba povedat kaj je njegova nova vloga
+                        for playa in dynamic:   #robberju je treba povedat kaj je njegova nova vloga
                             if playa['user_id'] == robber.id:
                                 new_role = playa['role']
+                                print(new_role, robber.name)
                                 msg = '> Great! You are now ' + new_role.split('-')[0] + ' - ' + new_role.split('-')[1] + '.'
                                 await robber.send(msg)
                                 break
@@ -451,8 +460,10 @@ async def on_message(message):
                     else:
                         victim = ww.findUser(static, wolfy, choice, method='by_username')
                         dynamic, switch_msg = ww.switch(dynamic, robber.id, victim.id)   #rob the victim
+                        print('\nstatic >>>\n', static)
+                        print('\ndynamic >>>\n', dynamic)
                         #print(game)#game = list(game) in case game becomes tuple somehow???
-                        for playa in static:   #robberju je treba povedat kaj je njegova nova vloga
+                        for playa in dynamic:   #robberju je treba povedat kaj je njegova nova vloga
                             if playa['user_id'] == robber.id:
                                 new_role = playa['role']
                                 msg = 'Great! You are now ' + new_role
@@ -500,6 +511,8 @@ async def on_message(message):
                                     second_name = user.name
 
                         dynamic, switch_msg = ww.switch(dynamic, firstID, secondID)   #menjam
+                        print('\nstatic >>>\n', static)
+                        print('\ndynamic >>>\n', dynamic)
                         print('troublemaker -',troublemaker.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         await troublemaker.send('> Well done! You switched **`' + first_name + '`** and **`' + second_name + '`**.')
                         next_one = ww.whos_next(static, data);

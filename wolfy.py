@@ -40,6 +40,14 @@ errors = ['Mission failed succesfully!',  #za tiste, ki ne znajo vnašat wolfy u
             'Pišuka Polde, ni to prava komanda']
 specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ne znaš komandirat, jarane."']  #najprej prvi msg, počakam 3s, pošljem drugi error
 
+# Dictionary of commands {'command_name':'description'}
+commands = {'basic':
+                {
+                    'woof':'ping Wolfy', 
+                    'wolfy':'Wolfy tells common German phrase...',
+                    'maš kak vic?':'a rabm sploh razlagat?'
+                },
+            'game':{}} 
 '''   
 Enkrat mi bo ratal sporočilo za pozdrav - lahko je random nemška fraza iz seznama(http://streettalksavvy.com/street-talk-german-slang/german-slang-phrases/) 
 Ne rabi bit sporočilo na začetku logina, lohk je sam ena fora, ki je sprogramirana v bota. Kličeš z eno frazo in bot odgovori iz random knjižnice nemških fraz.    
@@ -265,10 +273,15 @@ async def on_message(message):
     #-------------------------------------------------------------------------------------------#
     elif message.content.startswith('woof'):      # message for ping
         await message.channel.send('WoofWoof!')
+    elif message.content == 'help': #Wolfy pomagaj!
+        user = wolfy.get_user(message.author.id)
+        msg = 'Wolfy commands:\n'
+        HELP = '```\n' + msg + '\n```' 
+        await user.send(HELP)
     #-------------------------------------------------------------------------------------------#
-    elif message.content.startswith('ustreli'):#rabim seznam vicev
+    elif message.content.startswith('maš kak vic?'):#rabim seznam vicev
         await message.channel.send(vic)        #prostor za zbirko vicev, fraz in podobnih stvari
-    elif message.content.startswith('spam') or message.content.startswith('wolfy'):  #rabim seznam nempkih glupih fraz
+    elif message.content.startswith('wolfy'):  #rabim seznam nempkih glupih fraz
         await message.channel.send('Ich wünsche allen Durchfall, kurze Arme, und kein Klopapier') 
     #-------------------------------------------------------------------------------------------#
     elif message.content == '.logout':     # by wolfy - stops script
@@ -294,6 +307,9 @@ async def on_message(message):
 
 ### .w START GAME - send msg to players
     elif message.content == '.w':
+        # Edino un, ki začne igro jo lahko konča - to je ADMIN
+        ADMIN = message.author.id
+
         #global CHANNEL in bi tja vse pošiljal...detajli
         await message.channel.send('...erewolfes?')     
         #Uvozim json podatke o igri in igralcih
@@ -626,34 +642,39 @@ async def on_message(message):
 
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
     elif message.content == 'w.end':
-        try:
-            table = wolfy.get_channel(CHANNEL)
-        except:
-            CHANNEL = 691400770557444096 #table v NoFunAllowed
-            table = wolfy.get_channel(CHANNEL)
-        if not static:
-            await table.send('The game hasn\'t started yet.')
-        else:
-            ### glavno sporočilo za vse ###
-            #v channel #table prikažem kdo je bil kdo 
-            msg = 'GameOver:\n'
-            table_cards = '\nTable cards were\n'
-            for player in dynamic:          #končni rezultat igre
-                playerID = player['user_id']
-                #show table cards
-                if playerID in [(n+1) for n in range(3)]:
-                    role_name = player['role'].split(' ')[0]
-                    table_cards = table_cards + ' - ' + role_name + '\n'
-                else:
-                    user = wolfy.get_user(playerID)
-                    player_name = user.name
-                    role_name = player['role'].split(' ')[0]
-                    msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'
-            static = [] #reset game
+        admin = wolfy.get_user(ADMIN)
+        user = wolfy.get_user(message.author.id)
+        if user is admin:
+            try:
+                table = wolfy.get_channel(CHANNEL)
+            except:
+                CHANNEL = 691400770557444096 #table v NoFunAllowed
+                table = wolfy.get_channel(CHANNEL)
+            if not static:
+                await table.send('The game hasn\'t started yet.')
+            else:
+                ### glavno sporočilo za vse ###
+                #v channel #table prikažem kdo je bil kdo 
+                msg = 'GameOver:\n'
+                table_cards = '\nTable cards were\n'
+                for player in dynamic:          #končni rezultat igre
+                    playerID = player['user_id']
+                    #show table cards
+                    if playerID in [(n+1) for n in range(3)]:
+                        role_name = player['role'].split(' ')[0]
+                        table_cards = table_cards + ' - ' + role_name + '\n'
+                    else:
+                        user = wolfy.get_user(playerID)
+                        player_name = user.name
+                        role_name = player['role'].split(' ')[0]
+                        msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'
+                static = [] #reset game
 
-            msg = msg + table_cards
-            beautifulmsg = f'```yaml\n{msg}\n```'
-            await table.send(beautifulmsg)
+                msg = msg + table_cards
+                beautifulmsg = f'```yaml\n{msg}\n```'
+                await table.send(beautifulmsg)
+        else:
+            await user.send('You are not admin of current game. You will have to talk with **`' + admin.name + '`** about that.')
             
 
 ###  CHEAT CODES ###

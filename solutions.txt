@@ -35,7 +35,7 @@ Bugs and TODO:
     *- ne uporabljam številk ampak kar imena uporabnikov povsod(lažje za uporabljat), odstrani kodiranje s številkami
     *- igra se mora končat, ko vsi igralci odigrajo svoje, ne ko zmanjka vlog!!!
      - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
-     - admin, ki začne igro, je edini, ki jo lohk konča predčasno
+    *- admin, ki začne igro, je edini, ki jo lohk konča predčasno
     *- troublemaker in ROBBER ne smeta met dostopa do kart na sredini
      - timing 10 min -> po tem času vsak lahko konča igro
     *- troublemaker in robber, ko zamejata vloge v igri, ne sme klicat starih vlog -> torej rabim dve igri oz. slovarja(static/dynamic)

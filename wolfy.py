@@ -285,7 +285,7 @@ async def on_message(message):
     
     ### WEREWOLFES GAME
     #-------------------------------------------------------------------------------------------#
-    elif message.content == '.s':
+    elif message.content == '.state':
         #Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
         user_id = message.author.id
         nickname = message.author.name

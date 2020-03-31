@@ -103,9 +103,18 @@ def transcribe(igame):
     
     \n...e.g. transcribe to get different id()
     '''
-    ogame = []
-    for playa in igame:
-        ogame.append(playa)
+    if isinstance(igame, dict):
+        ogame = {}
+        for payer in igame.keys():
+            ogame[payer] = igame[payer]
+    elif isinstance(igame, list):
+        ogame = []
+        for playa in igame:
+            ogame.append(playa)
+    elif isinstance(igame, str):
+        ogame = ''
+        for char in igame:
+            ogame = ogame + char
     return ogame
 
 def list_active_roles(game_roles):
@@ -240,37 +249,49 @@ def switch(igame, idA, idB):
         switched...string with a message who was switched
     '''
     ogame = transcribe(igame)
+    dynogame = []
     switched = "switched "
     #saving in temp variables
     print('id(igame) >>>', id(igame))
     for player in igame:
+        #print('player >>>', player)
+        #print('player_i >>>', transcribe(player))
         player_i = transcribe(player)
         if player_i['user_id'] == idA:
-            tmpA = player_i['role']
+            tmpA = transcribe(player_i['role'])
             print('id(tmpA) >>>', id(tmpA))
             print('id(player_i) >>>', id(player_i))
             switched = switched + player_i['name'] + '(' + player_i['role'].split(' ')[0] + ') '
         elif player_i['user_id'] == idB:
-            tmpB = player_i['role']
+            tmpB = transcribe(player_i['role'])
             print('id(tmpB) >>>', id(tmpB))
+            print('id(player_i >>>', id(player_i))
             switched = switched + player_i['name'] + '(' + player_i['role'].split(' ')[0] + ') '
     switched = switched + 'to '
     #switching roles
     print('id(ogame) >>>', id(ogame))
     for playa in ogame:
+        #print('>>> playa_i', playa)
         playa_i = transcribe(playa)
+        #print('>>> playa_i', playa_i)
         if playa_i['user_id'] == idA:
-            playa_i['role'] = tmpB
-            print('id(playa_iB) >>>', id(playa_i['role']))
-            print('id(playa_i) >>>', id(playa_i))
+            playa_i['role'] = transcribe(tmpB)
+            playme = transcribe(playa_i)
+            print('id(playa_iB) >>>', id(playme))
+            #print('id(playa_i) >>>', id(playa_i))
             switched = switched + playa_i['name'] + '(' + playa_i['role'].split(' ')[0] + ') '
         elif playa_i['user_id'] == idB:
-            playa_i['role'] = tmpA
-            print('id(playa_iA) >>>', id(playa_i['role']))
+            playa_i['role'] = transcribe(tmpA)
+            playme = transcribe(playa_i)
+            print('id(playa_iA) >>>', id(playme))
             switched = switched + playa_i['name'] + '(' + playa_i['role'].split(' ')[0] + ') '
+        else:
+            playme = transcribe(playa_i)
+
+        dynogame.append(playme)
     switched = switched + 'ID: ' + str(igame is ogame)
 
-    return ogame, switched
+    return dynogame, switched
 
 def change_status(data, user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
     '''

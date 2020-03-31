@@ -5,6 +5,8 @@ from random import shuffle, randint
 from numpy import linspace
 import json
 import collections
+from discord.ext.commands import Bot
+wolfy = Bot(command_prefix='.')
 
 #Uvozim json podatke o igri in igralcih
 data = json.load(open('.game_data.json', 'r'))
@@ -240,22 +242,34 @@ def switch(igame, idA, idB):
     ogame = transcribe(igame)
     switched = "switched "
     #saving in temp variables
+    print('id(igame) >>>', id(igame))
     for player in igame:
-        if player['user_id'] == idA:
-            tmpA = player['role']
-            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
-        elif player['user_id'] == idB:
-            tmpB = player['role']
-            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
+        player_i = transcribe(player)
+        if player_i['user_id'] == idA:
+            tmpA = player_i['role']
+            print('id(tmpA) >>>', id(tmpA))
+            print('id(player_i) >>>', id(player_i))
+            switched = switched + player_i['name'] + '(' + player_i['role'].split(' ')[0] + ') '
+        elif player_i['user_id'] == idB:
+            tmpB = player_i['role']
+            print('id(tmpB) >>>', id(tmpB))
+            switched = switched + player_i['name'] + '(' + player_i['role'].split(' ')[0] + ') '
     switched = switched + 'to '
     #switching roles
-    for player in ogame:
-        if player['user_id'] == idA:
-            player['role'] = tmpB
-            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
-        elif player['user_id'] == idB:
-            player['role'] = tmpA
-            switched = switched + player['name'] + '(' + player['role'].split(' ')[0] + ') '
+    print('id(ogame) >>>', id(ogame))
+    for playa in ogame:
+        playa_i = transcribe(playa)
+        if playa_i['user_id'] == idA:
+            playa_i['role'] = tmpB
+            print('id(playa_iB) >>>', id(playa_i['role']))
+            print('id(playa_i) >>>', id(playa_i))
+            switched = switched + playa_i['name'] + '(' + playa_i['role'].split(' ')[0] + ') '
+        elif playa_i['user_id'] == idB:
+            playa_i['role'] = tmpA
+            print('id(playa_iA) >>>', id(playa_i['role']))
+            switched = switched + playa_i['name'] + '(' + playa_i['role'].split(' ')[0] + ') '
+    switched = switched + 'ID: ' + str(igame is ogame)
+
     return ogame, switched
 
 def change_status(data, user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
@@ -342,22 +356,29 @@ def whos_next(game, data):
 
 
 ### For testing
-testgame = [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-            {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'played':False}, 
-            {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'TROUBLEMAKER - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-            {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'INSOMNIAC - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}, 
-            {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'DRUNK - The Villager has no special ability, but he is definitely not a werewolf.', 'played':False}]
-ida = 689399469090799848
-idb = 593722710706749441
-game = testgame#assign_roles(data)    #dict of active player:roles
-#nightrole = int(input('which role turn? '))
-#for playa in game:
-    #print(playa['role'].split(' ')[0], playa['played'])
-nextrole = whos_next(game, data)
-#print('\n',nextrole,'\n')
+testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - ', 'played':False},
+                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
+                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
+robber_id = 689399469090799848
+victim_id = 593722710706749441
 
-#for playa in game:
-    #print(playa['role'].split(' ')[0], playa['played'])
+static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
+dynamic = transcribe(static) #ta se bo spreminjala
+choice = 'JanezDobrivnik'
+
+print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
+print('dynamic >>>\n', id(dynamic), dynamic)
+print('\nDO STUFF!\n')
+#victim = findUser(dynamic, wolfy, choice, method='by_username')
+dynamic, switch_msg = switch(dynamic, robber_id, victim_id)   #rob the victim
+print('static is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
+print('dynamic >>>\n', id(dynamic), dynamic)
+print('MSG: ' + switch_msg)
+
 
 ####################################################### DUMP #####################################################
 '''

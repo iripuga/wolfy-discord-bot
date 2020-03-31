@@ -10,8 +10,8 @@ global next_one #hranim ime vloge, ki je naslednja na vrsti - tut nujno
 global CHANNEL #kanal v katerem igralci igrajo
 global ADMIN #samo tist, ki začne igro jo lohk predčasno konča
 #global t_start #čas začetka igre - na konc pogledam t_end in gledam kdaj je 10 min
-static = [{}]
-dynamic = [{}]
+static = []
+dynamic = []
 next_one = ''
 
 import discord
@@ -304,7 +304,7 @@ async def on_message(message):
         
         #for i in range(len(game)):
         #    game.pop()
-        static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
+        static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
         dynamic = ww.transcribe(static) #ta se bo spreminjala
         #print('static >>>', id(static))
         #print('dynamic >>>', id(dynamic))

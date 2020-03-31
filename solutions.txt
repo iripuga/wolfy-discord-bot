@@ -23,6 +23,7 @@ dvosmerna komunikacija discord -> https://stackoverflow.com/questions/42617183/u
 change online status of players -> https://www.programcreek.com/python/example/107416/discord.Status
 format messages -> https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
 diamond problem(static and dynamic) -> https://towardsdatascience.com/how-to-connect-objects-with-each-other-in-different-situations-with-pythonic-ways-d3aaf4c89553
+static game in Class -> https://stackoverflow.com/questions/68645/are-static-class-variables-possible-in-python 
 
 Bugs and TODO:
     *- BUG <safety net zorca in nobenga druzga ne spusti čez! - odvisno od zaporedja v game pa ne bi smelo bit>

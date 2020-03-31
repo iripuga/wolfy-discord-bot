@@ -71,10 +71,10 @@ GUILD = int(GUILD)
 
 
 ### FUNKCIJE #####################################################################################
-def msg4user(player):
+def msg4user(game_player):
     #Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem vsakemu uporabniku
-    playername = player['name']
-    role = player['role']
+    playername = game_player['name']
+    role = game_player['role']
     rolename = role.split(' ')[0]
     if playername == 'zorkoporko':
         emoji = {'villager':':neutral_face:',
@@ -238,6 +238,10 @@ async def on_ready():
 ############################################## MAIN ##############################################
 @wolfy.event
 async def on_message(message):
+    '''
+    Ukazi izven Werewolfs igre se začnej z '.' + <ime_ukaza>. 
+    Ukazi v igri pa se kličejo z 'w.' + <ime_ukaza>
+    '''
     global data
     global static   #dict -> igra na začetku, po kateri kličem igralce
     global dynamic  #dict -> igra v kateri se vse spreminja
@@ -247,16 +251,9 @@ async def on_message(message):
 
     #Če nista dve definiciji sta static in dynamic skos isti - neki s pointerji
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - ', 'played':False},
-                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
-                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
-    testgame1 = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - ', 'played':False},
-                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
+                #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'DRUNK - ', 'played':False},
+                #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
                 {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
                 {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
                 {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
@@ -285,7 +282,7 @@ async def on_message(message):
     
     ### WEREWOLFES GAME
     #-------------------------------------------------------------------------------------------#
-    elif message.content == '.state':
+    elif message.content.startswith('.state'):
         #Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
         user_id = message.author.id
         nickname = message.author.name
@@ -304,7 +301,7 @@ async def on_message(message):
         
         #for i in range(len(game)):
         #    game.pop()
-        static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
+        static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
         dynamic = ww.transcribe(static) #ta se bo spreminjala
         #print('static >>>', id(static))
         #print('dynamic >>>', id(dynamic))
@@ -383,7 +380,7 @@ async def on_message(message):
 ###  NIGHT GAME - for dynamic roles to change game cards
     #Za vsako dinamično vlogo posebej glede na night_order...če igralec ni ta vloga ga Wolfy ignorira
     elif message.content.startswith('w.seer'):      ### SEER
-        print('\nseer-start:',next_one)
+        print('\n>>> seer-start:',next_one)
         id_seer = message.author.id
         seer = wolfy.get_user(id_seer)
         _bljak, players4seer = ww.list4role(static, 'SEER', wolfy) #_bljak is list4msg, which we don't need anymore, but still need for function output
@@ -415,7 +412,8 @@ async def on_message(message):
                     first = ''; second = ''; #sporočila za posamezne karte
                     for card in look:
                         for tableCard in static:
-                            if tableCard['name'] == card:
+                            shortName = tableCard['name'][0] + tableCard['name'][-1]
+                            if shortName == card:
                                 if first == '':
                                     first = card + ' is a ' + tableCard['role']
                                 else:
@@ -429,7 +427,7 @@ async def on_message(message):
                 else:   #če zajebe in neki ni prov vnesel
                     await seer.send('Well done! Somehow you fucked up...'); #If you fuck up the seer number we move on
                     break
-        print('seer-end:', next_one, '\n')
+        print('>>> seer-end:', next_one, '\n')
     
     elif message.content.startswith('w.robber'):    ### ROBBER
         print('\n>>> robber-start', next_one)                                                                            
@@ -455,8 +453,8 @@ async def on_message(message):
                         print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
                         print('dynamic >>>\n', id(dynamic), dynamic)
                         print('\nDO STUFF!\n')
-                        victim = ww.findUser(dynamic, wolfy, choice, method='by_username')
-                        dynamic, switch_msg = ww.transcribe(ww.switch(dynamic, robber.id, victim.id))   #rob the victim
+                        victim = ww.findUser(static, wolfy, choice, method='by_username')
+                        dynamic, switch_msg = ww.switch(dynamic, robber.id, victim.id)   #rob the victim
                         print('static is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
                         print('dynamic >>>\n', id(dynamic), dynamic)
                         #print(game)#game = list(game) in case game becomes tuple somehow???
@@ -476,7 +474,7 @@ async def on_message(message):
         print('>>> robber-end',next_one, '\n')
 
     if message.content.startswith('w.trouble'):       ### TROUBLEMAKER
-        print('\ntroublemaker-start', next_one)                                                                            
+        print('\n>>> troublemaker-start', next_one)                                                                            
         id_trouble = message.author.id
         troublemaker = wolfy.get_user(id_trouble);
         _bljak, players4trouble = ww.list4role(static, 'TROUBLEMAKER', wolfy)
@@ -518,10 +516,10 @@ async def on_message(message):
                     else:
                         await troublemaker.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
                         break
-        print('troublemaker-end',next_one, '\n')
+        print('>>> troublemaker-end',next_one, '\n')
 
     if message.content.startswith('w.drunk'):   ### DRUNK
-        print('\ndrunk-start', next_one)                                                                            
+        print('\n>>> drunk-start', next_one)                                                                            
         id_drunk = message.author.id
         drunk = wolfy.get_user(id_drunk);
         _bljak, players4drunk = ww.list4role(static, 'DRUNK', wolfy)
@@ -531,28 +529,33 @@ async def on_message(message):
             #print('user:', drunk, drunk.id, ' <> player:', player['name'], ' <> role:', player['role'].split(' ')[0])
             playersRole = player['role'].split(' ')[0]
             if safe:  #past the safetyNet
-                drunk_choice = message.content.split(' ')[1]  #katero karto na mizi je uporabnik izbral
-                if drunk_choice == 'abstain':
-                    await drunk.send('> Abstinence is your choice, good for you.') #drunk-pass
-                    next_one = ww.whos_next(static, data);
-                    await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
-                    break
-                else:
-                    if drunk_choice in ['tableCard' + str(n+1) for n in range(3)]:
-                        cardID = ww.findUser(static, wolfy, drunk_choice, method='on_table')
-                        dynamic, switch_msg = ww.switch(dynamic, drunk.id, cardID)
-                        print('drunk -',drunk.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
-                        await drunk.send('> In the morning you won\'t know who you are...')
+                if len(message.content.split(' ')) > 1:
+                    drunk_choice = message.content.split(' ')[1]  #katero karto na mizi je uporabnik izbral
+                    if drunk_choice == 'abstain':
+                        await drunk.send('> Abstinence is your choice, good for you.') #drunk-pass
                         next_one = ww.whos_next(static, data);
                         await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
                         break
                     else:
-                        await drunk.send('> Off course you screwed up. Your\'re drunk!')
-                        break
-        print('drunk-end',next_one, '\n')
+                        print(drunk_choice)
+                        if drunk_choice in ['t' + str(n+1) for n in range(3)]:
+                            cardID = ww.findUser(static, wolfy, drunk_choice, method='on_table')
+                            dynamic, switch_msg = ww.switch(dynamic, drunk.id, cardID)
+                            print('drunk -',drunk.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
+                            await drunk.send('> In the morning you won\'t know who you are...')
+                            next_one = ww.whos_next(static, data);
+                            await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                            break
+                        else:
+                            await drunk.send('> Off course you screwed up. Your\'re drunk!')
+                            break
+                else:
+                    await drunk.send('> Off course you screwed up. Your\'re drunk!')
+                    break
+        print('>>> drunk-end',next_one, '\n')
 
     if message.content.startswith('w.insomniac'):   ### INSOMNIAC
-        print('\ninsomniac-start', next_one)                                                                            
+        print('\n>>> insomniac-start', next_one)                                                                            
         id_insomniac = message.author.id
         insomniac = wolfy.get_user(id_insomniac);
         _bljak, players4insomniac = ww.list4role(static, 'INSOMNIAC', wolfy)
@@ -584,16 +587,16 @@ async def on_message(message):
                 else:
                     await insomniac.send('> Dude, you had one job!')
                     break
-        print('insomniac-end',next_one, '\n')
+        print('>>> insomniac-end',next_one, '\n')
 
     if message.content.startswith('w.abstain'):
-        print('\nabstain-start', next_one)                                                                            
+        print('\n>>> abstain-start', next_one)                                                                            
         id_abstain = message.author.id
         abstain = wolfy.get_user(id_abstain)
         await abstain.send('> Abstinence is your choice.') #role-pass
         next_one = ww.whos_next(static, data);
         await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
-        print('troublemaker-end',next_one, '\n')
+        print('>>> abstain-end',next_one, '\n')
 
 ### JOKE commands for roles with no dynamic night function ###
     if message.content.startswith('hunter'):

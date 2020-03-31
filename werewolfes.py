@@ -101,7 +101,7 @@ def transcribe(igame):
     then objects are connected. 
     Yet I want static to be disconected to dynamic...
     
-    \n...e.g. transcribe to get different id()
+    \n...e.g. transcribe to get different id(). Function can also transcribe different data types.
     '''
     if isinstance(igame, dict):
         ogame = {}
@@ -115,6 +115,8 @@ def transcribe(igame):
         ogame = ''
         for char in igame:
             ogame = ogame + char
+    else:
+        raise NotImplementedError('Data type of \'igame\' unknown')
     return ogame
 
 def list_active_roles(game_roles):
@@ -154,7 +156,7 @@ def list4role(game, rolename, wolfy):
     players4role = {}
     for player in game:
         if player['name'] in ['tableCard' + str(n+1) for n in range(3)]:    #za tableCards ne morem narest wolfy objekta user - samo SEER lahko gleda karte ki so na mizi
-            if rolename == 'SEER':
+            if (rolename == 'SEER') or (rolename == 'DRUNK'):
                 list4msg = list4msg + ' - '+ player['name'][0] + player['name'][-1] + '\n'
                 players4role[player['name']] = player['user_id']
             else:
@@ -389,8 +391,24 @@ victim_id = 593722710706749441
 
 static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
 dynamic = transcribe(static) #ta se bo spreminjala
-choice = 'JanezDobrivnik'
+choice = 't1'
+for c in static:
+    shortName = c['name'][0] + c['name'][-1]
+    if shortName == choice:
+        print(choice, '>>>', c['name'])
+        choice = c['name']
+        print(choice)
+        break
+card_id = findUser(static, wolfy, choice, method='on_table')
+print(card_id)
 
+
+
+
+
+####################################################### DUMP #####################################################
+'''
+choice = 'JanezDobrivnik'
 print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
 print('dynamic >>>\n', id(dynamic), dynamic)
 print('\nDO STUFF!\n')
@@ -399,9 +417,9 @@ dynamic, switch_msg = switch(dynamic, robber_id, victim_id)   #rob the victim
 print('static is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
 print('dynamic >>>\n', id(dynamic), dynamic)
 print('MSG: ' + switch_msg)
+'''
 
 
-####################################################### DUMP #####################################################
 '''
 def _assign_roles0(idata=data, desires=None):   
     

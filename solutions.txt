@@ -26,21 +26,22 @@ diamond problem(static and dynamic) -> https://towardsdatascience.com/how-to-con
 static game in Class -> https://stackoverflow.com/questions/68645/are-static-class-variables-possible-in-python 
 
 Bugs and TODO:
-    *- BUG <safety net zorca in nobenga druzga ne spusti čez! - odvisno od zaporedja v game pa ne bi smelo bit>
-
+    *- BUG <safety net zorca in nobenga druzga ne spusti čez! Odvisno od zaporedja v game pa ne bi smelo bit>
     *- dodaj troublemaker, insomniac, drunk komande v on_message()
     *- pisanje mora biti v kanal iz katerega izhaja ukaz '.w'
     *- BUG <dvakrat pošlje sporočilo vlogi, ko jo igraš>
     - ROBBER, če se zamenjaš z vlogo, ti pošlje command msg tudi od nove vloge
     *- SEER ni še narjen za namizne karte
     *- ne uporabljam številk ampak kar imena uporabnikov povsod(lažje za uporabljat), odstrani kodiranje s številkami
-     - igra se mora končat, ko vsi igralci odigrajo svoje, ne ko zmanjka vlog!!!
+    *- igra se mora končat, ko vsi igralci odigrajo svoje, ne ko zmanjka vlog!!!
      - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
      - admin, ki začne igro, je edini, ki jo lohk konča predčasno
-     - troublemaker in ROBBER ne smeta met dostopa do kart na sredini
+    *- troublemaker in ROBBER ne smeta met dostopa do kart na sredini
      - timing 10 min -> po tem času vsak lahko konča igro
-     - troublemaker in robber, ko zamejata vloge v igri, ne sme klicat starih vlog -> torej rabim dve igri oz. slovarja(static/dynamic)
-     - tableCard1 gre v t1
-     *- static in dynamic rabita ločeni definiciji slovarja igre kar pa ni izvedljivo -> kako narest ločene pointerje -> pointerjev ni v python, rabim ločene id-je. Preverim z id(var_name).
-     - static in dynamic sta po zamenjavi še vedno ista, kljub različnim object id-jem
-     *- ROBBER ti ne napiše pravega imena zamenjane vloge
+    *- troublemaker in robber, ko zamejata vloge v igri, ne sme klicat starih vlog -> torej rabim dve igri oz. slovarja(static/dynamic)
+    *- tableCard1 gre v t1
+    *- static in dynamic rabita ločeni definiciji slovarja igre kar pa ni izvedljivo -> kako narest ločene pointerje -> pointerjev ni v python, rabim ločene id-je. Preverim z id(var_name).
+    *- static in dynamic sta po zamenjavi še vedno ista, kljub različnim object id-jem -for zanke ne dump-uja spremenljivk po koncu izvedbe
+    *- ROBBER ti ne napiše pravega imena zamenjane vloge
+    - wolfy lahko piše samo v en server naenkrat...v tistga kamor se vpišem ob začetku seje
+    - napiši help ukaz, ki izpiše vse ukaze in jih prikaže za uporabnike(w.help)

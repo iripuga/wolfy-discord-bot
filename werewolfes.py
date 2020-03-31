@@ -151,7 +151,7 @@ def list4role(game, rolename, wolfy):
         players4role...dict {user.name: user.id} of users for a specific role to chose from 
     '''
     tableID = [1, 2, 3]
-    list4msg = f' - To abstain from your power type: <w.{rolename.lower()} abstain>\n'  #list4msg...string formated list for easier output
+    list4msg = f' - To abstain from your power TYPE: <w.abstain>\n'  #list4msg...string formated list for easier output
     list4insomniac = list4msg
     players4role = {}
     for player in game:
@@ -229,6 +229,11 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
                 user = wolfy.get_user(player['user_id'])
                 break
     elif method == 'on_table':
+        for c in game:
+            shortName = c['name'][0] + c['name'][-1]
+            if shortName == searchPar:
+                searchPar = c['name']
+                break
         tableCard = searchPar #tista karta, s katero moram neki ponoč narest
         for player in game:
             if player['user_id'] in tableID:
@@ -391,6 +396,15 @@ victim_id = 593722710706749441
 
 static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
 dynamic = transcribe(static) #ta se bo spreminjala
+
+
+
+
+
+
+
+####################################################### DUMP #####################################################
+'''
 choice = 't1'
 for c in static:
     shortName = c['name'][0] + c['name'][-1]
@@ -401,12 +415,8 @@ for c in static:
         break
 card_id = findUser(static, wolfy, choice, method='on_table')
 print(card_id)
+'''
 
-
-
-
-
-####################################################### DUMP #####################################################
 '''
 choice = 'JanezDobrivnik'
 print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)

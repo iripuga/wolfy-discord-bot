@@ -252,7 +252,7 @@ async def on_message(message):
     #Če nista dve definiciji sta static in dynamic skos isti - neki s pointerji
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
                 #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'DRUNK - ', 'played':False},
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'INSOMNIAC - ', 'played':False},
                 #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
                 {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
                 {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
@@ -542,15 +542,15 @@ async def on_message(message):
                             cardID = ww.findUser(static, wolfy, drunk_choice, method='on_table')
                             dynamic, switch_msg = ww.switch(dynamic, drunk.id, cardID)
                             print('drunk -',drunk.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
-                            await drunk.send('> In the morning you won\'t know who you are...')
+                            await drunk.send('> In the morning you won\'t know who you are...:face_vomiting:')
                             next_one = ww.whos_next(static, data);
                             await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
                             break
                         else:
-                            await drunk.send('> Off course you screwed up. Your\'re drunk!')
+                            await drunk.send('> Of course you screwed up. Your\'re drunk!')
                             break
                 else:
-                    await drunk.send('> Off course you screwed up. Your\'re drunk!')
+                    await drunk.send('> Of course you screwed up. Your\'re drunk!')
                     break
         print('>>> drunk-end',next_one, '\n')
 

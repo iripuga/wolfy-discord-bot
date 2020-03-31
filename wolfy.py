@@ -452,12 +452,13 @@ async def on_message(message):
                     break
                 elif choice in players4robber.keys():
                     if choice not in ['tableCard' + str(n+1) for n in range(3)]:
-                        print('\nstatic >>>\n', id(static), static)
-                        print('\ndynamic >>>\n', id(dynamic), dynamic)
-                        victim = ww.findUser(ww.transcribe(static), wolfy, choice, method='by_username')
+                        print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
+                        print('dynamic >>>\n', id(dynamic), dynamic)
+                        print('\nDO STUFF!\n')
+                        victim = ww.findUser(dynamic, wolfy, choice, method='by_username')
                         dynamic, switch_msg = ww.transcribe(ww.switch(dynamic, robber.id, victim.id))   #rob the victim
-                        print('\nstatic >>>\n', id(static), static)
-                        print('\ndynamic >>>\n', id(dynamic), dynamic)
+                        print('static is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
+                        print('dynamic >>>\n', id(dynamic), dynamic)
                         #print(game)#game = list(game) in case game becomes tuple somehow???
                         for playa in dynamic:   #robberju je treba povedat kaj je njegova nova vloga
                             if playa['user_id'] == robber.id:
@@ -465,7 +466,7 @@ async def on_message(message):
                                 msg = 'Great! You are now ' + new_role
                                 await robber.send(msg)
                                 break
-                        print('robber -',robber.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
+                        print('\nrobber -',robber.name,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         next_one = ww.whos_next(static, data);
                         await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
                         break

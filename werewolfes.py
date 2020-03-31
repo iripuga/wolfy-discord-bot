@@ -185,11 +185,11 @@ def list4role(game, rolename, wolfy):
     msg = msg1 + msg2
     return msg, players4role
 
-def findUser(game, wolfy, searchPar, method='by_rolename'):
+def findUser(igame, wolfy, searchPar, method='by_rolename'):
     '''
     Finds role in active game data, by searching for its rolename. Returns discord object User\n
     Input:
-        game...game data in list, each element is a dict
+        igame...game data in list, each element is a dict
         searchPar...search parameter to help me find my user. Possible combinations:\n
          - par2find = rolename, method='by_rolename'
          - par2find = discord username, method='by_username'
@@ -199,6 +199,7 @@ def findUser(game, wolfy, searchPar, method='by_rolename'):
     Output:
         user...discord object User - player who we are looking for by searchPar
     '''
+    game = transcribe(igame)
     tableID = [1, 2, 3]
     user = None
     if method == 'by_rolename':
@@ -236,7 +237,7 @@ def switch(igame, idA, idB):
         ogame...refreshed igame ro should I say reshuffled
         switched...string with a message who was switched
     '''
-    ogame = igame
+    ogame = transcribe(igame)
     switched = "switched "
     #saving in temp variables
     for player in igame:

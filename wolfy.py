@@ -1,6 +1,9 @@
 ###   TODO  ###
 # - ko zajebe mu vrnem error message
 # - rabim funkcijo errorHandler
+# - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
+# - wolfy lahko piše samo v en server naenkrat...v tistga kamor se vpišem ob začetku seje
+# - timing 10 min -> po tem času vsak lahko konča igro
 # # # # # # # #
 
 global data #.game_data.json
@@ -32,22 +35,34 @@ class Custom(discord.Client):
     async def overridden_fun():
         return
 '''
-errors = ['Mission failed succesfully!',  #za tiste, ki ne znajo vnašat wolfy ukaze - izbiram random
+errors = [  'Mission failed succesfully!',  #za tiste, ki ne znajo vnašat wolfy ukaze - izbiram random
             'Well done! Somehow you fucked up...',
             'As\' si mau duška dau?!',
             'Ma goni se!',
             'Bemti nanule, kristusove opanke...',
-            'Pišuka Polde, ni to prava komanda']
-specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ne znaš komandirat, jarane."']  #najprej prvi msg, počakam 3s, pošljem drugi error
+            'Pišuka Polde, ni to prava komanda',
+            'Pejt v maloro klamfe srat, hudič sakramenski.',
+            'Ka zaj te bom jaz učil komande pisat? Nea mi ga seri, lepo te prosim.',
+            'Ahhh, das ist unglaublich...']
+specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ni ne znaš komandirat, jarane."']  #najprej prvi msg, počakam 3s, pošljem drugi error
 
 # Dictionary of commands {'command_name':'description'}
-commands = {'basic':
-                {
-                    'woof':'ping Wolfy', 
-                    'wolfy':'Wolfy tells common German phrase...',
-                    'maš kak vic?':'a rabm sploh razlagat?'
-                },
-            'game':{}} 
+commands = {
+    'basic':
+        {
+            "'woof'":'ping wolfy', 
+            "'wolfy'":'wolfy tells common german phrase or a joke...',  #'maš kak vic?':'a rabm sploh razlagat?',
+            "'.id'":'wolfy, whats my discord id',
+            "'.logout'":'bye, wolfy',
+            "'.state'":'change your state(on/off), if its off you wont be able to play',
+            "'.w'":'start new game of werewolfes'
+        },
+    'game':
+        {
+            "'w.<rolename>'":'you will know when the time is right and the moon is bright...',
+            "'w.end'":'everybodys roles are revealed, only person who started the game can end it'
+        }
+} 
 '''   
 Enkrat mi bo ratal sporočilo za pozdrav - lahko je random nemška fraza iz seznama(http://streettalksavvy.com/street-talk-german-slang/german-slang-phrases/) 
 Ne rabi bit sporočilo na začetku logina, lohk je sam ena fora, ki je sprogramirana v bota. Kličeš z eno frazo in bot odgovori iz random knjižnice nemških fraz.    
@@ -275,11 +290,23 @@ async def on_message(message):
         await message.channel.send('WoofWoof!')
     elif message.content == 'help': #Wolfy pomagaj!
         user = wolfy.get_user(message.author.id)
-        msg = 'Wolfy commands:\n'
-        HELP = '```\n' + msg + '\n```' 
+
+        msg = 'Basics:\n'
+        basic = commands['basic']
+        ingame = commands['game']
+        for cmd in basic:
+            fullcmd = ' ' + cmd + ' - ' + basic[cmd] + '\n'
+            msg = msg + fullcmd
+        msg = msg + '\nDaGame:\n'
+        for cmd in ingame:
+            fullcmd = ' ' + cmd + ' - ' + ingame[cmd] + '\n'
+            msg = msg + fullcmd
+        msg = msg + '\nViel Spass!\n'
+
+        HELP = '```prolog\n' + msg + '\n```' 
         await user.send(HELP)
     #-------------------------------------------------------------------------------------------#
-    elif message.content.startswith('maš kak vic?'):#rabim seznam vicev
+    elif message.content.startswith('vic?'):#rabim seznam vicev
         await message.channel.send(vic)        #prostor za zbirko vicev, fraz in podobnih stvari
     elif message.content.startswith('wolfy'):  #rabim seznam nempkih glupih fraz
         await message.channel.send('Ich wünsche allen Durchfall, kurze Arme, und kein Klopapier') 

@@ -30,7 +30,7 @@ Bugs and TODO:
     *- dodaj troublemaker, insomniac, drunk komande v on_message()
     *- pisanje mora biti v kanal iz katerega izhaja ukaz '.w'
     *- BUG <dvakrat pošlje sporočilo vlogi, ko jo igraš>
-    - ROBBER, če se zamenjaš z vlogo, ti pošlje command msg tudi od nove vloge
+    *- ROBBER, če se zamenjaš z vlogo, ti pošlje command msg tudi od nove vloge
     *- SEER ni še narjen za namizne karte
     *- ne uporabljam številk ampak kar imena uporabnikov povsod(lažje za uporabljat), odstrani kodiranje s številkami
     *- igra se mora končat, ko vsi igralci odigrajo svoje, ne ko zmanjka vlog!!!
@@ -44,4 +44,4 @@ Bugs and TODO:
     *- static in dynamic sta po zamenjavi še vedno ista, kljub različnim object id-jem -for zanke ne dump-uja spremenljivk po koncu izvedbe
     *- ROBBER ti ne napiše pravega imena zamenjane vloge
     - wolfy lahko piše samo v en server naenkrat...v tistga kamor se vpišem ob začetku seje
-    - napiši help ukaz, ki izpiše vse ukaze in jih prikaže za uporabnike(w.help)
+    *- napiši help ukaz, ki izpiše vse ukaze in jih prikaže za uporabnike(w.help)

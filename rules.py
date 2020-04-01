@@ -18,8 +18,8 @@ data = {
     'roles':
        [#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},  #lohk jih kr tuki razporediš po zaporednih številkah. Če se nč z vlogo ne zgodi je order 0
        	#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
-        {'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
-        {'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
+        #{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
+        #{'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
 	    {'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
         #{'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3}, 
 	    {'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3},

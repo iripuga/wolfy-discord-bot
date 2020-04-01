@@ -122,6 +122,11 @@ def transcribe(igame):
 def list_active_roles(game_roles):
     #Dobim seznam imen vlog iz slovarja {id: role}. Samo imena vlog
     justroles=''
+
+    print('game >>>', game_roles, '\n')
+    for mix in range(1042):
+        shuffle(game_roles)
+    print('shuffled >>>', game_roles, '\n')
     for player in game_roles:
         role = player['role'].split(' ')[0]
         justroles = justroles + ' - ' + role + '\n'
@@ -155,11 +160,11 @@ def list4role(game, rolename, wolfy):
     list4insomniac = list4msg
     players4role = {}
 
-    print('game >>>', game, '\n')
-    for mix in range(100):
+    #print('game >>>', game, '\n')
+    for mix in range(1042):
         shuffle(game)
-    print('shuffled >>>', game)
-    for player in Gshuffled:
+    #print('shuffled >>>', game, '\n')
+    for player in game:
         if player['name'] in ['tableCard' + str(n+1) for n in range(3)]:    #za tableCards ne morem narest wolfy objekta user - samo SEER lahko gleda karte ki so na mizi
             if (rolename == 'SEER') or (rolename == 'DRUNK'):
                 list4msg = list4msg + ' - '+ player['name'][0] + player['name'][-1] + '\n'
@@ -380,8 +385,43 @@ def whos_next(game, data):
         #od zdaj naprej KODIRAM direkt z imeni, saj so že po vrsti urejena v seznam
     return next_role
 
+def openCards(cards, wolfy, tip='dynamic'):
+    '''
+    This reveals all players in game and table cards and forms a message
+    to be sent on discord.\n
+    Input:
+        cards...game list of dictionaries, different name is to avoid same memory adresses
+        wolfy...I need my bot to get real user names
+        type...za izpisat statične vloge in ne končne
+    Output:
+        term...message for terminal
+        msg...message for discord
+    '''
+    if tip == 'static':
+        term = '\n<<< START GAME >>>\n'
+        msg = 'InTheBeginning:\n'
+        table_cards = '\nTable cards were\n'
+    else:
+        term = '\n<<< END GAME >>>\n'
+        msg = 'AtTheEnd:\n'
+        table_cards = '\nTable cards are\n'
+    
+    for player in cards:          #končni rezultat igre
+        playerID = player['user_id']
+        #show table cards
+        if playerID in [(n+1) for n in range(3)]:
+            role_name = player['role'].split(' ')[0]
+            table_cards = table_cards + ' - ' + role_name + '\n'
+            term = term + 'tableCard' + str(playerID) + ' ' + role_name + '\n'
+        else:
+            user = wolfy.get_user(playerID)
+            player_name = user.name
+            role_name = player['role'].split(' ')[0]
+            msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'
+            term = term + player_name + ' ' + role_name + '\n'
+    msg = msg + table_cards
 
-
+    return term, msg
 
 
 

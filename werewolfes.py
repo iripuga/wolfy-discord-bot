@@ -119,8 +119,8 @@ def transcribe(igame):
         raise NotImplementedError('Data type of \'igame\' unknown')
     return ogame
 
-def list_active_roles(game_roles):
-    #Dobim seznam imen vlog iz slovarja {id: role}. Samo imena vlog
+def listRoles(game_roles):
+    #Dobim seznam imen vlog iz slovarja {id: role}. Samo imena vlog za začetek igre
     justroles=''
 
     print('game >>>', game_roles, '\n')
@@ -372,7 +372,7 @@ def whos_next(game, data):
     if active_roles_order == []:
         return None #Noben več ni na vrsti
     #print('b', night)
-    print('a', active_roles_order)
+    print('active_roles_order >>>', active_roles_order)
 
     #ta prva dinamična vloga je SEER 
     #active, active_roles_order = at_night(game, data) #slovar, urejen seznam vseh aktivnih vlog
@@ -385,13 +385,14 @@ def whos_next(game, data):
         #od zdaj naprej KODIRAM direkt z imeni, saj so že po vrsti urejena v seznam
     return next_role
 
-def openCards(cards, wolfy, tip='dynamic'):
+def openCards(cards, wolfy, listOrder, tip='dynamic'):
     '''
-    This reveals all players in game and table cards and forms a message
-    to be sent on discord.\n
+    END MESSAGE - This reveals all players in game and table cards and 
+    forms a message to be sent on discord.\n
     Input:
         cards...game list of dictionaries, different name is to avoid same memory adresses
         wolfy...I need my bot to get real user names
+        listOrder...pove v kakšnem vrstnem redu moram prikazovat karte
         type...za izpisat statične vloge in ne končne
     Output:
         term...message for terminal
@@ -446,7 +447,14 @@ victim_id = 593722710706749441
 #static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
 #dynamic = transcribe(static) #ta se bo spreminjala
 
+#TODO
 
+listOd = ['tableCard3', 'tableCard2', 'tableCard1', 'iripuga'] #to moram uredit, tko da bo vedno isti vrstni red izpisa v discordu
+for e in listOd:
+    if e in ['tableCard1', 'tableCard2', 'tableCard3']:
+        listOd.remove(e)
+
+print(listOd)
 
 
 
@@ -464,9 +472,7 @@ for c in static:
         break
 card_id = findUser(static, wolfy, choice, method='on_table')
 print(card_id)
-'''
 
-'''
 choice = 'JanezDobrivnik'
 print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
 print('dynamic >>>\n', id(dynamic), dynamic)
@@ -476,10 +482,7 @@ dynamic, switch_msg = switch(dynamic, robber_id, victim_id)   #rob the victim
 print('static is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
 print('dynamic >>>\n', id(dynamic), dynamic)
 print('MSG: ' + switch_msg)
-'''
 
-
-'''
 def _assign_roles0(idata=data, desires=None):   
     
     Shuffle new roles for another game of werewolfes
@@ -534,5 +537,5 @@ def at_night(game, data): #lahko bi dodal, da samo vprašam kdo je naslednji
     for active in nightOrder:
         active_roles_order.append(active)
     return night, active_roles_order
-'''
+    '''
 ##################################################################################################################

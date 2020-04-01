@@ -82,9 +82,9 @@ wolfy = Bot(command_prefix='.') #connection to discord bot, same and more than C
 # Which GUILD to use??? Guild je server v discord jeziku. Za nov server moraš v server najprej prijavit bota preko developers strani
 print('Which guild? ', end=' ')
 server = input()
-if server == 'NFA':
+if server.upper() == 'NFA':
     GUILD = os.getenv('NFA')
-elif server == 'w':
+elif server.upper() == 'w':
     GUILD = os.getenv('WoofServer')
 else:
     GUILD = os.getenv('MaGuilt') #default GUILD is MG
@@ -288,7 +288,7 @@ async def on_message(message):
     #-------------------------------------------------------------------------------------------#
     elif message.content.startswith('woof'):      # message for ping
         await message.channel.send('WoofWoof!')
-    elif message.content == 'help': #Wolfy pomagaj!
+    elif message.content.startswith('help'): #Wolfy pomagaj!
         user = wolfy.get_user(message.author.id)
 
         msg = 'Basics:\n'

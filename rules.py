@@ -6,22 +6,22 @@ import json
 ### json DATA for game functionalities
 data = {
     'members':
-        [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on'}, 
-         {'name': 'rok', 'user_id': 261105970548178944, 'status': 'off'},
-         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'off'},
-         {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off'},
-         {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off'},
-         {'name': 'lovric', 'user_id': 548304226988720149, 'status': 'off'},
-         {'name': 'tableCard1', 'user_id': 1, 'status': 'on'},  #tri karte na sredini mize
-         {'name': 'tableCard2', 'user_id': 2, 'status': 'on'},
-         {'name': 'tableCard3', 'user_id': 3, 'status': 'on'}],
+        [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'played': False}, 
+         {'name': 'rok', 'user_id': 261105970548178944, 'status': 'on', 'played': False},
+         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'played': False},
+         {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'played': False},
+         {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off', 'played': False},
+         {'name': 'lovric', 'user_id': 548304226988720149, 'status': 'off', 'played': False},
+         {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': True},  #tri karte na sredini mize
+         {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': True},
+         {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': True}],
     'roles':
-       [{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},  #lohk jih kr tuki razporediš po zaporednih številkah. Če se nč z vlogo ne zgodi je order 0
-       	{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
+       [#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},  #lohk jih kr tuki razporediš po zaporednih številkah. Če se nč z vlogo ne zgodi je order 0
+       	#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
         {'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
         {'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
 	    {'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
-        {'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3}, 
+        #{'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3}, 
 	    {'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3},
 	    {'name': 'ROBBER', 'description': 'At night, the Robber may choose to rob a card from another player and place his Robber card where the other card was. Then the Robber looks at his new role card.', 'night_order': 5},
 	    {'name': 'TROUBLEMAKER', 'description': 'At night the Troublemaker may switch the cards of two other players without looking at those cards.', 'night_order': 6},

@@ -45,3 +45,5 @@ Bugs and TODO:
     *- ROBBER ti ne napiše pravega imena zamenjane vloge
     - wolfy lahko piše samo v en server naenkrat...v tistga kamor se vpišem ob začetku seje
     *- napiši help ukaz, ki izpiše vse ukaze in jih prikaže za uporabnike(w.help)
+    *- če je na mizi dinamična vloga jo skenslam
+    - prikaz NewGame mora premešat, da niso spodnje tri namizne karte

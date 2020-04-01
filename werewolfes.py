@@ -300,14 +300,16 @@ def switch(igame, idA, idB):
 
     return dynogame, switched
 
-def change_status(data, user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
+def change_status(user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
     '''
     Function changes status of current user to on/off. Updated dictionary is then written to hidden file .game_data.json from which this game runs
     Input:
         data...slovar igre 
         user_id...kdo hoče menjat status
     '''
-    members = data['members']
+    #Uvozim json podatke o igri in igralcih
+    gdata = json.load(open('.game_data.json', 'r'))
+    members = gdata['members']
     klik = ''
     user_name = ''
     user_id = user_id
@@ -321,7 +323,7 @@ def change_status(data, user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
                 klik = 'on'
                 member['status'] = klik
     with open('.game_data.json', 'w', encoding='utf-8') as f:       
-        json.dump(data, f, ensure_ascii=False, indent=4)
+        json.dump(gdata, f, ensure_ascii=False, indent=4)
         
     return klik #to je trenutno stanje za vhodni user_id
 
@@ -357,7 +359,7 @@ def whos_next(game, data):
     if active_roles_order == []:
         return None #Noben več ni na vrsti
     #print('b', night)
-    #print('a', active_roles_order)
+    print('a', active_roles_order)
 
     #ta prva dinamična vloga je SEER 
     #active, active_roles_order = at_night(game, data) #slovar, urejen seznam vseh aktivnih vlog
@@ -391,11 +393,11 @@ testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 
                 {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
                 {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
                 {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
-robber_id = 689399469090799848
+usr_id = 689399469090799848
 victim_id = 593722710706749441
-
-static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
-dynamic = transcribe(static) #ta se bo spreminjala
+print('klik', change_status(usr_id))
+#static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
+#dynamic = transcribe(static) #ta se bo spreminjala
 
 
 

@@ -1,5 +1,5 @@
 ###   TODO  ###
-# - ko zajebe mu vrnem error message
+# - ko zajebe mu vrnem random error message
 # - rabim funkcijo errorHandler
 # - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
 # - wolfy lahko piše samo v en server naenkrat...v tistga kamor se vpišem ob začetku seje
@@ -54,7 +54,7 @@ commands = {
             "'wolfy'":'wolfy tells common german phrase or a joke...',  #'maš kak vic?':'a rabm sploh razlagat?',
             "'.id'":'wolfy, whats my discord id',
             "'.logout'":'bye, wolfy',
-            "'.state'":'change your state(on/off), if its off you wont be able to play',
+            "'.status'":'change your status(on/off), if its off you wont be able to play',
             "'.w'":'start new game of werewolfes'
         },
     'game':
@@ -318,20 +318,19 @@ async def on_message(message):
         your_id = message.author.id
         user = wolfy.get_user(your_id)
         await user.send('Your ID is: ' + str(your_id))
-    #-------------------------------------------------------------------------------------------#
-    
-    ### WEREWOLFES GAME
-    #-------------------------------------------------------------------------------------------#
-    elif message.content.startswith('.state'):
+    elif message.content.startswith('.status'):
         #Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
         user_id = message.author.id
         nickname = message.author.name
-        klik = ww.change_status(data, user_id)        #menjava statusa
+        klik = ww.change_status(user_id)        #menjava statusa
         #with open('.game_data.json', 'w', encoding='utf-8') as f:
         #    json.dump(data, f, ensure_ascii=False, indent=4)
         msg = nickname + ' status: ' + klik
         await message.channel.send(str(msg))   
-
+    #-------------------------------------------------------------------------------------------#
+    
+    ### WEREWOLFES GAME
+    #-------------------------------------------------------------------------------------------#
 ### .w START GAME - send msg to players
     elif message.content == '.w':
         # Edino un, ki začne igro jo lahko konča - to je ADMIN
@@ -344,7 +343,7 @@ async def on_message(message):
         
         #for i in range(len(game)):
         #    game.pop()
-        static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
+        static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
         dynamic = ww.transcribe(static) #ta se bo spreminjala
         #print('static >>>', id(static))
         #print('dynamic >>>', id(dynamic))

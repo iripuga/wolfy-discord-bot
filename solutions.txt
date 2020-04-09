@@ -52,3 +52,10 @@ Bugs and TODO:
     - kako dopelgangerja narest?!
     - id od static in dynamic se mora resetirat, drugač igramo skos isto igro! lohk pa resetiram vedno terminal
     - wolfy mora za vse vloge napisat da so na vrsti, ker drugače igralci prehitro pogruntajo kdo je kdo
+
+Dodatki za špil:
+    - prevedi igrico v slovenščino zaradi copyright - a 
+    - funkcija za villagerja -> Masovna depresija: vsi villagerji so tannerji
+    - cela igra okrog tannerja(ime: Just Kill Me!)
+    - navaden villager lahko enga pokaže in izve a je drugi villager al' ni
+    - Balkanska verzija(ime: Ćobani)

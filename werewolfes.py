@@ -393,7 +393,7 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
         cards...game list of dictionaries, different name is to avoid same memory adresses
         wolfy...I need my bot to get real user names
         listOrder...pove v kakšnem vrstnem redu moram prikazovat karte
-        type...za izpisat statične vloge in ne končne
+        tip...da vem al' izpisujem statične vloge al' končen rezultat igre
     Output:
         term...message for terminal
         msg...message for discord
@@ -407,17 +407,19 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
         msg = 'AtTheEnd:\n'
         table_cards = '\nTable cards are\n'
     
-    for player in cards:          #končni rezultat igre
-        playerID = player['user_id']
-        #show table cards
-        if playerID in [(n+1) for n in range(3)]:
-            role_name = player['role'].split(' ')[0]
+    for username in listOrder:          #končni rezultat igre
+        for karta in cards:  #poiščem userja, ki je trenutno v listOrder
+            if karta['name'] == username:
+                user = karta
+                break
+
+        if karta['user_id'] in [1, 2, 3]:
+            role_name = karta['role'].split(' ')[0]
             table_cards = table_cards + ' - ' + role_name + '\n'
-            term = term + 'tableCard' + str(playerID) + ' ' + role_name + '\n'
+            term = term + 'tableCard' + str(karta['user_id']) + ' ' + role_name + '\n'
         else:
-            user = wolfy.get_user(playerID)
-            player_name = user.name
-            role_name = player['role'].split(' ')[0]
+            player_name = karta['name']
+            role_name = karta['role'].split(' ')[0]
             msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'
             term = term + player_name + ' ' + role_name + '\n'
     msg = msg + table_cards
@@ -442,6 +444,14 @@ testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 
                 {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
                 {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
                 {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
+endgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
+                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - ', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'DRUNK - ', 'played':False},
+                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
+                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
+
 usr_id = 689399469090799848
 victim_id = 593722710706749441
 #static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
@@ -449,12 +459,16 @@ victim_id = 593722710706749441
 
 #TODO
 
-listOd = ['tableCard3', 'tableCard2', 'tableCard1', 'iripuga'] #to moram uredit, tko da bo vedno isti vrstni red izpisa v discordu
-for e in listOd:
-    if e in ['tableCard1', 'tableCard2', 'tableCard3']:
-        listOd.remove(e)
-
-print(listOd)
+listOd = ['iripuga', 'tableCard1', 'tableCard2', 'tableCard3'] #to moram uredit, tko da bo vedno isti vrstni red izpisa v discordu
+term, msg = openCards(testgame, wolfy, listOd, tip='static')
+term1, msg1 = openCards(endgame, wolfy, listOd)
+print(term)
+print()
+print(msg)
+print()
+print(term1)
+print()
+print(msg1)
 
 
 

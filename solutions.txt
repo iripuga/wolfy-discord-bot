@@ -48,10 +48,12 @@ Bugs and TODO:
     *- če je na mizi dinamična vloga jo skenslam, nekako lahko pride karta na mizi na vrsto, kar ni prov
     - prikaz NewGame mora premešat, da niso spodnje tri namizne karte
     - assign roles niso dost random!!!
-    - table cards in usernames se morajo vedno izpisat v istem vrstnem redu
+    *- table cards in usernames se morajo vedno izpisat v istem vrstnem redu
     - kako dopelgangerja narest?!
     - id od static in dynamic se mora resetirat, drugač igramo skos isto igro! lohk pa resetiram vedno terminal
     - wolfy mora za vse vloge napisat da so na vrsti, ker drugače igralci prehitro pogruntajo kdo je kdo
+    - Ko se igra začne jo je treba končat, drugač vsi notr skačejo
+    - nočna navodila se vsa pošiljajo v DM posameznim igralcem
 
 Dodatki za špil:
     - prevedi igrico v slovenščino zaradi copyright - a 
@@ -59,3 +61,19 @@ Dodatki za špil:
     - cela igra okrog tannerja(ime: Just Kill Me!)
     - navaden villager lahko enga pokaže in izve a je drugi villager al' ni
     - Balkanska verzija(ime: Ćobani)
+
+
+                                byZorek
+EXTRA RULES:
+
+Maš še en deck of cards, k dodajo random pravilo za tisti session.
+
+PRIMERI:
+    - 1 TANNER igra on the VILLAGE TEAM to rundo
+    - 2 Če je tvoja vloga VILLAGER, lohk vprašaš, če je njegova vloga VILLAGER in če je navaden VILLAGER, ti pove
+    - 3 SEER gre dvakrat to rundo
+    - 4 TROUBLEMAKER gre dvakrat to rundo
+    - 5 ROBBER gre dvakrat to rundo
+    - 6 MINION igra on the VILLAGE TEAM to rundo
+    - 7 vsi normalni VILLAGER-ji igrajo on the WEREWOLVES TEAM to rundo
+    - 8 če se ubije enga iz VILLAGER TEAM-a ni še konc, ampak se še enkrat lohk izbira

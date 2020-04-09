@@ -371,7 +371,6 @@ async def on_message(message):
         for player in static:
             playerID = player['user_id']
             playersRole = player['role'].split(' ')[0]
-            listOrder.append(player['name'])  #rabim za izpis v discord
             #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
             if playerID in [(n+1) for n in range(3)]:
                 print(player['name'] + ' ' + str(player['role'].split(' ')[0]))  #don't send message to tableCards
@@ -381,7 +380,7 @@ async def on_message(message):
                 player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
                 init_msg = msg4user(player) #lovrič me je blokiral!!! no_hello ne morem pošiljat
                 await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
-            ### .w NIGHT GAME - for static roles to know each other 
+                ### .w NIGHT GAME - for static roles to know each other 
                 if playersRole == 'VILLAGER':
                     player['played'] = True #nothing happens - just to make sure, that nothing happens
                 elif playersRole == 'WEREWOLF': 
@@ -416,13 +415,13 @@ async def on_message(message):
                     if not flag:
                         await user.send('> You are the only MASON')
                     #player['played'] = True  #to se bo zgodilo v funkciji whos_next
-
+            listOrder.append(player['name'])  #rabim za izpis v discord
         #rearrange list order for clear output at the end of game
         for card in ['tableCard1', 'tableCard2', 'tableCard3']:
             listOrder.remove(card)
         for card in ['tableCard1', 'tableCard2', 'tableCard3']:
             listOrder.append(card)
-        print(listOrder)
+        print('listOrder >>>', listOrder)
 
         #send message to next role - his turn 
         next_one = ww.whos_next(static, data); #0-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
@@ -679,33 +678,46 @@ async def on_message(message):
 
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
     elif message.content == 'w.end':
-        print(listOrder)
-        user = wolfy.get_user(message.author.id)
         try:
-            admin = wolfy.get_user(ADMIN)
-            if user is admin:
-                try:
-                    table = wolfy.get_channel(CHANNEL)
-                except: #če ne pozna channel poščje v NoFunAllowed
-                    CHANNEL = 691400770557444096 #table v NoFunAllowed
-                    table = wolfy.get_channel(CHANNEL)
+            table = wolfy.get_channel(CHANNEL)
+        except: #če ne pozna channel poščje v NoFunAllowed
+            CHANNEL = 691400770557444096 #table v NoFunAllowed
+            table = wolfy.get_channel(CHANNEL)
 
-                if not static:
-                    await table.send('The game hasn\'t started yet.')
-                else:
-                    ### glavno sporočilo za vse ###
-                    #v channel #table prikažem kdo je bil kdo 
-                    start_terminal, start_msg = ww.openCards(static, wolfy, listOrder, tip='static') #_fujfuj ne rabim nikjer
-                    end_terminal, end_msg = ww.openCards(dynamic, wolfy, listOrder)
-                    static = [] #reset game
+        user = wolfy.get_user(message.author.id)
+        admin = wolfy.get_user(ADMIN)
+        print(user, admin)
 
-                    print(start_terminal, '\n', end_terminal) #začetne vloge so itak že napisane na začetku
-                    beautifulmsg = f'```yaml\n{start_msg}\n{end_msg}```'
-                    await table.send(beautifulmsg)
+        if not static:
+            await table.send(f'{user.name} the game hasn\'t started yet.')
+        else:
+            if message.author.id == ADMIN:
+                admin = wolfy.get_user(ADMIN)
+                ### glavno sporočilo za vse ###
+                #v channel #table prikažem kdo je bil kdo 
+                print(static,'\n', listOrder)
+
+                start_terminal, start_msg = ww.openCards(static, wolfy, listOrder, tip='static') #_fujfuj ne rabim nikjer
+                end_terminal, end_msg = ww.openCards(dynamic, wolfy, listOrder)
+                
+                # reset game #
+                static = []
+                dynamic = [] 
+                ADMIN = None
+                admin = None
+                user = None
+                CHANNEL = None
+                listOrder = []
+                next_one = ''
+                ##############
+
+                print(start_terminal, '\n', end_terminal) #začetne vloge so itak že napisane na začetku
+                beautifulmsg = f'```yaml\n{start_msg}\n{end_msg}```'
+                await table.send(beautifulmsg)
             else:
                 await user.send('You are not admin of current game. You will have to talk with **`' + admin.name + '`** about that.')
-        except:
-            await user.send('The game hasn\'t started yet!')
+#        except:
+#            await user.send('The game hasn\'t started yet!')
         
 
 ###  CHEAT CODES ###

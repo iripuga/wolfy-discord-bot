@@ -123,10 +123,10 @@ def listRoles(game_roles):
     #Dobim seznam imen vlog iz slovarja {id: role}. Samo imena vlog za začetek igre
     justroles=''
 
-    print('game >>>', game_roles, '\n')
+    #print('game >>>', game_roles, '\n')
     for mix in range(1042):
         shuffle(game_roles)
-    print('shuffled >>>', game_roles, '\n')
+    #print('shuffled >>>', game_roles, '\n')
     for player in game_roles:
         role = player['role'].split(' ')[0]
         justroles = justroles + ' - ' + role + '\n'
@@ -372,7 +372,7 @@ def whos_next(game, data):
     if active_roles_order == []:
         return None #Noben več ni na vrsti
     #print('b', night)
-    print('active_roles_order >>>', active_roles_order)
+    print('\nactive_roles_order >>>', active_roles_order)
 
     #ta prva dinamična vloga je SEER 
     #active, active_roles_order = at_night(game, data) #slovar, urejen seznam vseh aktivnih vlog
@@ -401,28 +401,32 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
     if tip == 'static':
         term = '\n<<< START GAME >>>\n'
         msg = 'InTheBeginning:\n'
-        table_cards = '\nTable cards were\n'
+        tense = ' was ' #angleški čas past
+        table_cards = '\nTable cards were...\n'
     else:
         term = '\n<<< END GAME >>>\n'
         msg = 'AtTheEnd:\n'
-        table_cards = '\nTable cards are\n'
+        tense = ' is ' #angleški čas present
+        table_cards = '\nTable cards are...\n'
     
     for username in listOrder:          #končni rezultat igre
-        for karta in cards:  #poiščem userja, ki je trenutno v listOrder
-            if karta['name'] == username:
-                user = karta
+        for c in cards:  #poiščem userja, ki je trenutno v listOrder
+            if c['name'] == username:
+                karta = c
                 break
-
-        if karta['user_id'] in [1, 2, 3]:
+        '''
+        if karta['name'] in ['tableCard' + str(n+1) for n in range(3)]:
             role_name = karta['role'].split(' ')[0]
-            table_cards = table_cards + ' - ' + role_name + '\n'
+            table_cards = table_cards + ' - ' + karta['name'] + ' ' + role_name + '\n'
             term = term + 'tableCard' + str(karta['user_id']) + ' ' + role_name + '\n'
         else:
-            player_name = karta['name']
-            role_name = karta['role'].split(' ')[0]
-            msg = msg + ' - ' + player_name + ' was ' + role_name + '\n'
-            term = term + player_name + ' ' + role_name + '\n'
-    msg = msg + table_cards
+        '''
+        player_name = karta['name']
+        if player_name == 'tableCard1':
+            msg = msg + table_cards
+        role_name = karta['role'].split(' ')[0]
+        msg = msg + ' - ' + player_name + tense + role_name + '\n'
+        term = term + player_name + ' ' + role_name + '\n'
 
     return term, msg
 
@@ -459,9 +463,11 @@ victim_id = 593722710706749441
 
 #TODO
 
-listOd = ['iripuga', 'tableCard1', 'tableCard2', 'tableCard3'] #to moram uredit, tko da bo vedno isti vrstni red izpisa v discordu
-term, msg = openCards(testgame, wolfy, listOd, tip='static')
-term1, msg1 = openCards(endgame, wolfy, listOd)
+igra = [{'name': 'columbo55', 'user_id': 689072253002186762, 'status': 'on', 'played': True, 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': False, 'role': 'INSOMNIAC - The Insomniac wakes up and looks at their card (to see if it has changed).'}, {'name': 'JanezDobrivnik', 'user_id': 593722710706749441, 'status': 'on', 'played': False, 'role': 'TROUBLEMAKER - At night the Troublemaker may switch the cards of two other players without looking at those cards.'}, {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': False, 'role': 'ROBBER - At night, the Robber may choose to rob a card from another player and place his Robber card where the other card was. Then the Robber looks at his new role card.'}, {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': True, 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'played': True, 'role': 'SEER - At night, the Seer may look eighter at one other players card or at two of the center cards, but does not move them.'}] 
+listOd = ['iripuga', 'JanezDobrivnik', 'columbo55', 'tableCard1', 'tableCard2', 'tableCard3'] #to moram uredit, tko da bo vedno isti vrstni red izpisa v discordu
+term, msg = openCards(igra, wolfy, listOd, tip='static')
+term1, msg1 = openCards(igra, wolfy, listOd)
+'''
 print(term)
 print()
 print(msg)
@@ -469,7 +475,7 @@ print()
 print(term1)
 print()
 print(msg1)
-
+'''
 
 
 

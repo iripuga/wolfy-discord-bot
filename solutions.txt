@@ -43,7 +43,7 @@ Bugs and TODO:
     *- static in dynamic rabita ločeni definiciji slovarja igre kar pa ni izvedljivo -> kako narest ločene pointerje -> pointerjev ni v python, rabim ločene id-je. Preverim z id(var_name).
     *- static in dynamic sta po zamenjavi še vedno ista, kljub različnim object id-jem -for zanke ne dump-uja spremenljivk po koncu izvedbe
     *- ROBBER ti ne napiše pravega imena zamenjane vloge
-    - NUJNO -> wolfy lahko piše samo v en server naenkrat...v tistga kjer je trenutna igra, drugač se vsega nabere preveč
+    *- NUJNO -> wolfy lahko piše samo v en server naenkrat...v tistga kjer je trenutna igra, drugač se vsega nabere preveč
     *- napiši help ukaz, ki izpiše vse ukaze in jih prikaže za uporabnike(w.help)
     *- če je na mizi dinamična vloga jo skenslam, nekako lahko pride karta na mizi na vrsto, kar ni prov
     *- prikaz NewGame mora premešat, da niso spodnje tri namizne karte

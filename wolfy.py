@@ -10,6 +10,7 @@ global data #.game_data.json
 global static #ta se definira na začetku in po njej vloge igrajo
 global dynamic #v tej se odražajo dejanja vlog - this will be my main game dict in which all will happen - TA JE NUJNA, ostale niti ne tolk
 global next_one #hranim ime vloge, ki je naslednja na vrsti - tut nujno
+global GUILD
 global CHANNEL #kanal v katerem igralci igrajo
 global ADMIN #samo tist, ki začne igro jo lohk predčasno konča
 global listOrder #seznam imen igralcev, ki jih uporabim, da je vedno isto zaporedje igralcev v izpisu
@@ -97,6 +98,7 @@ else:
     GUILD = os.getenv('MaGuilt') #default GUILD is MG
     CHANNEL = os.getenv('MG-table')
 GUILD = int(GUILD)
+CHANNEL = int(CHANNEL)
 ##################################################################################################
 
 
@@ -263,7 +265,7 @@ async def on_ready():
     )
     show_members = '\n - '.join([member.name for member in guild.members])
     print(f'Guild Members:\n - {show_members}')
-    channel = wolfy.get_channel(int(CHANNEL))
+    channel = wolfy.get_channel(CHANNEL)
 
     await wolfy.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="to w.help"))
     await channel.send('Hallo, ich möchte ein Spiel zu spielen!')    
@@ -274,13 +276,14 @@ async def on_ready():
 @wolfy.event
 async def on_message(message):
     '''
-    Ukazi izven Werewolfs igre se začnejo z '.' + <ime_ukaza>. 
-    Ukazi v igri pa se kličejo z 'w.' + <ime_ukaza>
+    Ukaz za začetek Werewolfs igre je '.w' 
+    Ostali ukazi pa se kličejo z 'w.' + <ime_ukaza> ali pa samo <ime_ukaza>
     '''
     global data
     global static   #dict -> igra na začetku, po kateri kličem igralce
     global dynamic  #dict -> igra v kateri se vse spreminja
     global next_one
+    global GUILD
     global CHANNEL
     global ADMIN
     global listOrder #seznam imen igralcev, ki jih uporabim, da je vedno isto zaporedje igralcev v izpisu
@@ -299,7 +302,8 @@ async def on_message(message):
     if message.author == wolfy.user:    # ignore bot messages in chat - tko se bot ne bo pogovarjal sam s sabo!
         return
     #-------------------------------------------------------------------------------------------#
-    elif message.content.startswith('woof'):      # message for ping
+    elif message.content.startswith('woof'):      # message to call wolfy in desired channel and server
+        GUILD = message.guild.id
         CHANNEL = message.channel.id
         await message.channel.send('WoofWoof!')
     elif message.content.startswith('w.help'): #Wolfy pomagaj!
@@ -347,98 +351,94 @@ async def on_message(message):
     #-------------------------------------------------------------------------------------------#
 ### .w START GAME - send msg to players
     elif message.content == '.w':
-        # Edino un, ki začne igro jo lahko konča - to je ADMIN
-        ADMIN = message.author.id
+        ADMIN = message.author.id   # Edino un, ki začne igro jo lahko konča - to je ADMIN
+        gameroom = wolfy.get_channel(CHANNEL)   #global CHANNEL kamor pošiljam splošne info o igri
+        gameguild = wolfy.get_guild(GUILD)
 
-        #global CHANNEL in bi tja vse pošiljal...detajli
-        await message.channel.send('...erewolfes?')     
-        #Uvozim json podatke o igri in igralcih
-        data = json.load(open('.game_data.json', 'r'))
-        
-        #for i in range(len(game)):
-        #    game.pop()
-        static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
-        dynamic = ww.transcribe(static) #ta se bo spreminjala
-        #print('static >>>', id(static))
-        #print('dynamic >>>', id(dynamic))
-        print('>>> .w-start NEW GAME: static is dynamic?', static is dynamic)
-        #static[0] = {'IamEmptyInside': None}
-        #dynamic = ww.transcribe(static) #vsakič, ko var na novo definiram se spremeni id
-        #print('static >>>', id(static), static, '\n')
-        #print('dynamic >>>', id(dynamic), dynamic)
+        if message.channel.id != CHANNEL:
+            someroom = wolfy.get_channel(message.channel.id)
+            admin = wolfy.get_user(ADMIN)
+            await someroom.send(f'**{admin.name}** you are in the wrong room. Game is on **{gameguild}** in **#{gameroom}**. Go there! \n...or say "woof" and we can play the game here.')
+        else:
+            await gameroom.send('...erewolfes?')  
 
-        CHANNEL = message.channel.id #tam kjer začnem igro, tam se bo končala
-        nextRole = None   #ni še noč, villager itak spi
-        
-        #adding nicknames
-        justroles = ww.listRoles(static)  #katere vloge so v igri
-        msg = 'NewGame:\n' + justroles + '\nassigning roles...'
-        beautifulmsg = f'```yaml\n{msg}\n```'
-        await message.channel.send(beautifulmsg) 
-        time.sleep(1);
+            #Uvozim json podatke o igri in igralcih
+            data = json.load(open('.game_data.json', 'r'))
+            
+            #definiram igro in preverim, če sta kazalca od slovarjev različna
+            static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
+            dynamic = ww.transcribe(static) #ta se bo spreminjala
+            print(f'>>> .w-start NEW GAME on {gameguild} in {gameroom}: \n - static is dynamic?', static is dynamic)
+            
+            #adding nicknames
+            justroles = ww.listRoles(static)  #katere vloge so v igri
+            msg = 'NewGame:\n' + justroles + '\nassigning roles...'
+            beautifulmsg = f'```yaml\n{msg}\n```'
+            await message.channel.send(beautifulmsg) 
+            time.sleep(1);
 
-        print('\nACTIVE ROLES:')
-        for player in static:
-            playerID = player['user_id']
-            playersRole = player['role'].split(' ')[0]
-            #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
-            if playerID in [(n+1) for n in range(3)]:
-                print(' - ' + player['name'] + ' ' + str(player['role'].split(' ')[0]))  #don't send message to tableCards
-            else:   
-                user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
-                print(user.name, player['role'].split(' ')[0])
-                player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
-                init_msg = msg4user(player) #lovrič me je blokiral!!! no_hello ne morem pošiljat
-                await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
-                ### .w NIGHT GAME - for static roles to know each other 
-                if playersRole == 'VILLAGER':
-                    player['played'] = True #nothing happens - just to make sure, that nothing happens
-                elif playersRole == 'WEREWOLF': 
-                    flag = False
-                    for player_i in static:
-                        if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
-                            werewolf = wolfy.get_user(player_i['user_id']);
-                            if werewolf != user:
+            print('\nACTIVE ROLES:')
+            for player in static:
+                playerID = player['user_id']
+                playersRole = player['role'].split(' ')[0]
+                #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
+                if playerID in [(n+1) for n in range(3)]:
+                    print(' - ' + player['name'] + ' ' + str(player['role'].split(' ')[0]))  #don't send message to tableCards
+                else:   
+                    user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
+                    print(user.name, player['role'].split(' ')[0])
+                    player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
+                    init_msg = msg4user(player) #lovrič me je blokiral!!! no_hello ne morem pošiljat
+                    await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
+                    ### .w NIGHT GAME - for static roles to know each other 
+                    if playersRole == 'VILLAGER':
+                        player['played'] = True #nothing happens - just to make sure, that nothing happens
+                    elif playersRole == 'WEREWOLF': 
+                        flag = False
+                        for player_i in static:
+                            if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
+                                werewolf = wolfy.get_user(player_i['user_id']);
+                                if werewolf != user:
+                                    flag = True
+                                    await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF                       
+                        if not flag:
+                            await user.send('> You are the only WEREWOLF') 
+                        player['played'] = True
+                    elif playersRole == 'MINION':
+                        flag = False #da vem, če sem našel kakega volkodlaka
+                        for player_i in static:
+                            if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
                                 flag = True
-                                await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF                       
-                    if not flag:
-                        await user.send('> You are the only WEREWOLF') 
-                    player['played'] = True
-                elif playersRole == 'MINION':
-                    flag = False #da vem, če sem našel kakega volkodlaka
-                    for player_i in static:
-                        if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
-                            flag = True
-                            werewolf = wolfy.get_user(player_i['user_id']);
-                            await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF
-                    if not flag:
-                        await user.send('> You have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!')
-                    player['played'] = True
-                elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
-                    flag = False #davem, če sem našel kakega masona
-                    for player_i in static:
-                        if (player_i['role'].split(' ')[0] == 'MASON') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
-                            mason = wolfy.get_user(player_i['user_id']);
-                            if mason != user:
-                                flag = True
-                                await user.send(f'> - **`{mason.name}`** is a MASON')
-                    if not flag:
-                        await user.send('> You are the only MASON')
-                    #player['played'] = True  #to se bo zgodilo v funkciji whos_next
-            listOrder.append(player['name'])  #rabim za izpis v discord
-        #rearrange list order for clear output at the end of game - tableCards in the end
-        for card in ['tableCard1', 'tableCard2', 'tableCard3']:
-            listOrder.remove(card)
-        for card in ['tableCard1', 'tableCard2', 'tableCard3']:
-            listOrder.append(card)
-        print('\nlistOrder >>>', listOrder)
+                                werewolf = wolfy.get_user(player_i['user_id']);
+                                await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF
+                        if not flag:
+                            await user.send('> You have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!')
+                        player['played'] = True
+                    elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
+                        flag = False #davem, če sem našel kakega masona
+                        for player_i in static:
+                            if (player_i['role'].split(' ')[0] == 'MASON') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
+                                mason = wolfy.get_user(player_i['user_id']);
+                                if mason != user:
+                                    flag = True
+                                    await user.send(f'> - **`{mason.name}`** is a MASON')
+                        if not flag:
+                            await user.send('> You are the only MASON')
+                        #player['played'] = True  #to se bo zgodilo v funkciji whos_next
+                listOrder.append(player['name'])  #rabim za izpis v discord
+            #rearrange list order for clear output at the end of game - tableCards in the end
+            for card in ['tableCard1', 'tableCard2', 'tableCard3']:
+                listOrder.remove(card)
+            for card in ['tableCard1', 'tableCard2', 'tableCard3']:
+                listOrder.append(card)
+            print('\nlistOrder >>>', listOrder)
 
-        #send message to next role - his turn 
-        
-        next_one = ww.whos_next(static, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
-        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
-        #print(listOrder)
-        print('\n>>> .w-end',next_one)
+            #send message to next role - his turn 
+            nextRole = None   #ni še noč, villager itak spi
+            next_one = ww.whos_next(static, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
+            await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
+            #print(listOrder)
+            print('\n>>> .w-end',next_one)
 
 ###  NIGHT GAME - for dynamic roles to change game cards
     #Za vsako dinamično vlogo posebej glede na night_order...če igralec ni ta vloga ga Wolfy ignorira
@@ -690,18 +690,18 @@ async def on_message(message):
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
     elif message.content == 'w.end':
         try:
-            table = wolfy.get_channel(message.channel.id)
+            gameroom = wolfy.get_channel(message.channel.id)
             user = wolfy.get_user(message.author.id)
             admin = wolfy.get_user(ADMIN)
             print('table, user, admin >>>', table, user, admin)
         except: #če ne pozna channel poščje v NoFunAllowed
             user = wolfy.get_user(message.author.id)
-            table = wolfy.get_channel(message.channel.id)
+            gameroom = wolfy.get_channel(message.channel.id)
         print('\n>>> w.end-start ' + user.name + ' in #', end='')
-        print(table, type(message.channel.id), type(CHANNEL))
+        print(gameroom, type(message.channel.id), type(CHANNEL))
 
         if (not static) and (int(CHANNEL) == message.channel.id):
-            await table.send(f'{user.name} the game hasn\'t started yet!')
+            await gameroom.send(f'{user.name} the game hasn\'t started yet!')
         elif ADMIN == None:
             pass
         else:
@@ -720,14 +720,14 @@ async def on_message(message):
                 ADMIN = None
                 admin = None
                 user = None
-                #CHANNEL se spremeni samo z ukazom 'woof'  = message.channel.id #kjer se igra konča se spet začne razen, če ne rečem drugač
+                #CHANNEL se spremeni samo z ukazom 'woof'
                 listOrder = []
                 next_one = ''
                 ##############
 
                 print(start_terminal, '\n', end_terminal) #začetne vloge so itak že napisane na začetku
                 beautifulmsg = f'```yaml\n{start_msg}\n{end_msg}```'
-                await table.send(beautifulmsg)
+                await gameroom.send(beautifulmsg)
             else:
                 await user.send('You are not admin of current game. You will have to talk with **`' + admin.name + '`** about that.')
         print('>>> w.end-end')        

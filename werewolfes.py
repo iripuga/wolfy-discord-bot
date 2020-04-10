@@ -120,7 +120,13 @@ def transcribe(igame):
     return ogame
 
 def listRoles(game_roles):
-    #Dobim seznam imen vlog iz slovarja {id: role}. Samo imena vlog za začetek igre
+    '''
+    Vrne seznam vseh vlog v igri.
+    \nInput:
+        game_roles...seznam imen vlog v slovarju {id: role}
+    Output:
+        justroles...samo imena vlog za začetek igre
+    '''
     justroles=''
 
     #print('game >>>', game_roles, '\n')
@@ -347,14 +353,25 @@ def whos_next(game, data):
     Input:
         game, data...current game, data about roles(json)
     Important vars:
-        active_roles_order...seznam vlog, za ponoč v vrstnem redu
-        night...slovar {'rolename':'night_order'}
+        active_roles_order...seznam vlog, ki jih igrajo ljudje v nočnem vrstnem redu
     Output:
         next_role...naslednji night_role, tip int
+        all_roles_order...seznam vseh vlog(tudi na mizi) v nočnem vrstnem redu
     '''
-    night = {}; active_roles_order = [] #hranim iste podatke samo na drugačen način
+    night = {} # slovar samo igralcev {'rolename':'night_order'}
+    nightAll = {} # slovar vseh vlog v igri po vrsti
+    all_roles_order = [] # seznam vseh vlog v igri po vrsti
+    active_roles_order = [] # seznam vlog po vrsti za igralce
     cards = data['roles'] #role cards
+    
+    # sestavljam slovarja night in nightAll
     for player in game:
+        just_role = player['role'].split(' ')[0]
+        for c in cards: #izpuščam statične vloge in sestavljam slovar vlog {'rolename':night_order}
+            if (c['night_order'] != None): #spustim samo tiste, ki spijo ponoč
+                if c['name'] == just_role:
+                    nightAll[c['name']] = c['night_order']
+
         if player['user_id'] in [n+1 for n in range(3)]:
             pass
         else:
@@ -364,18 +381,24 @@ def whos_next(game, data):
                     if (card['night_order'] != None) and (card['night_order'] > 3): #spustim prve 4
                         if card['name'] == active_role:
                             night[card['name']] = card['night_order'] #dodam aktivno, še neigrano vlogo
-    
-    nightOrder = collections.OrderedDict(sorted(night.items(), key=lambda t:t[1]))
-    
-    for active in nightOrder:
+                            nightAll[card['name']] = card['night_order']
+    #urejam slovarje
+    AllRolesOrder = collections.OrderedDict(sorted(nightAll.items(), key=lambda t:t[1]))
+    ActiveRolesOrder = collections.OrderedDict(sorted(night.items(), key=lambda t:t[1]))
+
+    # zaporedje vlog za vse vloge v igri
+    for role in AllRolesOrder:
+        all_roles_order.append(role)
+    print('\nall_roles_order >>>', all_roles_order)   
+
+    # zaporedje vlog samo tiste, ki jih igrajo ljudje
+    for active in ActiveRolesOrder:
         active_roles_order.append(active)   
     if active_roles_order == []:
         return None #Noben več ni na vrsti
-    #print('b', night)
     print('\nactive_roles_order >>>', active_roles_order)
 
     #ta prva dinamična vloga je SEER 
-    #active, active_roles_order = at_night(game, data) #slovar, urejen seznam vseh aktivnih vlog
     next_rolename = active_roles_order[0]   #noben od teh še ni igral
     for player in game:
         playersRole = player['role'].split(' ')[0]
@@ -383,7 +406,7 @@ def whos_next(game, data):
             next_role = playersRole #tuki dobim številko, ki pove katera vloga je na vrsti
             player['played'] = True #ta igralec je zdaj zabeležen, kot da je že odigral
         #od zdaj naprej KODIRAM direkt z imeni, saj so že po vrsti urejena v seznam
-    return next_role
+    return next_role#, all_roles_order
 
 def openCards(cards, wolfy, listOrder, tip='dynamic'):
     '''
@@ -399,12 +422,12 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
         msg...message for discord
     '''
     if tip == 'static':
-        term = '\n<<< START GAME >>>\n'
+        term = '\nSTART GAME:\n'
         msg = 'InTheBeginning:\n'
         tense = ' was ' #angleški čas past
         table_cards = '\nTable cards were...\n'
     else:
-        term = '\n<<< END GAME >>>\n'
+        term = '\nEND GAME:\n'
         msg = 'AtTheEnd:\n'
         tense = ' is ' #angleški čas present
         table_cards = '\nTable cards are...\n'
@@ -426,7 +449,7 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
             msg = msg + table_cards
         role_name = karta['role'].split(' ')[0]
         msg = msg + ' - ' + player_name + tense + role_name + '\n'
-        term = term + player_name + ' ' + role_name + '\n'
+        term = term + ' - ' + player_name + ' ' + role_name + '\n'
 
     return term, msg
 
@@ -476,6 +499,8 @@ print(term1)
 print()
 print(msg1)
 '''
+#n = whos_next(igra, data)
+#print(n)
 
 
 

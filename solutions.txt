@@ -34,7 +34,7 @@ Bugs and TODO:
     *- SEER ni še narjen za namizne karte
     *- ne uporabljam številk ampak kar imena uporabnikov povsod(lažje za uporabljat), odstrani kodiranje s številkami
     *- igra se mora končat, ko vsi igralci odigrajo svoje, ne ko zmanjka vlog!!!
-     - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
+     - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo in da lahko spreminjamo zaporedje vlog
     *- admin, ki začne igro, je edini, ki jo lohk konča predčasno
     *- troublemaker in ROBBER ne smeta met dostopa do kart na sredini
      - timing 10 min -> po tem času vsak lahko konča igro
@@ -43,14 +43,14 @@ Bugs and TODO:
     *- static in dynamic rabita ločeni definiciji slovarja igre kar pa ni izvedljivo -> kako narest ločene pointerje -> pointerjev ni v python, rabim ločene id-je. Preverim z id(var_name).
     *- static in dynamic sta po zamenjavi še vedno ista, kljub različnim object id-jem -for zanke ne dump-uja spremenljivk po koncu izvedbe
     *- ROBBER ti ne napiše pravega imena zamenjane vloge
-    - wolfy lahko piše samo v en server naenkrat...v tistga kamor se vpišem ob začetku seje
+    - NUJNO -> wolfy lahko piše samo v en server naenkrat...v tistga kjer je trenutna igra, drugač se vsega nabere preveč
     *- napiši help ukaz, ki izpiše vse ukaze in jih prikaže za uporabnike(w.help)
     *- če je na mizi dinamična vloga jo skenslam, nekako lahko pride karta na mizi na vrsto, kar ni prov
-    - prikaz NewGame mora premešat, da niso spodnje tri namizne karte
+    *- prikaz NewGame mora premešat, da niso spodnje tri namizne karte
     - assign roles niso dost random!!!
     *- table cards in usernames se morajo vedno izpisat v istem vrstnem redu
     - kako dopelgangerja narest?!
-    - id od static in dynamic se mora resetirat, drugač igramo skos isto igro! lohk pa resetiram vedno terminal
+    *- id od static in dynamic se mora resetirat, drugač igramo skos isto igro! lohk pa resetiram vedno terminal
     - wolfy mora za vse vloge napisat da so na vrsti, ker drugače igralci prehitro pogruntajo kdo je kdo
     - Ko se igra začne jo je treba končat, drugač vsi notr skačejo
     - nočna navodila se vsa pošiljajo v DM posameznim igralcem

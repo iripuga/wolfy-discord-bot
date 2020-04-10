@@ -7,8 +7,8 @@ import json
 data = {
     'members':
         [{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'played': False}, 
-         {'name': 'rok', 'user_id': 261105970548178944, 'status': 'on', 'played': False},
-         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'played': False},
+         {'name': 'rok', 'user_id': 261105970548178944, 'status': 'off', 'played': False},
+         {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'off', 'played': False},
          {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'played': False},
          {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off', 'played': False},
          {'name': 'lovric', 'user_id': 548304226988720149, 'status': 'off', 'played': False},
@@ -16,9 +16,9 @@ data = {
          {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': True},
          {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': True}],
     'roles':
-       [#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},  #lohk jih kr tuki razporediš po zaporednih številkah. Če se nč z vlogo ne zgodi je order 0
-       	#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
-        #{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': 0},
+       [#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': None},  #lohk jih kr tuki razporediš po zaporednih številkah. Če se nč z vlogo ne zgodi je order 0
+       	#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': None},
+        #{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': None},
         #{'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
 	    {'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
         #{'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3}, 
@@ -29,8 +29,8 @@ data = {
         {'name': 'INSOMNIAC', 'description': 'The Insomniac wakes up and looks at their card (to see if it has changed).', 'night_order': 8},
 	    {'name': 'DRUNK', 'description': 'The Drunk exchanges his card with a card from the center, they do not look at their new role.', 'night_order': 7},
         {'name': 'MINION', 'description': 'The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.', 'night_order': 2},
-        {'name': 'HUNTER', 'description': 'If the Hunter dies, the player he is pointing at dies as well.', 'night_order': 0},
-        {'name': 'TANNER', 'description': 'The Tanner is on his own team and he wins only if he gets killed.', 'night_order': 0}], 
+        {'name': 'HUNTER', 'description': 'If the Hunter dies, the player he is pointing at dies as well.', 'night_order': None},
+        {'name': 'TANNER', 'description': 'The Tanner is on his own team and he wins only if he gets killed.', 'night_order': None}], 
     }
 
 with open('.game_data.json', 'w', encoding='utf-8') as f:

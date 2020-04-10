@@ -19,6 +19,7 @@ static = []
 dynamic = []
 listOrder = []
 next_one = ''
+ADMIN = None
 
 import discord
 from discord.ext.commands import Bot
@@ -53,11 +54,12 @@ specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ni ne 
 commands = {
     'basic':
         {
-            "'woof'":'ping wolfy', 
+            "'woof'":'ping wolfy to your channel, only there can you play the game', 
             "'wolfy'":'wolfy tells common german phrase or a joke...',  #'maš kak vic?':'a rabm sploh razlagat?',
-            "'.id'":'wolfy, whats my discord id',
-            "'.logout'":'bye, wolfy',
-            "'.status'":'change your status(on/off), if its off you wont be able to play',
+            "'w.help'":'you know that already',
+            "'w.id'":'wolfy, whats my discord id',
+            "'w.logout'":'bye, wolfy',
+            "'w.status'":'change your status(on/off), if its off you wont be able to play',
             "'.w'":'start new game of werewolfes'
         },
     'game':
@@ -87,10 +89,13 @@ print('Which guild? ', end=' ')
 server = input()
 if server.upper() == 'NFA':
     GUILD = os.getenv('NFA')
+    CHANNEL = os.getenv('NFA-table')
 elif server.upper() == 'W':
     GUILD = os.getenv('WoofServer')
+    CHANNEL = os.getenv('W-general')
 else:
     GUILD = os.getenv('MaGuilt') #default GUILD is MG
+    CHANNEL = os.getenv('MG-table')
 GUILD = int(GUILD)
 ##################################################################################################
 
@@ -248,6 +253,7 @@ async def throwError(errors):
 @wolfy.event   #@ je event handler - ko se vzpostavi povezava se izvede ta funkcija
 async def on_ready():
     #print(wolfy.guilds)
+    
     for guild in wolfy.guilds:      #Na katerem serverju sem in...
         if int(guild.id) == GUILD:
             break
@@ -257,7 +263,10 @@ async def on_ready():
     )
     show_members = '\n - '.join([member.name for member in guild.members])
     print(f'Guild Members:\n - {show_members}')
-    #await wolfy.channel.send('Hallo')    
+    channel = wolfy.get_channel(int(CHANNEL))
+
+    await wolfy.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="to w.help"))
+    await channel.send('Hallo, ich möchte ein Spiel zu spielen!')    
 ##################################################################################################
 
 
@@ -265,7 +274,7 @@ async def on_ready():
 @wolfy.event
 async def on_message(message):
     '''
-    Ukazi izven Werewolfs igre se začnej z '.' + <ime_ukaza>. 
+    Ukazi izven Werewolfs igre se začnejo z '.' + <ime_ukaza>. 
     Ukazi v igri pa se kličejo z 'w.' + <ime_ukaza>
     '''
     global data
@@ -291,8 +300,9 @@ async def on_message(message):
         return
     #-------------------------------------------------------------------------------------------#
     elif message.content.startswith('woof'):      # message for ping
+        CHANNEL = message.channel.id
         await message.channel.send('WoofWoof!')
-    elif message.content.startswith('help'): #Wolfy pomagaj!
+    elif message.content.startswith('w.help'): #Wolfy pomagaj!
         user = wolfy.get_user(message.author.id)
 
         msg = 'Basics:\n'
@@ -315,14 +325,14 @@ async def on_message(message):
     elif message.content.startswith('wolfy'):  #rabim seznam nempkih glupih fraz
         await message.channel.send('Ich wünsche allen Durchfall, kurze Arme, und kein Klopapier') 
     #-------------------------------------------------------------------------------------------#
-    elif message.content == '.logout':     # by wolfy - stops script
+    elif message.content == 'w.logout':     # by wolfy - stops script
         await message.channel.send('Aufwiedersehen!')  
         await wolfy.close()
-    elif message.content == '.id':  #vsak lahko izve svoj id
+    elif message.content == 'w.id':  #vsak lahko izve svoj id
         your_id = message.author.id
         user = wolfy.get_user(your_id)
         await user.send('Your ID is: ' + str(your_id))
-    elif message.content.startswith('.status'):
+    elif message.content.startswith('w.status'):
         #Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
         user_id = message.author.id
         nickname = message.author.name
@@ -367,13 +377,13 @@ async def on_message(message):
         await message.channel.send(beautifulmsg) 
         time.sleep(1);
 
-        print('\nACTIVE ROLES >>>')
+        print('\nACTIVE ROLES:')
         for player in static:
             playerID = player['user_id']
             playersRole = player['role'].split(' ')[0]
             #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
             if playerID in [(n+1) for n in range(3)]:
-                print(player['name'] + ' ' + str(player['role'].split(' ')[0]))  #don't send message to tableCards
+                print(' - ' + player['name'] + ' ' + str(player['role'].split(' ')[0]))  #don't send message to tableCards
             else:   
                 user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
                 print(user.name, player['role'].split(' ')[0])
@@ -416,15 +426,16 @@ async def on_message(message):
                         await user.send('> You are the only MASON')
                     #player['played'] = True  #to se bo zgodilo v funkciji whos_next
             listOrder.append(player['name'])  #rabim za izpis v discord
-        #rearrange list order for clear output at the end of game
+        #rearrange list order for clear output at the end of game - tableCards in the end
         for card in ['tableCard1', 'tableCard2', 'tableCard3']:
             listOrder.remove(card)
         for card in ['tableCard1', 'tableCard2', 'tableCard3']:
             listOrder.append(card)
-        print('listOrder >>>', listOrder)
+        print('\nlistOrder >>>', listOrder)
 
         #send message to next role - his turn 
-        next_one = ww.whos_next(static, data); #0-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
+        
+        next_one = ww.whos_next(static, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
         await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
         #print(listOrder)
         print('\n>>> .w-end',next_one)
@@ -679,23 +690,26 @@ async def on_message(message):
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
     elif message.content == 'w.end':
         try:
-            table = wolfy.get_channel(CHANNEL)
+            table = wolfy.get_channel(message.channel.id)
+            user = wolfy.get_user(message.author.id)
+            admin = wolfy.get_user(ADMIN)
+            print('table, user, admin >>>', table, user, admin)
         except: #če ne pozna channel poščje v NoFunAllowed
-            CHANNEL = 691400770557444096 #table v NoFunAllowed
-            table = wolfy.get_channel(CHANNEL)
+            user = wolfy.get_user(message.author.id)
+            table = wolfy.get_channel(message.channel.id)
+        print('\n>>> w.end-start ' + user.name + ' in #', end='')
+        print(table, type(message.channel.id), type(CHANNEL))
 
-        user = wolfy.get_user(message.author.id)
-        admin = wolfy.get_user(ADMIN)
-        print(user, admin)
-
-        if not static:
-            await table.send(f'{user.name} the game hasn\'t started yet.')
+        if (not static) and (int(CHANNEL) == message.channel.id):
+            await table.send(f'{user.name} the game hasn\'t started yet!')
+        elif ADMIN == None:
+            pass
         else:
             if message.author.id == ADMIN:
                 admin = wolfy.get_user(ADMIN)
                 ### glavno sporočilo za vse ###
                 #v channel #table prikažem kdo je bil kdo 
-                print(static,'\n', listOrder)
+                #print(static,'\n', listOrder)
 
                 start_terminal, start_msg = ww.openCards(static, wolfy, listOrder, tip='static') #_fujfuj ne rabim nikjer
                 end_terminal, end_msg = ww.openCards(dynamic, wolfy, listOrder)
@@ -706,7 +720,7 @@ async def on_message(message):
                 ADMIN = None
                 admin = None
                 user = None
-                CHANNEL = None
+                #CHANNEL se spremeni samo z ukazom 'woof'  = message.channel.id #kjer se igra konča se spet začne razen, če ne rečem drugač
                 listOrder = []
                 next_one = ''
                 ##############
@@ -716,9 +730,7 @@ async def on_message(message):
                 await table.send(beautifulmsg)
             else:
                 await user.send('You are not admin of current game. You will have to talk with **`' + admin.name + '`** about that.')
-#        except:
-#            await user.send('The game hasn\'t started yet!')
-        
+        print('>>> w.end-end')        
 
 ###  CHEAT CODES ###
     elif message.content == '.wolfy #iwannawin': #to bo na konc drugačen klic - GAME OVER

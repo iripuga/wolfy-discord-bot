@@ -6,7 +6,7 @@
 # - timing 10 min -> po tem času vsak lahko konča igro
 # # # # # # # #
 
-global data #.game_data.json
+global data #.gameData.json
 global static #ta se definira na začetku in po njej vloge igrajo
 global dynamic #v tej se odražajo dejanja vlog - this will be my main game dict in which all will happen - TA JE NUJNA, ostale niti ne tolk
 global next_one #hranim ime vloge, ki je naslednja na vrsti - tut nujno
@@ -178,7 +178,7 @@ async def msg4insomniac(message, game, channel, wolfy):
         await table.send('INSOMNIAC, open your  👀')
         await insomniac.send(msg)
 
-async def msg4whos_next(message, game, channel, wolfy, nightRole):
+async def msg4whos_next(message, game, channel, wolfy, data):
     '''
     Pošlje sporočilo igralcu, ki je naslednji na vrsti. Nič ne vrne zaenkrat.\n
     Input:
@@ -186,8 +186,11 @@ async def msg4whos_next(message, game, channel, wolfy, nightRole):
         game...aktualna igra
         channel...kanal v katerem se igra. Tja grejo sporočila za vse.
         wolfy...ma bot
-        nightRole...ime vloge, ki bi trenutno mogla bit na vrsti, type string
+        data...slovar celotne igre in igralcev .gameData.json
     '''
+    #nightRole je ime vloge, ki bi trenutno mogla bit na vrsti, type string
+    nightRole = ww.whos_next(static, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
+
     if nightRole == 'WEREWOLF':
         pass    #zrihtano v .w
     elif nightRole == 'MINION':
@@ -302,10 +305,17 @@ async def on_message(message):
     if message.author == wolfy.user:    # ignore bot messages in chat - tko se bot ne bo pogovarjal sam s sabo!
         return
     #-------------------------------------------------------------------------------------------#
-    elif message.content.startswith('woof'):      # message to call wolfy in desired channel and server
-        GUILD = message.guild.id
-        CHANNEL = message.channel.id
-        await message.channel.send('WoofWoof!')
+    elif message.content.startswith('woof'):      # message to call wolfy to desired channel on desired server
+        gameguild = wolfy.get_guild(GUILD)
+        gameroom = wolfy.get_channel(CHANNEL)
+        if (not static) and (message.guild.id != None): #če ni igre lahko menjam guild in channel, drugač pa ne ker bi lahko kdorkoli prekinil trenuntno igro
+            GUILD = message.guild.id
+            CHANNEL = message.channel.id
+            await message.channel.send('WoofWoof!')
+        elif message.guild.id == None:
+            await message.channel.send(f'Yo can not play that alone in hear! Come join in **{gameguild}** in **{gameroom}**.')
+        else:
+            await message.channel.send(f'Can\'t do that! Game is currently active on **{gameguild}** in **{gameroom}**. Maybe later...')
     elif message.content.startswith('w.help'): #Wolfy pomagaj!
         user = wolfy.get_user(message.author.id)
 
@@ -341,7 +351,7 @@ async def on_message(message):
         user_id = message.author.id
         nickname = message.author.name
         klik = ww.change_status(user_id)        #menjava statusa
-        #with open('.game_data.json', 'w', encoding='utf-8') as f:
+        #with open('.gameData.json', 'w', encoding='utf-8') as f:
         #    json.dump(data, f, ensure_ascii=False, indent=4)
         msg = nickname + ' status: ' + klik
         await message.channel.send(str(msg))   
@@ -351,19 +361,20 @@ async def on_message(message):
     #-------------------------------------------------------------------------------------------#
 ### .w START GAME - send msg to players
     elif message.content == '.w':
-        ADMIN = message.author.id   # Edino un, ki začne igro jo lahko konča - to je ADMIN
         gameroom = wolfy.get_channel(CHANNEL)   #global CHANNEL kamor pošiljam splošne info o igri
         gameguild = wolfy.get_guild(GUILD)
 
         if message.channel.id != CHANNEL:
+            someuser = wolfy.get_user(message.author.id)
             someroom = wolfy.get_channel(message.channel.id)
-            admin = wolfy.get_user(ADMIN)
-            await someroom.send(f'**{admin.name}** you are in the wrong room. Game is on **{gameguild}** in **#{gameroom}**. Go there! \n...or say "woof" and we can play the game here.')
-        else:
+            await someroom.send(f'**`{someuser.name}`** you are in the wrong room. Game is on **{gameguild}** in **#{gameroom}**. Go there! \n...or say "woof" and we can play the game here.')
+        elif not static: #if game is nonexistent, only then a new game can begin
             await gameroom.send('...erewolfes?')  
+            ADMIN = message.author.id   # Edino un, ki začne igro jo lahko konča - to je ADMIN
+            admin = wolfy.get_user(ADMIN)
 
             #Uvozim json podatke o igri in igralcih
-            data = json.load(open('.game_data.json', 'r'))
+            data = json.load(open('.gameData.json', 'r'))
             
             #definiram igro in preverim, če sta kazalca od slovarjev različna
             static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
@@ -434,11 +445,13 @@ async def on_message(message):
             print('\nlistOrder >>>', listOrder)
 
             #send message to next role - his turn 
-            nextRole = None   #ni še noč, villager itak spi
             next_one = ww.whos_next(static, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
             await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
             #print(listOrder)
             print('\n>>> .w-end',next_one)
+        else:
+            admin = wolfy.get_user(ADMIN)
+            await message.channel.send(f'Can\'t start a new game with the current one still running. You can ask **`{admin.name}`** to finish the current game?')
 
 ###  NIGHT GAME - for dynamic roles to change game cards
     #Za vsako dinamično vlogo posebej glede na night_order...če igralec ni ta vloga ga Wolfy ignorira
@@ -689,19 +702,23 @@ async def on_message(message):
 
 ###  END GAME - who died, Wolfy reveals all the cards  ##################
     elif message.content == 'w.end':
-        try:
+        try:        #preveri, če je ADMIN ... to bi moral pomenit, da se igra še ni začela
             gameroom = wolfy.get_channel(message.channel.id)
             user = wolfy.get_user(message.author.id)
             admin = wolfy.get_user(ADMIN)
             print('table, user, admin >>>', table, user, admin)
         except: #če ne pozna channel poščje v NoFunAllowed
             user = wolfy.get_user(message.author.id)
-            gameroom = wolfy.get_channel(message.channel.id)
+            gameguild = wolfy.get_guild(GUILD)
+            gameroom = wolfy.get_channel(CHANNEL)
         print('\n>>> w.end-start ' + user.name + ' in #', end='')
-        print(gameroom, type(message.channel.id), type(CHANNEL))
+        #print(gameroom, type(message.channel.id), type(CHANNEL))
 
-        if (not static) and (int(CHANNEL) == message.channel.id):
-            await gameroom.send(f'{user.name} the game hasn\'t started yet!')
+        if  CHANNEL != message.channel.id:
+            someroom = wolfy.get_channel(message.channel.id)
+            await someroom.send(f'**`{user.name}`** you are in the wrong room. Game is on **{gameguild}** in **#{gameroom}**. Go there! \n...or say "woof" and we can play the game here.')
+        elif not static:
+            await gameroom.send(f'**{user.name}** the game hasn\'t started yet!')
         elif ADMIN == None:
             pass
         else:

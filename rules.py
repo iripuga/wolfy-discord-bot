@@ -33,7 +33,7 @@ data = {
         {'name': 'TANNER', 'description': 'The Tanner is on his own team and he wins only if he gets killed.', 'night_order': None}], 
     }
 
-with open('.game_data.json', 'w', encoding='utf-8') as f:
+with open('.gameData.json', 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
 
 print('\nActive players:')

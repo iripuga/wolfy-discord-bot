@@ -9,7 +9,7 @@ from discord.ext.commands import Bot
 wolfy = Bot(command_prefix='.')
 
 #Uvozim json podatke o igri in igralcih
-data = json.load(open('.game_data.json', 'r'))
+data = json.load(open('.gameData.json', 'r'))
 
 ### Funkcije #####################################################################################
 def find_active(members):
@@ -318,13 +318,13 @@ def switch(igame, idA, idB):
 
 def change_status(user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
     '''
-    Function changes status of current user to on/off. Updated dictionary is then written to hidden file .game_data.json from which this game runs
+    Function changes status of current user to on/off. Updated dictionary is then written to hidden file .gameData.json from which this game runs
     Input:
         data...slovar igre 
         user_id...kdo hoče menjat status
     '''
     #Uvozim json podatke o igri in igralcih
-    gdata = json.load(open('.game_data.json', 'r'))
+    gdata = json.load(open('.gameData.json', 'r'))
     members = gdata['members']
     klik = ''
     user_name = ''
@@ -338,7 +338,7 @@ def change_status(user_id): ### NE DELA - MENJAVA SE NE UPOŠTEVA PRI .w
             else:
                 klik = 'on'
                 member['status'] = klik
-    with open('.game_data.json', 'w', encoding='utf-8') as f:       
+    with open('.gameData.json', 'w', encoding='utf-8') as f:       
         json.dump(gdata, f, ensure_ascii=False, indent=4)
         
     return klik #to je trenutno stanje za vhodni user_id

@@ -1,0 +1,110 @@
+{
+    "members": [
+        {
+            "name": "iripuga",
+            "user_id": 689399469090799848,
+            "status": "on",
+            "played": false
+        },
+        {
+            "name": "rok",
+            "user_id": 261105970548178944,
+            "status": "off",
+            "played": false
+        },
+        {
+            "name": "zorkoporko",
+            "user_id": 593722710706749441,
+            "status": "off",
+            "played": false
+        },
+        {
+            "name": "kristof",
+            "user_id": 689072253002186762,
+            "status": "off",
+            "played": false
+        },
+        {
+            "name": "klemzo",
+            "user_id": 641347330804678667,
+            "status": "off",
+            "played": false
+        },
+        {
+            "name": "lovric",
+            "user_id": 548304226988720149,
+            "status": "off",
+            "played": false
+        },
+        {
+            "name": "tableCard1",
+            "user_id": 1,
+            "status": "on",
+            "played": true
+        },
+        {
+            "name": "tableCard2",
+            "user_id": 2,
+            "status": "on",
+            "played": true
+        },
+        {
+            "name": "tableCard3",
+            "user_id": 3,
+            "status": "on",
+            "played": true
+        }
+    ],
+    "roles": [
+        {
+            "name": "WEREWOLF",
+            "description": "At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.",
+            "night_order": 1
+        },
+        {
+            "name": "MASON",
+            "description": "The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.",
+            "night_order": 3
+        },
+        {
+            "name": "ROBBER",
+            "description": "At night, the Robber may choose to rob a card from another player and place his Robber card where the other card was. Then the Robber looks at his new role card.",
+            "night_order": 5
+        },
+        {
+            "name": "TROUBLEMAKER",
+            "description": "At night the Troublemaker may switch the cards of two other players without looking at those cards.",
+            "night_order": 6
+        },
+        {
+            "name": "SEER",
+            "description": "At night, the Seer may look eighter at one other players card or at two of the center cards, but does not move them.",
+            "night_order": 4
+        },
+        {
+            "name": "INSOMNIAC",
+            "description": "The Insomniac wakes up and looks at their card (to see if it has changed).",
+            "night_order": 8
+        },
+        {
+            "name": "DRUNK",
+            "description": "The Drunk exchanges his card with a card from the center, they do not look at their new role.",
+            "night_order": 7
+        },
+        {
+            "name": "MINION",
+            "description": "The Minion wakes up and sees who the Werewolves are. If the Minion dies and no Werewolves die, the Minion and the Werewolves win.",
+            "night_order": 2
+        },
+        {
+            "name": "HUNTER",
+            "description": "If the Hunter dies, the player he is pointing at dies as well.",
+            "night_order": null
+        },
+        {
+            "name": "TANNER",
+            "description": "The Tanner is on his own team and he wins only if he gets killed.",
+            "night_order": null
+        }
+    ]
+}

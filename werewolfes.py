@@ -279,38 +279,25 @@ def switch(igame, idA, idB):
     dynogame = []
     switched = "switched "
     #saving in temp variables
-    print('id(igame) >>>', id(igame))
     for player in igame:
-        #print('player >>>', player)
-        #print('player_i >>>', transcribe(player))
         player_i = transcribe(player)
         if player_i['user_id'] == idA:
             tmpA = transcribe(player_i['role'])
-            print('id(tmpA) >>>', id(tmpA))
-            print('id(player_i) >>>', id(player_i))
             switched = switched + player_i['name'] + '(' + player_i['role'].split(' ')[0] + ') '
         elif player_i['user_id'] == idB:
             tmpB = transcribe(player_i['role'])
-            print('id(tmpB) >>>', id(tmpB))
-            print('id(player_i >>>', id(player_i))
             switched = switched + player_i['name'] + '(' + player_i['role'].split(' ')[0] + ') '
     switched = switched + 'to '
     #switching roles
-    print('id(ogame) >>>', id(ogame))
     for playa in ogame:
-        #print('>>> playa_i', playa)
         playa_i = transcribe(playa)
-        #print('>>> playa_i', playa_i)
         if playa_i['user_id'] == idA:
             playa_i['role'] = transcribe(tmpB)
             playme = transcribe(playa_i)
-            print('id(playa_iB) >>>', id(playme))
-            #print('id(playa_i) >>>', id(playa_i))
             switched = switched + playa_i['name'] + '(' + playa_i['role'].split(' ')[0] + ') '
         elif playa_i['user_id'] == idB:
             playa_i['role'] = transcribe(tmpA)
             playme = transcribe(playa_i)
-            print('id(playa_iA) >>>', id(playme))
             switched = switched + playa_i['name'] + '(' + playa_i['role'].split(' ')[0] + ') '
         else:
             playme = transcribe(playa_i)

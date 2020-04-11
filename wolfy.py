@@ -348,7 +348,7 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
     elif nextRole == 'INSOMNIAC':
         await msg4insomniac(message, game, channel, wolfy, active=roleStatus)       
     else:
-        time.sleep(uniform(5.7, 8.7))
+        time.sleep(uniform(2.7, 5.7))
         await table.send('```prolog\nEverybody, open your  👀```') #Na konc zbudim vse
     
     startTime = time.time()  #nov start time
@@ -579,13 +579,14 @@ async def on_message(message):
                         #player['played'] = True  #to se bo zgodilo v funkciji whos_next
                 listOrder.append(player['name'])  #rabim za izpis v discord
 
+            time.sleep(uniform(2.3, 5.1))
             await message.channel.send('WEREWOLFES, MINION and MASON have done their thing :crescent_moon:')
             #rearrange list order for clear output at the end of game - tableCards in the end
             for card in ['tableCard1', 'tableCard2', 'tableCard3']:
                 listOrder.remove(card)
             for card in ['tableCard1', 'tableCard2', 'tableCard3']:
                 listOrder.append(card)
-            print('\nlistOrder >>>', listOrder)
+            print('\nplayersOrder >>>', listOrder)
 
             # Send message to next role - his turn 
             startTime = time.time()  #kao zacetek poteze za naslednjega igralca

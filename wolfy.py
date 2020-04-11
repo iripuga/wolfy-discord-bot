@@ -2,8 +2,8 @@
 # - ko zajebe mu vrnem random error message
 # - rabim funkcijo errorHandler
 # - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
-# - wolfy lahko piše samo v en server naenkrat...v tistga kamor se vpišem ob začetku seje
 # - timing 10 min -> po tem času vsak lahko konča igro
+# - nočna navodila se vsa pošiljajo v DM posameznim igralcem...zvem id-je od igralcev in jih fliknem v en list. pol ko pošiljam sporočilo iteriram čez ta list
 # # # # # # # #
 
 global data #.gameData.json
@@ -452,6 +452,9 @@ async def on_message(message):
         if (not static) and (message.guild != None): #če ni igre lahko menjam guild in channel, drugač pa ne ker bi lahko kdorkoli prekinil trenuntno igro
             GUILD = message.guild.id
             CHANNEL = message.channel.id
+            newguild = wolfy.get_guild(GUILD)
+            newroom = wolfy.get_channel(CHANNEL)
+            print(f'\n>>> woof switched to {newguild} in channel #{newroom}')
             await message.channel.send('WoofWoof!')
         elif message.guild == None:
             await message.channel.send(f'You can not play game alone! Come join in **{gameguild}** in **{gameroom}**.')

@@ -53,7 +53,6 @@ Bugs and TODO:
     *- id od static in dynamic se mora resetirat, drugač igramo skos isto igro! lohk pa resetiram vedno terminal
     *- wolfy mora za vse vloge napisat da so na vrsti, ker drugače igralci prehitro pogruntajo kdo je kdo
     *- Ko se igra začne jo je treba končat, drugač vsi notr skačejo
-    - nočna navodila se vsa pošiljajo v DM posameznim igralcem
     *- če je več istih vlog v igri jih mora wolfy klicat vse hkrati -> to je edin pri mason, werewolfe in se zrihta v .w
     *- random timing za fake vloge
     *- sporočila za fake vloge dat pod vse potrebne komande(ni nujno za pasivne vloge)

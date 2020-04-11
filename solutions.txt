@@ -51,12 +51,12 @@ Bugs and TODO:
     *- table cards in usernames se morajo vedno izpisat v istem vrstnem redu
     - kako dopelgangerja narest?!
     *- id od static in dynamic se mora resetirat, drugač igramo skos isto igro! lohk pa resetiram vedno terminal
-    - wolfy mora za vse vloge napisat da so na vrsti, ker drugače igralci prehitro pogruntajo kdo je kdo
-    - Ko se igra začne jo je treba končat, drugač vsi notr skačejo
+    *- wolfy mora za vse vloge napisat da so na vrsti, ker drugače igralci prehitro pogruntajo kdo je kdo
+    *- Ko se igra začne jo je treba končat, drugač vsi notr skačejo
     - nočna navodila se vsa pošiljajo v DM posameznim igralcem
-    - če je več istih vlog v igri jih mora wolfy klicat vse hkrati
-    - random timing za fake vloge
-    - sporočila za fake vloge dat pod vse potrebne komande(ni nujno za pasivne vloge)
+    *- če je več istih vlog v igri jih mora wolfy klicat vse hkrati -> to je edin pri mason, werewolfe in se zrihta v .w
+    *- random timing za fake vloge
+    *- sporočila za fake vloge dat pod vse potrebne komande(ni nujno za pasivne vloge)
     - funkcija msg4whos_next ne dela dobro...primer testgame v werewolfes.py
 
 Dodatki za špil:
@@ -65,6 +65,7 @@ Dodatki za špil:
     - cela igra okrog tannerja(ime: Just Kill Me!)
     - navaden villager lahko enga pokaže in izve a je drugi villager al' ni
     - Balkanska verzija(ime: Ćobani)
+    - ime igre 'Unneccessary \n... but still, we did it!'
 
 
                                 byZorek

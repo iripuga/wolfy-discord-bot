@@ -14,6 +14,7 @@ global GUILD
 global CHANNEL #kanal v katerem igralci igrajo
 global ADMIN #samo tist, ki začne igro jo lohk predčasno konča
 global listOrder #seznam imen igralcev, ki jih uporabim, da je vedno isto zaporedje igralcev v izpisu
+global start, end #spremenljivki za štopanje
 
 #global t_start #čas začetka igre - na konc pogledam t_end in gledam kdaj je 10 min
 static = []
@@ -26,7 +27,7 @@ import discord
 from discord.ext.commands import Bot
 import os
 from dotenv import load_dotenv
-from random import shuffle
+from random import shuffle, uniform, randint
 from numpy import linspace
 import werewolfes as ww
 import json
@@ -138,81 +139,221 @@ def msg4user(game_player):
     
     return msg_role
 
-async def msg4seer(message, game, channel, wolfy):
+async def msg4werewolf(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
+    table = wolfy.get_channel(channel)
+    if active:
+        pass #to je že na začetku zrihtan
+    else:
+        await table.send('WEREWOLFES, open your  👀')
+
+async def msg4minion(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
+    table = wolfy.get_channel(channel)
+    if active:
+        pass #to je že na začetku zrihtan
+    else:
+        await table.send('MINION, open your  👀')
+
+async def msg4mason(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
+    table = wolfy.get_channel(channel)
+    if active:
+        pass #to je že na začetku zrihtan
+    else:
+        await table.send('MASONS, open your  👀')
+
+async def msg4seer(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
     seer = ww.findUser(game, wolfy, 'SEER', method='by_rolename')
     table = wolfy.get_channel(channel)
-    if seer != None:
+    if seer != None and active:
         msg, _bljak = ww.list4role(game, 'SEER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
         await table.send('SEER, open your  👀')
         await seer.send(msg)
+    else:
+        await table.send('SEER, open your  👀')
 
-async def msg4robber(message, game, channel, wolfy):
+async def msg4robber(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
     robber = ww.findUser(game, wolfy, 'ROBBER', method='by_rolename')
     table = wolfy.get_channel(channel)
-    if robber != None:
+    if robber != None and active:
         msg, _bljak = ww.list4role(game, 'ROBBER', wolfy) #določim med kom lahko robber izbira
         await table.send('ROBBER, open your  👀')
         await robber.send(msg)
+    else:
+        await table.send('ROBBER, open your  👀')
 
-async def msg4troublemaker(message, game, channel, wolfy):
+async def msg4troublemaker(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
     troublemaker = ww.findUser(game, wolfy, 'TROUBLEMAKER', method='by_rolename')
     table = wolfy.get_channel(channel)
-    if troublemaker != None:
+    if troublemaker != None and active:
         msg, _bljak = ww.list4role(game, 'TROUBLEMAKER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
         await table.send('TROUBLEMAKER, open your  👀')
         await troublemaker.send(msg)
+    else:
+        await table.send('TROUBLEMAKER, open your  👀')
 
-async def msg4drunk(message, game, channel, wolfy):
+async def msg4drunk(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
     drunk = ww.findUser(game, wolfy, 'DRUNK', method='by_rolename')
     table = wolfy.get_channel(channel)
-    if drunk != None:
+    if drunk != None and active:
         msg, _bljak = ww.list4role(game, 'DRUNK', wolfy) #določim med kom lahko drunk izbira, _bljak ne rabim
         await table.send('DRUNK, open your  👀')
         await drunk.send(msg)
+    else:
+        await table.send('DRUNK, open your  👀')
 
-async def msg4insomniac(message, game, channel, wolfy):
+async def msg4insomniac(message, game, channel, wolfy, active):
+    '''
+    active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    '''
     insomniac = ww.findUser(game, wolfy, 'INSOMNIAC', method='by_rolename')
     table = wolfy.get_channel(channel)
-    if insomniac != None:
+    if insomniac != None and active:
         msg, _bljak = ww.list4role(game, 'INSOMNIAC', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
         await table.send('INSOMNIAC, open your  👀')
         await insomniac.send(msg)
+    else:
+        await table.send('INSOMNIAC, open your  👀')
 
-async def msg4whos_next(message, game, channel, wolfy, data):
+async def msg4whos_next(message, game, channel, wolfy, data, t1):
     '''
-    Pošlje sporočilo igralcu, ki je naslednji na vrsti. Nič ne vrne zaenkrat.\n
+    Pošlje sporočilo igralcu, ki je naslednji na vrsti. Vrne ime vloge, ki je naslednja na vrsti.
+    Tut vloge, ki nič ne delajo in so na mizi mora izgledat da so odigrale svojo potezo. 
+    Z izjemo villagerja, ki pa vedno spi ponoči.\n
     Input:
-        message...objekt od uporabnika, ko pošlej sporočilo v kanal
+        message...objekt od uporabnika, ko pošlje sporočilo v kanal
         game...aktualna igra
         channel...kanal v katerem se igra. Tja grejo sporočila za vse.
         wolfy...ma bot
         data...slovar celotne igre in igralcev .gameData.json
+        t1...previous start time -> to calculate deltaT i measure end time t2 at beginning of this function
+    Output: 
+        nextRole...ime vloge, ki bi trenutno mogla bit na vrsti, type string
+        startTime...current start time -> začnem štopat, da izmerim uporabnikov odziv oz. kolk časa je rabu, da je odgovoru
     '''
-    #nightRole je ime vloge, ki bi trenutno mogla bit na vrsti, type string
-    nightRole = ww.whos_next(static, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
+    t2 = time.time() # beležim končni čas odziva uporabnika
+    #deltaT = t2 - t1 #zračunam kolk je uporabnik rabil
+    #print('deltaT >>>', deltaT)
 
-    if nightRole == 'WEREWOLF':
-        pass    #zrihtano v .w
-    elif nightRole == 'MINION':
-        pass    #zrihtano v .w
-    elif nightRole == 'MASON':
-        pass    #zrihtano v .w
-    elif nightRole == 'SEER':
-        await msg4seer(message, game, channel, wolfy)
-    elif nightRole == 'ROBBER':
-        await msg4robber(message, game, channel, wolfy)
-    elif nightRole == 'TROUBLEMAKER':
-        await msg4troublemaker(message, game, channel, wolfy)  #await msg4robber(message, game, wolfy)
-    elif nightRole == 'DRUNK':
-        await msg4drunk(message, game, channel, wolfy)
-    elif nightRole == 'INSOMNIAC':
-        await msg4insomniac(message, game, channel, wolfy)       
-    elif nightRole == None:  #Ko noben več ni na vrsti
-        table = wolfy.get_channel(channel)
-        await table.send('```yaml\nEverybody, open your  👀\n```')
+    all_roles_order, active_roles_order = ww.whos_next(game, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
+    table = wolfy.get_channel(channel)
+    roleStatus = False # roleStatus je bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
+    #print('\nall_roles_order >>>', all_roles_order, '\nactive_roles_order >>>', active_roles_order)
+    
+     #sam zato, da gre v for zanki čez, ker neki nagaja zaradi OrderedDict() data tipa
+    if not active_roles_order:
+        active_roles_order = ['ShimSham'] 
+    elif not all_roles_order:
+        all_roles_order = ['ShamShim']
     else:
-        raise ValueError(str(nightRole) + ' is not awake at night.')
-    return
+        pass 
+    
+    localt1 = ww.transcribe(t1)
+    localt2 = ww.transcribe(t2)
+    #iskanje naslednje aktivne vloge med množico pasivnih vse dokler ne najdem ene aktivne
+    for i in range(len(all_roles_order)):
+        deltaT = localt2 - localt1 #zračunam kolk je uporabnik rabil
+        print('deltaT >>>', deltaT)
+        nextrole = all_roles_order[i]
+        print('\nnextRole >>>', nextrole)
+        if nextrole == None:
+            pass
+        elif nextrole == active_roles_order[0]: #naslednja dejansko aktivna vloga
+            for player in game:
+                if nextrole == player['role'].split(' ')[0]:
+                    nextRole = nextrole #small become large eventually
+                    player['played'] = True #ta igralec je zdaj zabeležen, kot da je že odigral
+                    roleStatus = True
+                    break
+            break
+        else:#if nextrole == all_roles_order[0]:  #fake aktivna vloga
+            for playa in game:
+                if nextrole == playa['role'].split(' ')[0]:
+                    all_roles_order[i] = None #odstranim ta element, ne smem spremenit dolžine seznama
+                    #print('\nall_roles_order.pop(0) >>>', all_roles_order)
+                    nextRole = nextrole #nima veze kdo je ta vloga, ker itak fejkam aktivnost
+                    playa['played'] = True #važno je da se ne pojavlja na kasnejših seznamih
+                    roleStatus = False
+                    break        
+        #else:
+           # raise ValueError('Unknown error in msg4whos_next() from wolfy.py')
+
+        # random delay da zgleda kokr da se neki dogaja v ozadju
+        localt1 = time.time() 
+        short = 8.71
+        long = 15.23
+        time.sleep(uniform(2.4, 5.7))
+        localt2 = time.time()
+
+        # Tukaj pošiljam sporočilo za nextRole
+        if nextRole == 'WEREWOLF':
+            await msg4werewolf(message, game, channel, wolfy, active=roleStatus)    #zrihtano v .w - tukaj le simuliram aktivnost za ostale igralce
+        elif nextRole == 'MINION':
+            await msg4minion(message, game, channel, wolfy, active=roleStatus)    #zrihtano v .w - tukaj le simuliram aktivnost za ostale igralce
+        elif nextRole == 'MASON':
+            await msg4mason(message, game, channel, wolfy, active=roleStatus)    #zrihtano v .w - tukaj le simuliram aktivnost za ostale igralce
+        elif nextRole == 'SEER':
+            await msg4seer(message, game, channel, wolfy, active=roleStatus)
+        elif nextRole == 'ROBBER':
+            await msg4robber(message, game, channel, wolfy, active=roleStatus)
+        elif nextRole == 'TROUBLEMAKER':
+            await msg4troublemaker(message, game, channel, wolfy, active=roleStatus)  
+        elif nextRole == 'DRUNK':
+            await msg4drunk(message, game, channel, wolfy, active=roleStatus)
+        elif nextRole == 'INSOMNIAC':
+            await msg4insomniac(message, game, channel, wolfy, active=roleStatus)       
+        else:
+            raise ValueError(str(nextRole) + ' is not awake at night.')
+
+        if roleStatus:
+            break # Če je aktivna vloga odigrala svoje skočim ven iz funkcije in igra se nadaljuje normalno
+    
+    if all(role is None for role in all_roles_order):  #Ko noben več ni na vrsti
+        nextRole = None  
+
+    # Še enkrat moram tole ponoviti izven for zanke, da se igra lahko premakne naprej
+    if nextRole == 'WEREWOLF':
+        await msg4werewolf(message, game, channel, wolfy, active=roleStatus)    #zrihtano v .w - tukaj le simuliram aktivnost za ostale igralce
+    elif nextRole == 'MINION':
+        await msg4minion(message, game, channel, wolfy, active=roleStatus)    #zrihtano v .w - tukaj le simuliram aktivnost za ostale igralce
+    elif nextRole == 'MASON':
+        await msg4mason(message, game, channel, wolfy, active=roleStatus)    #zrihtano v .w - tukaj le simuliram aktivnost za ostale igralce
+    elif nextRole == 'SEER':
+        await msg4seer(message, game, channel, wolfy, active=roleStatus)
+    elif nextRole == 'ROBBER':
+        await msg4robber(message, game, channel, wolfy, active=roleStatus)
+    elif nextRole == 'TROUBLEMAKER':
+        await msg4troublemaker(message, game, channel, wolfy, active=roleStatus)  
+    elif nextRole == 'DRUNK':
+        await msg4drunk(message, game, channel, wolfy, active=roleStatus)
+    elif nextRole == 'INSOMNIAC':
+        await msg4insomniac(message, game, channel, wolfy, active=roleStatus)       
+    else:
+        time.sleep(uniform(5.7, 8.7))
+        await table.send('```prolog\nEverybody, open your  👀```') #Na konc zbudim vse
+    
+    startTime = time.time()  #nov start time
+
+    return nextRole, startTime
 
 async def safetyNet(game, user, currentRole, role2protect):
     '''
@@ -290,7 +431,7 @@ async def on_message(message):
     global CHANNEL
     global ADMIN
     global listOrder #seznam imen igralcev, ki jih uporabim, da je vedno isto zaporedje igralcev v izpisu
-
+    global startTime, endTime
     #Če nista dve definiciji sta static in dynamic skos isti - neki s pointerji
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
                 #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
@@ -308,12 +449,12 @@ async def on_message(message):
     elif message.content.startswith('woof'):      # message to call wolfy to desired channel on desired server
         gameguild = wolfy.get_guild(GUILD)
         gameroom = wolfy.get_channel(CHANNEL)
-        if (not static) and (message.guild.id != None): #če ni igre lahko menjam guild in channel, drugač pa ne ker bi lahko kdorkoli prekinil trenuntno igro
+        if (not static) and (message.guild != None): #če ni igre lahko menjam guild in channel, drugač pa ne ker bi lahko kdorkoli prekinil trenuntno igro
             GUILD = message.guild.id
             CHANNEL = message.channel.id
             await message.channel.send('WoofWoof!')
-        elif message.guild.id == None:
-            await message.channel.send(f'Yo can not play that alone in hear! Come join in **{gameguild}** in **{gameroom}**.')
+        elif message.guild == None:
+            await message.channel.send(f'You can not play game alone! Come join in **{gameguild}** in **{gameroom}**.')
         else:
             await message.channel.send(f'Can\'t do that! Game is currently active on **{gameguild}** in **{gameroom}**. Maybe later...')
     elif message.content.startswith('w.help'): #Wolfy pomagaj!
@@ -414,7 +555,7 @@ async def on_message(message):
                                     await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF                       
                         if not flag:
                             await user.send('> You are the only WEREWOLF') 
-                        player['played'] = True
+                        #player['played'] = True  to se vse dela zdj v msg4whos_next
                     elif playersRole == 'MINION':
                         flag = False #da vem, če sem našel kakega volkodlaka
                         for player_i in static:
@@ -424,7 +565,7 @@ async def on_message(message):
                                 await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF
                         if not flag:
                             await user.send('> You have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!')
-                        player['played'] = True
+                        #player['played'] = True
                     elif playersRole == 'MASON': #MASON numbers taken care of in function ww.assigned_roles()
                         flag = False #davem, če sem našel kakega masona
                         for player_i in static:
@@ -437,6 +578,8 @@ async def on_message(message):
                             await user.send('> You are the only MASON')
                         #player['played'] = True  #to se bo zgodilo v funkciji whos_next
                 listOrder.append(player['name'])  #rabim za izpis v discord
+
+            await message.channel.send('WEREWOLFES, MINION and MASON have done their thing :crescent_moon:')
             #rearrange list order for clear output at the end of game - tableCards in the end
             for card in ['tableCard1', 'tableCard2', 'tableCard3']:
                 listOrder.remove(card)
@@ -444,9 +587,9 @@ async def on_message(message):
                 listOrder.append(card)
             print('\nlistOrder >>>', listOrder)
 
-            #send message to next role - his turn 
-            next_one = ww.whos_next(static, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
-            await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
+            # Send message to next role - his turn 
+            startTime = time.time()  #kao zacetek poteze za naslednjega igralca
+            next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)  #delay for non-active roles must be implemented here
             #print(listOrder)
             print('\n>>> .w-end',next_one)
         else:
@@ -469,9 +612,8 @@ async def on_message(message):
                 if len(look) == 1:    #če hoče videt igralca
                     if look[0] == 'abstain': 
                         await seer.send('It is easier to look away from da truth...\n...da truth is DaWee!') #seer-pass
-                        #send message to next role - his turn 
-                        next_one = ww.whos_next(static, data);
-                        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
+                        # Send message to next role - his turn 
+                        next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
                         break
                     else:
                         hiddenPlaya = look[0];  
@@ -480,9 +622,8 @@ async def on_message(message):
                             if playa['user_id'] == hiddenUser.id:
                                 hiddenRole = playa['role']
                         await seer.send('> **`' + hiddenPlaya + '`** is a ' + hiddenRole + '.')   #show hiddenPlayer
-                        #send message to next - his turn 
-                        next_one = ww.whos_next(static, data);
-                        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
+                        # Send message to next role - his turn 
+                        next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
                         break
                 elif len(look) == 2: #če hoče videt karti na mizi
                     first = ''; second = ''; #sporočila za posamezne karte
@@ -496,9 +637,8 @@ async def on_message(message):
                                     second = card + ' is a ' + tableCard['role']
                                     break
                     await seer.send(first + '\n' + second);
-                    #send message to next - his turn 
-                    next_one = ww.whos_next(static, data);
-                    await msg4whos_next(message, static, CHANNEL, wolfy, next_one)
+                    # Send message to next role - his turn 
+                    next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
                     break
                 else:   #če zajebe in neki ni prov vnesel
                     await seer.send('Well done! Somehow you fucked up...'); #If you fuck up the seer number we move on
@@ -521,18 +661,13 @@ async def on_message(message):
                 #print(playersRole)
                 if choice == 'abstain':
                     await robber.send('To steal or not to steal is your choice.') #robber-pass
-                    next_one = ww.whos_next(static, data);
-                    await msg4whos_next(message, game, CHANNEL, wolfy, next_one)  
+                    # Send message to next role - his turn 
+                    next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
                     break
                 elif choice in players4robber.keys():
                     if choice not in ['tableCard' + str(n+1) for n in range(3)]:
-                        #print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
-                        #print('dynamic >>>\n', id(dynamic), dynamic)
-                        #print('\nDO STUFF!\n')
                         victim = ww.findUser(static, wolfy, choice, method='by_username')
                         dynamic, switch_msg = ww.switch(dynamic, robber.id, victim.id)   #rob the victim
-                        #print('static is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
-                        #print('dynamic >>>\n', id(dynamic), dynamic)
                         #print(game)#game = list(game) in case game becomes tuple somehow???
                         for playa in dynamic:   #robberju je treba povedat kaj je njegova nova vloga
                             if playa['user_id'] == robber.id:
@@ -541,8 +676,8 @@ async def on_message(message):
                                 await robber.send(msg)
                                 break
                         print('\nrobber -',robber.name,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
-                        next_one = ww.whos_next(static, data);
-                        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                        # Send message to next role - his turn 
+                        next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime) 
                         break
                 else:
                     await robber.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
@@ -564,8 +699,8 @@ async def on_message(message):
                 trouble = message.content.split(' ')[1::]  #koga bomo menjal
                 if trouble[0] == 'abstain':
                     await troublemaker.send('Afraid to stir the pot, right? It\'s your choice.') #trouble pass
-                    next_one = ww.whos_next(static, data);
-                    await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                    # Send message to next role - his turn 
+                    next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime) 
                     break
                 else:
                     if len(trouble) == 2: #tukaj zamenjam dve karti
@@ -586,8 +721,8 @@ async def on_message(message):
                         #print('\ndynamic >>>\n', dynamic)
                         print('troublemaker -',troublemaker.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                         await troublemaker.send('> Well done! You switched **`' + first_name + '`** and **`' + second_name + '`**.')
-                        next_one = ww.whos_next(static, data);
-                        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                        # Send message to next role - his turn 
+                        next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime) 
                         break
                     else:
                         await troublemaker.send('Well done! Somehow you fucked up...');   #If you fuck up the victim number we move on
@@ -609,8 +744,8 @@ async def on_message(message):
                     drunk_choice = message.content.split(' ')[1]  #katero karto na mizi je uporabnik izbral
                     if drunk_choice == 'abstain':
                         await drunk.send('> Abstinence will be good for you.') #drunk-pass
-                        next_one = ww.whos_next(static, data);
-                        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                        # Send message to next role - his turn 
+                        next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
                         break
                     else:
                         print(drunk_choice)
@@ -619,8 +754,8 @@ async def on_message(message):
                             dynamic, switch_msg = ww.switch(dynamic, drunk.id, cardID)
                             print('drunk -',drunk.id,'>>>', switch_msg) #v terminalu vidim kdo je koga zamenjal
                             await drunk.send('> In the morning you won\'t know who you are...:face_vomiting:')
-                            next_one = ww.whos_next(static, data);
-                            await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                            # Send message to next role - his turn 
+                            next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
                             break
                         else:
                             await drunk.send('> Of course you screwed up. Your\'re drunk!')
@@ -644,21 +779,21 @@ async def on_message(message):
                 choice = message.content  #če hočeš pogledat svojo karto pusti prazno
                 if choice == 'w.insomniac abstain':
                     await insomniac.send('> Abstinence is your choice. Now go back to sleep!') #insomniac-pass
-                    next_one = ww.whos_next(static, data);
-                    await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                    # Send message to next role - his turn 
+                    next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime) 
                     break
                 elif choice == 'w.insomniac':
                     if player['user_id'] == insomniac.id:
                         whoami = player['role'].split(' ')[0]
                         if whoami == 'INSOMNIAC':
                             await insomniac.send('> At the end of the night you are still INSOMNIAC.')
-                            next_one = ww.whos_next(static, data);
-                            await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                            # Send message to next role - his turn 
+                            next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)  
                             break
                         else:
                             await insomniac.send('> At the dawn you wake up as ' + player['role'] + '.')
-                            next_one = ww.whos_next(static, data);
-                            await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+                            # Send message to next role - his turn 
+                            next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
                             break
                 else:
                     await insomniac.send('> Dude, you had one job!')
@@ -670,8 +805,8 @@ async def on_message(message):
         id_abstain = message.author.id
         abstain = wolfy.get_user(id_abstain)
         await abstain.send('> Abstinence is your choice.') #role-pass
-        next_one = ww.whos_next(static, data);
-        await msg4whos_next(message, static, CHANNEL, wolfy, next_one)  
+        # Send message to next role - his turn 
+        next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
         print('>>> abstain-end',next_one, '\n')
 
 ### JOKE commands for roles with no dynamic night function ###

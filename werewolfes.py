@@ -115,6 +115,10 @@ def transcribe(igame):
         ogame = ''
         for char in igame:
             ogame = ogame + char
+    elif isinstance(igame, float):
+        ogame = igame             #transcribe float
+        #while ogame < igame:
+        #    ogame = ogame + 0.1
     else:
         raise NotImplementedError('Data type of \'igame\' unknown')
     return ogame
@@ -352,36 +356,30 @@ def whos_next(game, data):
     Deluje le za dinamične vloge, ker so statične zrihtane v .w\n
     Input:
         game, data...current game, data about roles(json)
-    Important vars:
-        active_roles_order...seznam vlog, ki jih igrajo ljudje v nočnem vrstnem redu
     Output:
-        next_role...naslednji night_role, tip int
         all_roles_order...seznam vseh vlog(tudi na mizi) v nočnem vrstnem redu
+        active_roles_order...seznam vlog, ki jih igrajo ljudje v nočnem vrstnem redu
     '''
     night = {} # slovar samo igralcev {'rolename':'night_order'}
     nightAll = {} # slovar vseh vlog v igri po vrsti
     all_roles_order = [] # seznam vseh vlog v igri po vrsti
     active_roles_order = [] # seznam vlog po vrsti za igralce
-    cards = data['roles'] #role cards
+    cards = list(data['roles']) #role cards
     
     # sestavljam slovarja night in nightAll
     for player in game:
         just_role = player['role'].split(' ')[0]
-        for c in cards: #izpuščam statične vloge in sestavljam slovar vlog {'rolename':night_order}
-            if (c['night_order'] != None): #spustim samo tiste, ki spijo ponoč
-                if c['name'] == just_role:
-                    nightAll[c['name']] = c['night_order']
 
-        if player['user_id'] in [n+1 for n in range(3)]:
-            pass
+        if player['user_id'] in [1, 2, 3] and player['played'] == False:
+            for c in cards: #izpuščam statične vloge in sestavljam slovar vlog {'rolename':night_order}
+                if c['night_order'] != None and c['name'] == just_role:# and (player['played'] == False): #spustim samo tiste, ki ne spijo ponoč in še niso bile na vrsti
+                    nightAll[c['name']] = c['night_order']
         else:
-            if player['played'] == False:   #samo če še ni igral bo v končnem seznamu
-                active_role = player['role'].split(' ')[0]
+            if player['played'] == False:   #samo če igralec še ni igral bo v končnem seznamu - tudi namizne karte morajo fake igrati, zato da ostali ne pogruntajo kdo je kdo
                 for card in cards: #izpuščam statične vloge in sestavljam slovar vlog {'rolename':night_order}
-                    if (card['night_order'] != None) and (card['night_order'] > 3): #spustim prve 4
-                        if card['name'] == active_role:
-                            night[card['name']] = card['night_order'] #dodam aktivno, še neigrano vlogo
-                            nightAll[card['name']] = card['night_order']
+                    if card['night_order'] != None and card['name'] == just_role: #spustim zaspance
+                        night[card['name']] = card['night_order'] #dodam aktivno, še neigrano vlogo
+                        nightAll[card['name']] = card['night_order']
     #urejam slovarje
     AllRolesOrder = collections.OrderedDict(sorted(nightAll.items(), key=lambda t:t[1]))
     ActiveRolesOrder = collections.OrderedDict(sorted(night.items(), key=lambda t:t[1]))
@@ -389,24 +387,19 @@ def whos_next(game, data):
     # zaporedje vlog za vse vloge v igri
     for role in AllRolesOrder:
         all_roles_order.append(role)
-    print('\nall_roles_order >>>', all_roles_order)   
+    #print('\nall_roles_order >>>', all_roles_order)   
 
     # zaporedje vlog samo tiste, ki jih igrajo ljudje
     for active in ActiveRolesOrder:
         active_roles_order.append(active)   
-    if active_roles_order == []:
-        return None #Noben več ni na vrsti
-    print('\nactive_roles_order >>>', active_roles_order)
+    #print('\nactive_roles_order >>>', active_roles_order)
 
-    #ta prva dinamična vloga je SEER 
-    next_rolename = active_roles_order[0]   #noben od teh še ni igral
-    for player in game:
-        playersRole = player['role'].split(' ')[0]
-        if playersRole == next_rolename:
-            next_role = playersRole #tuki dobim številko, ki pove katera vloga je na vrsti
-            player['played'] = True #ta igralec je zdaj zabeležen, kot da je že odigral
-        #od zdaj naprej KODIRAM direkt z imeni, saj so že po vrsti urejena v seznam
-    return next_role#, all_roles_order
+    if (not active_roles_order) and (not not all_roles_order):
+        return all_roles_order, None #Noben aktiven več ni na vrsti
+    elif (not not active_roles_order) and (not all_roles_order):
+        return None, active_roles_order #Samo še aktivni so na vrsti
+    else:
+        return all_roles_order, active_roles_order
 
 def openCards(cards, wolfy, listOrder, tip='dynamic'):
     '''
@@ -465,12 +458,12 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
 
 ### For testing
 testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'ROBBER - ', 'played':False},
-                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
-                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
+                #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'INSOMNIAC - ', 'played':False}, 
+                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'WEREWOLF - ', 'played':False},
+                #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'ROBBER - ', 'played':False}, 
+                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'MASON - ', 'played':False}, 
+                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'ROBBER - ', 'played':False}, 
+                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'TROUBLEMAKER - ', 'played':False}]
 endgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
                 {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - ', 'played':False}, 
                 {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'DRUNK - ', 'played':False},
@@ -499,7 +492,7 @@ print(term1)
 print()
 print(msg1)
 '''
-#n = whos_next(igra, data)
+#n = whos_next(testgame, data)
 #print(n)
 
 

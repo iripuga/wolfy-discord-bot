@@ -2,9 +2,9 @@
 # - ko zajebe mu vrnem random error message
 # - rabim funkcijo errorHandler
 # - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
-# - timing 10 min -> po tem času vsak lahko konča igro
 # - nočna navodila se vsa pošiljajo v DM posameznim igralcem...zvem id-je od igralcev in jih fliknem v en list. pol ko pošiljam sporočilo iteriram čez ta list
-# - pogruntat čas fake timinga, da bo igra hitreje tekla. Mogoče uporabim random.gauss(mu, sigma).si
+# *- pogruntat čas fake timinga, da bo igra hitreje tekla. Mogoče uporabim random.gauss(mu, sigma).si
+# - w.vote kjer vsak napiše wolfyju koga bi ustrelil, wolfy počaka da vsi volijo in pol objavi v gameroom kod je umrl. Mora tut povedat kako je kdo volil.
 # # # # # # # #
 
 global data #.gameData.json
@@ -139,6 +139,27 @@ def msg4user(game_player):
     msg_role = f"{emoji[rolename.lower()]} {role} Go get \'em!\n"  #:muscle:
     
     return msg_role
+
+async def msg4all(message, userIDs, wolfy, activeRole):
+    '''
+    Funkcija poskrbi, da se sporočila namenjena vsem trenutnim igralcem pošljejo v DM. Zaenkrat nič ne vrne.
+    \nInput    
+        userIDs...seznam ID-jev trenutnih uporabnikov, da jim lahko pošiljam sporočila
+        wolfy...ma man
+        activeRole...name of role which wakes up at night
+    '''
+    activeRole.upper()  #velke črke hočem
+
+    if activeRole in ['VILLAGER', 'WEREWOLF', 'MINION', 'MASON']:
+        msg = 'WEREWOLFES, MASONS and MINION have done their thing :crescent_moon:'
+    else:
+        msg = f'{activeRole}, open your :eyes:'
+
+    for uid in userIDs:
+        u = wolfy.get_user(uid)
+        await u.send(msg)   
+
+    return f'>>> msg4all(..., {activeRole}) sent'
 
 async def msg4werewolf(message, game, channel, wolfy, active):
     '''
@@ -536,7 +557,8 @@ async def on_message(message):
             msg = 'NewGame:\n' + justroles + '\nassigning roles...'
             beautifulmsg = f'```yaml\n{msg}\n```'
             await message.channel.send(beautifulmsg) 
-            time.sleep(1);
+            time.sleep(uniform(0.5, 2.5));
+            await message.channel.send('Fertig!')
 
             print('\nACTIVE ROLES:')
             startTime = time.time()  #kao zacetek poteze od werewolfov, minionov in masonov
@@ -586,16 +608,16 @@ async def on_message(message):
                                     await user.send(f'> - **`{mason.name}`** is a MASON')
                         if not flag:
                             await user.send('> You are the only MASON')
-                        #player['played'] = True  #to se bo zgodilo v funkciji whos_next
-                listOrder.append(player['name'])  #rabim za izpis v discord
+                        
+                listOrder.append(player['name'])  #rabim ohranit isto zaporedje, da so igralci vedno izpisani v istem vrstnem redu v discord
 
             #rearrange list order for clear output at the end of game - tableCards in the end
             for card in ['tableCard1', 'tableCard2', 'tableCard3']:
                 listOrder.remove(card)
             for card in ['tableCard1', 'tableCard2', 'tableCard3']:
                 listOrder.append(card)
-            print('\nplayersOrder >>>', listOrder)
-
+            print('\nplayersOrder >>>', listOrder)   
+            print('userIDs >>>', ww.getIDs(listOrder, static))
             # Send message to next role - his turn 
             time.sleep(uniform(2.3, 4.1)) #da zgleda kot da pasivne vloge neki delajo
             await message.channel.send('WEREWOLFES, MINION and MASON have done their thing :crescent_moon:')

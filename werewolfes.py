@@ -92,6 +92,26 @@ def assign_roles(idata=data, desires=None):
                 break
     return assigned_roles
 
+def getIDs(listOrder, game):
+    '''
+    Funkcija uporabi urejen seznam igralcev po nočnem vrstnem redu 
+    in pridobi njihove id-je, da lahko pošiljam DM sporočila hkrati.
+    Input
+        listOrder...seznam igralcev po nočnih vlogah, ki ga wolfy.py uporablja za lepo izpisovanje v discord
+        game...seznam slovarjev aktualne igre, na kratko podatki o trenutni igri
+    Output
+        uids...User IDs, seznam id-jev od vseh igralcev, ki igrajo
+    '''
+    uids = []
+    for name in listOrder:
+        for u in game:
+            if u['name'] == name:
+                uid = u['user_id']
+                if uid not in [1, 2, 3]:
+                    txt = name + ' ' + str(uid)
+                    uids.append(txt)
+    return  uids
+
 def transcribe(igame):
     '''
     Just to transcribe object igame into new NOT CONNECTED object ogame

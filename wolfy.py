@@ -251,34 +251,38 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
         nextRole...ime vloge, ki bi trenutno mogla bit na vrsti, type string
         startTime...current start time -> začnem štopat, da izmerim uporabnikov odziv oz. kolk časa je rabu, da je odgovoru
     '''
+    #nastavim najkrajši in najdaljši čas zakasnitve
+    short = 6.1
+    long = 14.2
+    
     t2 = time.time() # beležim končni čas odziva uporabnika
-    #deltaT = t2 - t1 #zračunam kolk je uporabnik rabil
-    #print('deltaT >>>', deltaT)
+    print('active user\'s deltaT >>>', t2 - t1)
 
     all_roles_order, active_roles_order = ww.whos_next(game, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
     table = wolfy.get_channel(channel)
     roleStatus = False # roleStatus je bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     #print('\nall_roles_order >>>', all_roles_order, '\nactive_roles_order >>>', active_roles_order)
     
-     #sam zato, da gre v for zanki čez, ker neki nagaja zaradi OrderedDict() data tipa
+    # NI LOGIČNO - sam zato, da gre v for zanki čez, ker neki nagaja zaradi OrderedDict() data tipa
     if not active_roles_order:
         active_roles_order = ['ShimSham'] 
     elif not all_roles_order:
         all_roles_order = ['ShamShim']
     else:
         pass 
+    ########################################
     
     localt1 = ww.transcribe(t1)
     localt2 = ww.transcribe(t2)
     #iskanje naslednje aktivne vloge med množico pasivnih vse dokler ne najdem ene aktivne
     for i in range(len(all_roles_order)):
-        deltaT = localt2 - localt1 #zračunam kolk je uporabnik rabil
-        print('deltaT >>>', deltaT)
+        deltaT = t2 - t1 #zračunam kolk je uporabnik rabil
         nextrole = all_roles_order[i]
         print('\nnextRole >>>', nextrole)
         if nextrole == None:
             pass
         elif nextrole == active_roles_order[0]: #naslednja dejansko aktivna vloga
+            print('...is active')
             for player in game:
                 if nextrole == player['role'].split(' ')[0]:
                     nextRole = nextrole #small become large eventually
@@ -289,21 +293,16 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
         else:#if nextrole == all_roles_order[0]:  #fake aktivna vloga
             for playa in game:
                 if nextrole == playa['role'].split(' ')[0]:
+                    print('...waiting for playa')
                     all_roles_order[i] = None #odstranim ta element, ne smem spremenit dolžine seznama
                     #print('\nall_roles_order.pop(0) >>>', all_roles_order)
                     nextRole = nextrole #nima veze kdo je ta vloga, ker itak fejkam aktivnost
                     playa['played'] = True #važno je da se ne pojavlja na kasnejših seznamih
                     roleStatus = False
-                    break        
+                    break    
+
         #else:
            # raise ValueError('Unknown error in msg4whos_next() from wolfy.py')
-
-        # random delay da zgleda kokr da se neki dogaja v ozadju
-        localt1 = time.time() 
-        short = 8.71
-        long = 15.23
-        time.sleep(uniform(2.4, 5.7))
-        localt2 = time.time()
 
         # Tukaj pošiljam sporočilo za nextRole
         if nextRole == 'WEREWOLF':
@@ -327,7 +326,13 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
 
         if roleStatus:
             break # Če je aktivna vloga odigrala svoje skočim ven iz funkcije in igra se nadaljuje normalno
-    
+        else:
+            deltaT = uniform(short, long)
+            time.sleep(deltaT)
+            print('deltaT >>>', deltaT)
+            
+        ########################################################
+
     if all(role is None for role in all_roles_order):  #Ko noben več ni na vrsti
         nextRole = None  
 
@@ -349,7 +354,7 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
     elif nextRole == 'INSOMNIAC':
         await msg4insomniac(message, game, channel, wolfy, active=roleStatus)       
     else:
-        time.sleep(uniform(2.7, 5.7))
+        #time.sleep(uniform(short, long))
         await table.send('```prolog\nEverybody, open your  👀```') #Na konc zbudim vse
     
     startTime = time.time()  #nov start time
@@ -534,6 +539,7 @@ async def on_message(message):
             time.sleep(1);
 
             print('\nACTIVE ROLES:')
+            startTime = time.time()  #kao zacetek poteze od werewolfov, minionov in masonov
             for player in static:
                 playerID = player['user_id']
                 playersRole = player['role'].split(' ')[0]
@@ -583,8 +589,6 @@ async def on_message(message):
                         #player['played'] = True  #to se bo zgodilo v funkciji whos_next
                 listOrder.append(player['name'])  #rabim za izpis v discord
 
-            time.sleep(uniform(2.3, 5.1))
-            await message.channel.send('WEREWOLFES, MINION and MASON have done their thing :crescent_moon:')
             #rearrange list order for clear output at the end of game - tableCards in the end
             for card in ['tableCard1', 'tableCard2', 'tableCard3']:
                 listOrder.remove(card)
@@ -593,7 +597,8 @@ async def on_message(message):
             print('\nplayersOrder >>>', listOrder)
 
             # Send message to next role - his turn 
-            startTime = time.time()  #kao zacetek poteze za naslednjega igralca
+            time.sleep(uniform(2.3, 4.1)) #da zgleda kot da pasivne vloge neki delajo
+            await message.channel.send('WEREWOLFES, MINION and MASON have done their thing :crescent_moon:')
             next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)  #delay for non-active roles must be implemented here
             #print(listOrder)
             print('\n>>> .w-end',next_one)

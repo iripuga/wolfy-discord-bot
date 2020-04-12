@@ -4,6 +4,7 @@
 # - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
 # - timing 10 min -> po tem času vsak lahko konča igro
 # - nočna navodila se vsa pošiljajo v DM posameznim igralcem...zvem id-je od igralcev in jih fliknem v en list. pol ko pošiljam sporočilo iteriram čez ta list
+# - pogruntat čas fake timinga, da bo igra hitreje tekla. Mogoče uporabim random.gauss(mu, sigma).si
 # # # # # # # #
 
 global data #.gameData.json

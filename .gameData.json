@@ -3,7 +3,7 @@
         {
             "name": "iripuga",
             "user_id": 689399469090799848,
-            "status": "on",
+            "status": "off",
             "played": false
         },
         {
@@ -40,19 +40,19 @@
             "name": "tableCard1",
             "user_id": 1,
             "status": "on",
-            "played": true
+            "played": false
         },
         {
             "name": "tableCard2",
             "user_id": 2,
             "status": "on",
-            "played": true
+            "played": false
         },
         {
             "name": "tableCard3",
             "user_id": 3,
             "status": "on",
-            "played": true
+            "played": false
         }
     ],
     "roles": [

@@ -165,6 +165,7 @@ async def msg4werewolf(message, game, channel, wolfy, active):
     '''
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
+    activeRole = 'WEREWOLFES'
     table = wolfy.get_channel(channel)
     if active:
         pass #to je že na začetku zrihtan
@@ -425,8 +426,20 @@ async def throwError(errors):
 ### LOGIN into guild ################################################################################
 @wolfy.event   #@ je event handler - ko se vzpostavi povezava se izvede ta funkcija
 async def on_ready():
-    #print(wolfy.guilds)
-    
+    channel = wolfy.get_channel(CHANNEL)
+
+    # FINDING lovrič #
+    print(wolfy.private_channels)
+    for ch in wolfy.private_channels:
+        print(ch)
+    lovric = wolfy.get_user(689399469090799848)
+    print('>>> LOVRIČ', lovric.name, lovric.id)
+    try:
+        await lovric.send('jel radi?')
+    except:
+        await channel.send('ne radi!')
+    ##################
+
     for guild in wolfy.guilds:      #Na katerem serverju sem in...
         if int(guild.id) == GUILD:
             break
@@ -436,12 +449,24 @@ async def on_ready():
     )
     show_members = '\n - '.join([member.name for member in guild.members])
     print(f'Guild Members:\n - {show_members}')
-    channel = wolfy.get_channel(CHANNEL)
 
     await wolfy.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="to w.help"))
     await channel.send('Hallo, ich möchte ein Spiel zu spielen!')    
 ##################################################################################################
 
+# FINDING Lovrič #
+@wolfy.event
+async def in_msg(msg):
+    user = msg.author
+    for ch in client.private_channels:
+        print(ch)
+        if user in recipients and len(recipients) == 2:
+            await doSomethingWithChannel(ch, user)
+            return
+    # user doesn't have a PM channel yet if we got here
+    ch = await client.start_private_message(user)
+    await firstMessageToUser(ch, user)
+##################
 
 ############################################## MAIN ##############################################
 @wolfy.event
@@ -469,6 +494,7 @@ async def on_message(message):
                 {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
 
 ### other COM stuff
+    print('>>> PRIVATE CHANNELS >>>', wolfy.private_channels)
     #-------------------------------------------------------------------------------------------#
     if message.author == wolfy.user:    # ignore bot messages in chat - tko se bot ne bo pogovarjal sam s sabo!
         return
@@ -573,7 +599,11 @@ async def on_message(message):
                     print(user.name, player['role'].split(' ')[0])
                     player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
                     init_msg = msg4user(player) #lovrič me je blokiral!!! no_hello ne morem pošiljat
-                    await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
+                    try:
+                        await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
+                    except:
+                        msg = 'A jebiga ' + user.name  #za lovriča
+                        await gameroom.send(msg)
                     ### .w NIGHT GAME - for static roles to know each other 
                     if playersRole == 'VILLAGER':
                         player['played'] = True #nothing happens - just to make sure, that nothing happens

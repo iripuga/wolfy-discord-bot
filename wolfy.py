@@ -428,7 +428,7 @@ async def throwError(errors):
 async def on_ready():
     channel = wolfy.get_channel(CHANNEL)
 
-    # FINDING lovrič #
+    # TODO - FINDING lovrič #
     print(wolfy.private_channels)
     for ch in wolfy.private_channels:
         print(ch)
@@ -454,7 +454,7 @@ async def on_ready():
     await channel.send('Hallo, ich möchte ein Spiel zu spielen!')    
 ##################################################################################################
 
-# FINDING Lovrič #
+# TODO - FINDING Lovrič #
 @wolfy.event
 async def in_msg(msg):
     user = msg.author

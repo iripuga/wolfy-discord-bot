@@ -486,6 +486,11 @@ victim_id = 593722710706749441
 
 #TODO
 
+
+
+
+
+
 igra = [{'name': 'columbo55', 'user_id': 689072253002186762, 'status': 'on', 'played': True, 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': False, 'role': 'INSOMNIAC - The Insomniac wakes up and looks at their card (to see if it has changed).'}, {'name': 'JanezDobrivnik', 'user_id': 593722710706749441, 'status': 'on', 'played': False, 'role': 'TROUBLEMAKER - At night the Troublemaker may switch the cards of two other players without looking at those cards.'}, {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': False, 'role': 'ROBBER - At night, the Robber may choose to rob a card from another player and place his Robber card where the other card was. Then the Robber looks at his new role card.'}, {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': True, 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'played': True, 'role': 'SEER - At night, the Seer may look eighter at one other players card or at two of the center cards, but does not move them.'}] 
 listOd = ['iripuga', 'JanezDobrivnik', 'columbo55', 'tableCard1', 'tableCard2', 'tableCard3'] #to moram uredit, tko da bo vedno isti vrstni red izpisa v discordu
 term, msg = openCards(igra, wolfy, listOd, tip='static')

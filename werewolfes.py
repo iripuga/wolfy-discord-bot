@@ -238,6 +238,29 @@ def list4role(game, rolename, wolfy):
     msg = msg1 + msg2
     return msg, players4role
 
+def checkID(game, user_id, wolfy):
+    '''
+    POSEBEJ ZA LOVRIČA, da dosežem njegov server!!!
+    funkcija preveri vrsto id-ja in definira temu primeren objekt\n
+    Input:
+        game...trenutna igra(json) v kateri se nahajajo aktivni igralci
+        user_id...id uporabnika, ki trenutno igra igro
+        wolfy...ma men za kreiranje novih objektov
+    Output:
+        object...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
+    '''
+    for playa in game:
+        if playa['user_id'] == user_id: #to je lovričev server
+            lovric = wolfy.get_channel(702488609478934630) #channel "wolfy" na #L
+        else:
+            other = wolfy.get_user(user_id)
+    if not lovric:
+        print("checkID >> ITS SOMEONE ELSE")
+        return other
+    else:
+        print("checkID >> ITS LOVRIC")
+        return lovric
+
 def findUser(igame, wolfy, searchPar, method='by_rolename'):
     '''
     Finds role in active game data, by searching for its rolename. Returns discord object User\n
@@ -260,13 +283,13 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         rolename.upper();
         for player in game:
             if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
-                user = wolfy.get_user(player['user_id'])
+                user = checkID(game, player['user_id'], wolfy)
                 break
     elif method == 'by_username':
         username = searchPar
         for player in game:
             if (player['name'] == username) and (player['user_id'] not in tableID):
-                user = wolfy.get_user(player['user_id'])
+                user = checkID(game, player['user_id'], wolfy)
                 break
     elif method == 'on_table':
         for c in game:

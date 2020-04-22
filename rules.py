@@ -11,7 +11,10 @@ data = {
          {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'off', 'played': False},
          {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'played': False},
          {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off', 'played': False},
-         {'name': 'lovric', 'user_id': 701893659112636497, 'status': 'off', 'played': False}, #za lovriča je 'user_id' v resnici id od serverja #L, ker pač mora bit neki posebnega
+         {'name': 'lovric', 
+          'user_id': 702488609478934630, #za lovriča je 'user_id' v resnici id od channelja "#wolfy" na serverju "#Lovric", ker pač mora bit neki posebnega
+          'status': 'off', 
+          'played': False}, 
          {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': False},  #tri karte na sredini mize - vse morajo navidezno igrati igro
          {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': False},
          {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': False}],

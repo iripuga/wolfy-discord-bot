@@ -74,9 +74,6 @@ commands = {
 '''   
 Enkrat mi bo ratal sporočilo za pozdrav - lahko je random nemška fraza iz seznama(http://streettalksavvy.com/street-talk-german-slang/german-slang-phrases/) 
 Ne rabi bit sporočilo na začetku logina, lohk je sam ena fora, ki je sprogramirana v bota. Kličeš z eno frazo in bot odgovori iz random knjižnice nemških fraz.    
-@wolfy.event
-async def on_connect():
-    await wolfy.channel.send('Ich wünsche allen Durchfall, kurze Arme, und kein Klopapier') 
 ''' 
 #############################################################################################
 
@@ -106,29 +103,20 @@ CHANNEL = int(CHANNEL)
 
 
 ### FUNKCIJE #####################################################################################
-def checkID(game, user_id, wolfy):
+def catchLovric(id):
     '''
-    POSEBEJ ZA LOVRIČA, da dosežem njegov server!!!
-    funkcija preveri vrsto id-ja in definira temu primeren objekt\n
-    Input:
-        game...trenutna igra(json) v kateri se nahajajo aktivni igralci
-        user_id...id uporabnika, ki trenutno igra igro
-        wolfy...ma men za kreiranje novih objektov
-    Output:
-        object...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
+    function to find Lovrič and change his id to #wolfy channel id in server #Lovrič so that he doesn't cause any errors\n
+    Input
+        iID...input player id
+    Output
+        oID...returns sam id if its not lovrič and returns "wolfy" channel id if its lovrič
     '''
-    for playa in game:
-        if playa['user_id'] == user_id: #to je lovričev server
-            lovric = wolfy.get_channel(702488609478934630) #channel "wolfy" na #L
-            print("ITS LOVRIC")
-            print(type(lovric))
-        else:
-            print("ALSO HERE")
-            other = wolfy.get_user(user_id)
-    if not lovric:
-        return other
+    if iID == 548304226988720149: 
+        oID = 702488609478934630
     else:
-        return lovric
+        oID = iID
+
+    return oID
 
 def msg4user(game, game_player, wolfy):
     '''
@@ -143,8 +131,13 @@ def msg4user(game, game_player, wolfy):
     '''
     print(game_player)
     game_playerID = game_player['user_id']
-    user = checkID(game, game_playerID, wolfy)  #user - samo njemu pošiljam sporočila v tej funkciji - funkcija pa se iterira čez vse igralce
-    game_player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
+    user = ww.checkID(game, game_playerID, wolfy)  #user - samo njemu pošiljam sporočila v tej funkciji - funkcija pa se iterira čez vse igralce
+    
+    # PRILAGODIM IMENA IGRALCEV, da lepše izgleda na discordu
+    if game_player['name'] == 'lovric':
+        game_player['name'] = 'no_hello'; #še en dodatek za lovriča
+    else:
+        game_player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
 
     playername = game_player['name']
     role = game_player['role']
@@ -466,6 +459,7 @@ async def throwError(errors):
 async def on_ready():
     channel = wolfy.get_channel(CHANNEL)
 
+    '''
     # TODO - FINDING lovrič #
     print(wolfy.private_channels)
     for ch in wolfy.private_channels:
@@ -477,6 +471,7 @@ async def on_ready():
     except:
         await channel.send('ne radi!')
     ##################
+    '''
 
     for guild in wolfy.guilds:      #Na katerem serverju sem in...
         if int(guild.id) == GUILD:
@@ -488,10 +483,13 @@ async def on_ready():
     show_members = '\n - '.join([member.name for member in guild.members])
     print(f'Guild Members:\n - {show_members}')
 
-    await wolfy.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="to w.help"))
+    await wolfy.change_presence(status=discord.Status('w.help'), 
+                                game=discord.Game(name="Werewolfes"))
+                                #activity=discord.Activity(type=discord.ActivityType.playing, name="to w.help")) # da vsi vidijo ukaz za pomoč
     await channel.send('Hallo, ich möchte ein Spiel zu spielen!')    
 ##################################################################################################
 
+'''
 # TODO - FINDING Lovrič #
 @wolfy.event
 async def in_msg(msg):
@@ -505,6 +503,7 @@ async def in_msg(msg):
     ch = await client.start_private_message(user)
     await firstMessageToUser(ch, user)
 ##################
+'''
 
 ############################################## MAIN ##############################################
 @wolfy.event
@@ -522,7 +521,9 @@ async def on_message(message):
     global ADMIN
     global listOrder #seznam imen igralcev, ki jih uporabim, da je vedno isto zaporedje igralcev v izpisu
     global startTime, endTime
-    #Če nista dve definiciji sta static in dynamic skos isti - neki s pointerji
+    #Če nista dve definiciji sta static in dynamic skos isti - pointerji na pomnilniški prostor so isti, samo ime je drugo
+
+    '''
     testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
                 #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
                 {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'INSOMNIAC - ', 'played':False},
@@ -530,6 +531,7 @@ async def on_message(message):
                 {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
                 {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
                 {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
+    '''
 
 ### other COM stuff
     print('>>> PRIVATE CHANNELS >>>', wolfy.private_channels)
@@ -552,7 +554,7 @@ async def on_message(message):
         else:
             await message.channel.send(f'Can\'t do that! Game is currently active on **{gameguild}** in **{gameroom}**. Maybe later...')
     elif message.content.startswith('w.help'): #Wolfy pomagaj!
-        user = wolfy.get_user(message.author.id)
+        user = ww.checkID(static, message.author.id, wolfy) # povsod moram preverit, če je to LOVRIČ in potem pošljem sporočilo
 
         msg = 'Basics:\n'
         basic = commands['basic']
@@ -578,7 +580,9 @@ async def on_message(message):
         await message.channel.send('Aufwiedersehen!')  
         await wolfy.close()
     elif message.content == 'w.id':  #vsak lahko izve svoj id
-        your_id = message.author.id
+        # to je spet LOVRIČ jebemu mast haha #
+        your_id = catchLovric(message.author.id)
+        ######################################
         user = wolfy.get_user(your_id)
         await user.send('Your ID is: ' + str(your_id))
     elif message.content.startswith('w.status'):

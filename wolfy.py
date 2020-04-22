@@ -106,8 +106,46 @@ CHANNEL = int(CHANNEL)
 
 
 ### FUNKCIJE #####################################################################################
-def msg4user(game_player):
-    #Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem vsakemu uporabniku
+def checkID(game, user_id, wolfy):
+    '''
+    POSEBEJ ZA LOVRIČA, da dosežem njegov server!!!
+    funkcija preveri vrsto id-ja in definira temu primeren objekt\n
+    Input:
+        game...trenutna igra(json) v kateri se nahajajo aktivni igralci
+        user_id...id uporabnika, ki trenutno igra igro
+        wolfy...ma men za kreiranje novih objektov
+    Output:
+        object...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
+    '''
+    for playa in game:
+        if playa['user_id'] == user_id: #to je lovričev server
+            lovric = wolfy.get_channel(702488609478934630) #channel "wolfy" na #L
+            print("ITS LOVRIC")
+            print(type(lovric))
+        else:
+            print("ALSO HERE")
+            other = wolfy.get_user(user_id)
+    if not lovric:
+        return other
+    else:
+        return lovric
+
+def msg4user(game, game_player, wolfy):
+    '''
+    Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem vsakemu uporabniku\n
+    Input:
+        game...aktivna igra(seznam slovarjev) z vsemi igralci in vlogami
+        game_player...slovar enega igralca
+        wolfy...you know!
+    Output:
+        msg...sporočilo za igralca
+        user...objekt s katerim lahko pošljemo direktno sporočilo igralcu
+    '''
+    print(game_player)
+    game_playerID = game_player['user_id']
+    user = checkID(game, game_playerID, wolfy)  #user - samo njemu pošiljam sporočila v tej funkciji - funkcija pa se iterira čez vse igralce
+    game_player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
+
     playername = game_player['name']
     role = game_player['role']
     rolename = role.split(' ')[0]
@@ -138,7 +176,7 @@ def msg4user(game_player):
 
     msg_role = f"{emoji[rolename.lower()]} {role} Go get \'em!\n"  #:muscle:
     
-    return msg_role
+    return msg_role, user
 
 async def msg4all(message, userIDs, wolfy, activeRole):
     '''
@@ -595,15 +633,14 @@ async def on_message(message):
                 if playerID in [(n+1) for n in range(3)]:
                     print(' - ' + player['name'] + ' ' + str(player['role'].split(' ')[0]))  #don't send message to tableCards
                 else:   
-                    user = wolfy.get_user(playerID)      #user - samo njemu pošiljam sporočila v tej iteraciji for zanke
+                    init_msg, user = msg4user(static, player, wolfy) #lovrič me je blokiral!!! no_hello ne morem pošiljat
                     print(user.name, player['role'].split(' ')[0])
-                    player['name'] = user.name #priredim ime v slovarju game, da bo lažje naprej delat
-                    init_msg = msg4user(player) #lovrič me je blokiral!!! no_hello ne morem pošiljat
                     try:
                         await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
                     except:
                         msg = 'A jebiga ' + user.name  #za lovriča
                         await gameroom.send(msg)
+
                     ### .w NIGHT GAME - for static roles to know each other 
                     if playersRole == 'VILLAGER':
                         player['played'] = True #nothing happens - just to make sure, that nothing happens

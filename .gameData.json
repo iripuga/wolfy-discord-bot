@@ -33,7 +33,13 @@
         {
             "name": "lovric",
             "user_id": 548304226988720149,
-            "status": "on",
+            "status": "off",
+            "played": false
+        },
+        {
+            "name": "petra404",
+            "user_id": 314081364414562325,
+            "status": "off",
             "played": false
         },
         {

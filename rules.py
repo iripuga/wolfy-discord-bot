@@ -39,10 +39,12 @@ data = {
 with open('.gameData.json', 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
 
+print('\nActive roles:')
+for role in data['roles']:
+    print(role['name'])
+
 print('\nActive players:')
 for player in data['members']:
     if (player['status'] == 'on') and (player['user_id'] not in [1,2,3]):
         print(player['name'])
-print('\nCards:')
-for role in data['roles']:
-    print(role['name'])
+print()

@@ -251,16 +251,14 @@ def checkID(game, user_id):
     '''
     lovricID = 548304226988720149
     lovric = lovricID
-    for playa in game:
-        if playa['user_id'] != lovricID: #to je lovričev id, ki ga preusmerim na server #Lovrič
-            other = user_id
-        else:
-            lovric = 702488609478934630 #channel "no_hello" na #L
+            
 
-    if lovric == lovricID:
+    if lovricID != user_id:
+        other = user_id
         #print("checkID >> ITS SOMEONE ELSE")
         return other
     else:
+        lovric = 702488609478934630 #channel "no_hello" na #L
         #print("checkID >> ITS LOVRIC")
         return lovric
 
@@ -281,28 +279,29 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
     game = transcribe(igame)
     tableID = [1, 2, 3]
     user = None
+    print('findUser searchPar >>', searchPar)
     if method == 'by_rolename':
+        print('findUser method >>', method)
         rolename = searchPar
         rolename.upper();
         for player in game:
+            print('findUser >>', player['name'])
             if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
-                print('ww.findUser >>', player['user_id'])
                 userID = checkID(game, player['user_id'])
                 break
             else:
                 userID = None
-                break
     elif method == 'by_username':
+        print('findUser method >>', method)
         username = searchPar
         for player in game:
             if (player['name'] == username) and (player['user_id'] not in tableID):
-                print('ww.findUser >>', player['user_id'])
                 userID = checkID(game, player['user_id'])
                 break
             else:
                 userID = None
-                break
     elif method == 'on_table':
+        print('findUser method >>', method)
         for c in game:
             shortName = c['name'][0] + c['name'][-1]
             if shortName == searchPar:
@@ -317,6 +316,7 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         return card_id
     else:
         raise NotImplementedError('Method unknown in findUser().')
+    print('findUser userID>>', userID)
     return userID
 
 def switch(igame, idA, idB):

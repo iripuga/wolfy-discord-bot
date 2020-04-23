@@ -107,14 +107,17 @@ def catchLovric(iID, wolfy):
     Input
         iID...input player id
     Output
-        oUser...returns wolfy object(if lovrič returns wolfy channel)
+        woofUser...returns wolfy object(if lovrič returns wolfy channel)
     '''
+    woofUser = None
     if iID != 548304226988720149: 
-        oUser = wolfy.get_user(iID)
+        print('>>>>>>>>>>>>>> freePassFor >>', wolfy.get_user(iID))
+        woofUser = wolfy.get_user(iID)
     else:
-        oUser = wolfy.get_channel(702488609478934630)
-        
-    return oUser
+        print('>>>>>>>>>>>>>> catchingLovric >>', wolfy.get_channel(702488609478934630))
+        woofUser = wolfy.get_channel(702488609478934630)
+    print('catchLovric >>', iID, woofUser)   
+    return woofUser
 
 def msg4user(game, game_player, wolfy):
     '''
@@ -222,9 +225,9 @@ async def msg4seer(message, game, channel, wolfy, active):
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
     seer = catchLovric(ww.findUser(game, wolfy, 'SEER', method='by_rolename'), wolfy)
+    print('msg4seer >>', seer)
     table = wolfy.get_channel(channel)
     if seer != None and active:
-        print('msg4seer >>', seer)
         msg, _bljak = ww.list4role(game, 'SEER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
         await table.send('SEER, open your  👀')
         await seer.send(msg)
@@ -236,6 +239,7 @@ async def msg4robber(message, game, channel, wolfy, active):
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
     robber = catchLovric(ww.findUser(game, wolfy, 'ROBBER', method='by_rolename'), wolfy)
+    print('msg4robber >>', robber)
     table = wolfy.get_channel(channel)
     if robber != None and active:
         msg, _bljak = ww.list4role(game, 'ROBBER', wolfy) #določim med kom lahko robber izbira
@@ -249,6 +253,7 @@ async def msg4troublemaker(message, game, channel, wolfy, active):
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
     troublemaker = catchLovric(ww.findUser(game, wolfy, 'TROUBLEMAKER', method='by_rolename'), wolfy)
+    print('msg4troublemaker >>', troublemaker)
     table = wolfy.get_channel(channel)
     if troublemaker != None and active:
         msg, _bljak = ww.list4role(game, 'TROUBLEMAKER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim

@@ -164,7 +164,7 @@ def msg4user(game, game_player, wolfy):
                 'hunter':':gun:',
                 'tanner':':poop:'}
     newgame_msg = '```prolog\nNew Game - your role is...\n```\n'
-    msg_role = newgame_msg + f">>> {emoji[rolename.lower()]} *{role}* **Go get \'em!**\n"  #:muscle:
+    msg_role = newgame_msg + f">>> {emoji[rolename.lower()]} *{role}* *Go get \'em!*\n"  #:muscle:
     
     return msg_role, oUser
 
@@ -550,13 +550,21 @@ async def on_message(message):
     elif message.content.startswith('woof'):      # message to call wolfy to desired channel on desired server
         gameguild = wolfy.get_guild(GUILD)
         gameroom = wolfy.get_channel(CHANNEL)
+
+        msg1 = 'WoofWoof!'
+        msg2 = 'Ja, wolf!'
+        msg3 = 'Juuuhu!'
+        answers = [msg1, msg2, msg3]
+        for i in range(500):
+            shuffle(answers)
+
         if (not static) and (message.guild != None): #če ni igre lahko menjam guild in channel, drugač pa ne ker bi lahko kdorkoli prekinil trenuntno igro
             GUILD = message.guild.id
             CHANNEL = message.channel.id
             newguild = wolfy.get_guild(GUILD)
             newroom = wolfy.get_channel(CHANNEL)
             print(f'\n>>> woof switched to {newguild} in channel #{newroom}')
-            await message.channel.send('WoofWoof!')
+            await message.channel.send(answers[0])
         elif message.guild == None:
             await message.channel.send(f'You can not play game alone! Come join in **{gameguild}** in **{gameroom}**.')
         else:

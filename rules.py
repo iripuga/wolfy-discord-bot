@@ -15,7 +15,7 @@ data = {
           'user_id': 548304226988720149, #za lovriča je 'user_id' v resnici id od channelja "#wolfy" na serverju "#Lovric", ker pač mora bit neki posebnega
           'status': 'off', 
           'played': False}, 
-         {'name': 'petra404', 'user_id': 314081364414562325, 'status': 'off', 'played': False},
+         {'name': '5ra404', 'user_id': 314081364414562325, 'status': 'off', 'played': False},
          {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': False},  #tri karte na sredini mize - vse morajo navidezno igrati igro
          {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': False},
          {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': False}],

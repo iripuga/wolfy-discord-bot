@@ -163,8 +163,8 @@ def msg4user(game, game_player, wolfy):
                 'insomniac':':sleeping_accommodation:',
                 'hunter':':gun:',
                 'tanner':':poop:'}
-
-    msg_role = f"{emoji[rolename.lower()]} {role} Go get \'em!\n"  #:muscle:
+    newgame_msg = '```prolog\nNew Game - your role is...\n```\n'
+    msg_role = newgame_msg + f">>> {emoji[rolename.lower()]} *{role}* **Go get \'em!**\n"  #:muscle:
     
     return msg_role, oUser
 
@@ -227,12 +227,13 @@ async def msg4seer(message, game, channel, wolfy, active):
     seer = catchLovric(ww.findUser(game, wolfy, 'SEER', method='by_rolename'), wolfy)
     print('msg4seer >>', seer)
     table = wolfy.get_channel(channel)
+    table_msg = '```prolog\nSEER, open your  👀\n```'
     if seer != None and active:
         msg, _bljak = ww.list4role(game, 'SEER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
-        await table.send('SEER, open your  👀')
+        await table.send(table_msg)
         await seer.send(msg)
     else:
-        await table.send('SEER, open your  👀')
+        await table.send(table_msg)
 
 async def msg4robber(message, game, channel, wolfy, active):
     '''
@@ -241,12 +242,13 @@ async def msg4robber(message, game, channel, wolfy, active):
     robber = catchLovric(ww.findUser(game, wolfy, 'ROBBER', method='by_rolename'), wolfy)
     print('msg4robber >>', robber)
     table = wolfy.get_channel(channel)
+    table_msg = '```prolog\nROBBER, open your  👀\n```'
     if robber != None and active:
         msg, _bljak = ww.list4role(game, 'ROBBER', wolfy) #določim med kom lahko robber izbira
-        await table.send('ROBBER, open your  👀')
+        await table.send(table_msg)
         await robber.send(msg)
     else:
-        await table.send('ROBBER, open your  👀')
+        await table.send(table_msg)
 
 async def msg4troublemaker(message, game, channel, wolfy, active):
     '''
@@ -255,12 +257,13 @@ async def msg4troublemaker(message, game, channel, wolfy, active):
     troublemaker = catchLovric(ww.findUser(game, wolfy, 'TROUBLEMAKER', method='by_rolename'), wolfy)
     print('msg4troublemaker >>', troublemaker)
     table = wolfy.get_channel(channel)
+    table_msg = '```prolog\nTROUBLEMAKER, open your  👀\n```'
     if troublemaker != None and active:
         msg, _bljak = ww.list4role(game, 'TROUBLEMAKER', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
-        await table.send('TROUBLEMAKER, open your  👀')
+        await table.send(table_msg)
         await troublemaker.send(msg)
     else:
-        await table.send('TROUBLEMAKER, open your  👀')
+        await table.send(table_msg)
 
 async def msg4drunk(message, game, channel, wolfy, active):
     '''
@@ -268,12 +271,13 @@ async def msg4drunk(message, game, channel, wolfy, active):
     '''
     drunk = catchLovric(ww.findUser(game, wolfy, 'DRUNK', method='by_rolename'), wolfy)
     table = wolfy.get_channel(channel)
+    table_msg = '```prolog\nDRUNK, open your  👀\n```'
     if drunk != None and active:
         msg, _bljak = ww.list4role(game, 'DRUNK', wolfy) #določim med kom lahko drunk izbira, _bljak ne rabim
-        await table.send('DRUNK, open your  👀')
+        await table.send(table_msg)
         await drunk.send(msg)
     else:
-        await table.send('DRUNK, open your  👀')
+        await table.send(table_msg)
 
 async def msg4insomniac(message, game, channel, wolfy, active):
     '''
@@ -281,12 +285,13 @@ async def msg4insomniac(message, game, channel, wolfy, active):
     '''
     insomniac = catchLovric(ww.findUser(game, wolfy, 'INSOMNIAC', method='by_rolename'), wolfy)
     table = wolfy.get_channel(channel)
+    table_msg = '```prolog\nINSOMNIAC, open your  👀\n```'
     if insomniac != None and active:
         msg, _bljak = ww.list4role(game, 'INSOMNIAC', wolfy) #določim med kom lahko robber izbira, _bljak ne rabim
-        await table.send('INSOMNIAC, open your  👀')
+        await table.send(table_msg)
         await insomniac.send(msg)
     else:
-        await table.send('INSOMNIAC, open your  👀')
+        await table.send(table_msg)
 
 async def msg4whos_next(message, game, channel, wolfy, data, t1):
     '''
@@ -305,8 +310,8 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
         startTime...current start time -> začnem štopat, da izmerim uporabnikov odziv oz. kolk časa je rabu, da je odgovoru
     '''
     #nastavim najkrajši in najdaljši čas zakasnitve
-    short = 6.1
-    long = 14.2
+    short = 3.11
+    long = 9.25
     
     t2 = time.time() # beležim končni čas odziva uporabnika
     print('active user\'s deltaT >>>', t2 - t1)
@@ -316,7 +321,7 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
     roleStatus = False # roleStatus je bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     #print('\nall_roles_order >>>', all_roles_order, '\nactive_roles_order >>>', active_roles_order)
     
-    # NI LOGIČNO - sam zato, da gre v for zanki čez, ker neki nagaja zaradi OrderedDict() data tipa
+    # NI LOGIČNO - tuki je sam zato, da gre v for zanki čez, ker neki nagaja zaradi OrderedDict() data tipa
     if not active_roles_order:
         active_roles_order = ['ShimSham'] 
     elif not all_roles_order:
@@ -490,6 +495,9 @@ async def on_ready():
 ##################################################################################################
 
 '''
+woof
+Ja, wolf!
+
 # TODO - FINDING Lovrič #
 @wolfy.event
 async def in_msg(msg):

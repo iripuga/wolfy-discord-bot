@@ -57,6 +57,8 @@ Bugs and TODO:
     *- random timing za fake vloge
     *- sporočila za fake vloge dat pod vse potrebne komande(ni nujno za pasivne vloge)
     - funkcija msg4whos_next ne dela dobro...primer testgame v werewolfes.py
+    - w.seer no_hello ne dela
+    - v no_hello channel ne pošilja navodil za vlogo
 
 Dodatki za špil:
     - prevedi igrico v slovenščino zaradi copyright - a 

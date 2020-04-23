@@ -238,7 +238,7 @@ def list4role(game, rolename, wolfy):
     msg = msg1 + msg2
     return msg, players4role
 
-def checkID(game, user_id, wolfy):
+def checkID(game, user_id):
     '''
     POSEBEJ ZA LOVRIČA, da dosežem njegov server!!!
     funkcija preveri vrsto id-ja in definira temu primeren objekt\n
@@ -247,23 +247,26 @@ def checkID(game, user_id, wolfy):
         user_id...id uporabnika, ki trenutno igra igro
         wolfy...ma men za kreiranje novih objektov
     Output:
-        object...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
+        objectID...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
     '''
+    lovricID = 548304226988720149
+    lovric = lovricID
     for playa in game:
-        if playa['user_id'] == user_id: #to je lovričev server
-            lovric = wolfy.get_channel(702488609478934630) #channel "wolfy" na #L
+        if playa['user_id'] != lovricID: #to je lovričev id, ki ga preusmerim na server #Lovrič
+            other = user_id
         else:
-            other = wolfy.get_user(user_id)
-    if not lovric:
-        print("checkID >> ITS SOMEONE ELSE")
+            lovric = 702488609478934630 #channel "no_hello" na #L
+
+    if lovric == lovricID:
+        #print("checkID >> ITS SOMEONE ELSE")
         return other
     else:
-        print("checkID >> ITS LOVRIC")
+        #print("checkID >> ITS LOVRIC")
         return lovric
 
 def findUser(igame, wolfy, searchPar, method='by_rolename'):
     '''
-    Finds role in active game data, by searching for its rolename. Returns discord object User\n
+    Finds role in active game data, by searching for its rolename. Returns user ID\n
     Input:
         igame...game data in list, each element is a dict
         searchPar...search parameter to help me find my user. Possible combinations:\n
@@ -273,7 +276,7 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         wolfy...ma bot
         method...na kakšen način iščem uporabnika
     Output:
-        user...discord object User - player who we are looking for by searchPar
+        userID...discord UserID - player or card who we are looking for by searchPar
     '''
     game = transcribe(igame)
     tableID = [1, 2, 3]
@@ -283,13 +286,21 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         rolename.upper();
         for player in game:
             if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
-                user = checkID(game, player['user_id'], wolfy)
+                print('ww.findUser >>', player['user_id'])
+                userID = checkID(game, player['user_id'])
+                break
+            else:
+                userID = None
                 break
     elif method == 'by_username':
         username = searchPar
         for player in game:
             if (player['name'] == username) and (player['user_id'] not in tableID):
-                user = checkID(game, player['user_id'], wolfy)
+                print('ww.findUser >>', player['user_id'])
+                userID = checkID(game, player['user_id'])
+                break
+            else:
+                userID = None
                 break
     elif method == 'on_table':
         for c in game:
@@ -306,7 +317,7 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         return card_id
     else:
         raise NotImplementedError('Method unknown in findUser().')
-    return user
+    return userID
 
 def switch(igame, idA, idB):
     '''

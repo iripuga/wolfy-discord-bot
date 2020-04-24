@@ -413,7 +413,7 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1, listOrder):
         elif nextRole == 'INSOMNIAC':
             await msg4insomniac(message, game, channel, wolfy, listOrder, active=roleStatus)       
         else:
-            raise ValueError(str(nextRole) + ' is not awake at night.')
+            raise ValueError(str(nextRole) + ' is not awake at night or doesn\'t exist yet.')
 
         if roleStatus:
             break # Če je aktivna vloga odigrala svoje skočim ven iz funkcije in igra se nadaljuje normalno

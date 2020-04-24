@@ -603,8 +603,8 @@ async def on_message(message):
         else:
             await message.channel.send(f'Can\'t do that! Game is currently active on **{gameguild}** in **{gameroom}**. Maybe later...')
     elif message.content.startswith('w.help'): #Wolfy pomagaj!
-        user = wolfy.get_user(message.author.id) # povsod moram preverit, če je to LOVRIČ in potem pošljem sporočilo
-
+        #user = wolfy.get_channel(message.channel.id) # povsod moram preverit, če je to LOVRIČ in potem pošljem sporočilo
+        user = wolfy.get_user(message.author.id)
         msg = 'Basics:\n'
         basic = commands['basic']
         ingame = commands['game']
@@ -619,6 +619,7 @@ async def on_message(message):
 
         HELP = '```prolog\n' + msg + '\n```' 
         await user.send(HELP)
+        print('\nw.help >> HELPING', user, '\n')
     #-------------------------------------------------------------------------------------------#
     elif message.content.startswith('vic?'):#rabim seznam vicev
         await message.channel.send(vic)        #prostor za zbirko vicev, fraz in podobnih stvari

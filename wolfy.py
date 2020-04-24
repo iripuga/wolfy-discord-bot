@@ -110,12 +110,12 @@ def catchLovric(iID, wolfy):
         woofUser...returns wolfy object(if lovrič returns wolfy channel)
     '''
     woofUser = None
-    if iID != 548304226988720149: 
-        print('>>>>>>>>>>>>>> freePassFor >>', wolfy.get_user(iID))
-        woofUser = wolfy.get_user(iID)
-    else:
+    if iID == 702488609478934630:# TODO - 548304226988720149: 
         print('>>>>>>>>>>>>>> catchingLovric >>', wolfy.get_channel(702488609478934630))
         woofUser = wolfy.get_channel(702488609478934630)
+    else:
+        print('>>>>>>>>>>>>>> freePassFor >>', wolfy.get_user(iID))
+        woofUser = wolfy.get_user(iID)
     print('catchLovric >>', iID, woofUser)   
     return woofUser
 
@@ -164,7 +164,7 @@ def msg4user(game, game_player, wolfy):
                 'hunter':':gun:',
                 'tanner':':poop:'}
     newgame_msg = '```prolog\nNew Game - your role is...\n```\n'
-    msg_role = newgame_msg + f">>> {emoji[rolename.lower()]} *{role}* **Go get \'em!**\n"  #:muscle:
+    msg_role = newgame_msg + f">>> {emoji[rolename.lower()]} *{role}* *Go get \'em!*\n"  #:muscle:
     
     return msg_role, oUser
 
@@ -314,7 +314,7 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1):
     long = 9.25
     
     t2 = time.time() # beležim končni čas odziva uporabnika
-    print('active user\'s deltaT >>>', t2 - t1)
+    print('user\'s deltaT >>>', t2 - t1)
 
     all_roles_order, active_roles_order = ww.whos_next(game, data); #None-villager, 1-werewolf, 2-minion, 3-mason so zrihtani. Kdo je naslednji?
     table = wolfy.get_channel(channel)
@@ -432,6 +432,14 @@ async def safetyNet(game, user, currentRole, role2protect):
     '''
     issafe = False
     print('SafetyNet >>> ',end='')
+    
+    # Cath some Lovric again #
+    if user.id == 702488609478934630:# TODO - 548304226988720149: 
+        print('SafetyNet >>> catchingLovricAgain >>', wolfy.get_channel(702488609478934630))
+        user = wolfy.get_channel(702488609478934630)
+    else:
+        pass
+
     try:
         for player in game:     #najdem vlogo tega igralca
             if player['user_id'] == user.id:
@@ -550,13 +558,18 @@ async def on_message(message):
     elif message.content.startswith('woof'):      # message to call wolfy to desired channel on desired server
         gameguild = wolfy.get_guild(GUILD)
         gameroom = wolfy.get_channel(CHANNEL)
+
+        answers = ['WoofWoof!', 'Ja, wolf!', 'Juuuhu!', 'Spielen wir?', 'Evo me!']
+        for i in range(500):
+            shuffle(answers) # premešam, da se pošlje random sporočilo
+
         if (not static) and (message.guild != None): #če ni igre lahko menjam guild in channel, drugač pa ne ker bi lahko kdorkoli prekinil trenuntno igro
             GUILD = message.guild.id
             CHANNEL = message.channel.id
             newguild = wolfy.get_guild(GUILD)
             newroom = wolfy.get_channel(CHANNEL)
             print(f'\n>>> woof switched to {newguild} in channel #{newroom}')
-            await message.channel.send('WoofWoof!')
+            await message.channel.send(answers[0])
         elif message.guild == None:
             await message.channel.send(f'You can not play game alone! Come join in **{gameguild}** in **{gameroom}**.')
         else:
@@ -723,7 +736,8 @@ async def on_message(message):
                         break
                     else:
                         hiddenPlaya = look[0];  
-                        hiddenUser = catchLovric(ww.findUser(static, wolfy, hiddenPlaya, method='by_username'), wolfy)
+                        hiddenUserID = ww.findUser(static, wolfy, hiddenPlaya, method='by_username')
+                        hiddenUser = catchLovric(hiddenUserID, wolfy)
                         for playa in static:
                             if playa['user_id'] == hiddenUser.id:
                                 hiddenRole = playa['role']
@@ -772,7 +786,7 @@ async def on_message(message):
                     break
                 elif choice in players4robber.keys():
                     if choice not in ['tableCard' + str(n+1) for n in range(3)]:
-                        victim = catchLovric(ww.findUser(static, wolfy, choice, method='by_username'), wolfy)
+                        victim = ww.findUser(static, wolfy, choice, method='by_username')
                         dynamic, switch_msg = ww.switch(dynamic, robber.id, victim.id)   #rob the victim
                         #print(game)#game = list(game) in case game becomes tuple somehow???
                         for playa in dynamic:   #robberju je treba povedat kaj je njegova nova vloga
@@ -813,14 +827,14 @@ async def on_message(message):
                         for playa in trouble:
                             if firstID == None:  #zapišem ID v ta pravo/prosto spremenljivko
                                 if playa not in ['tableCard' + str(n+1) for n in range(3)]: #Določim ID igralca, ki ga menjam
-                                    user = catchLovric(ww.findUser(static, wolfy, playa, method='by_username'), wolfy) 
-                                    firstID = user.id
-                                    first_name = user.name
+                                    user1 = ww.findUser(static, wolfy, playa, method='by_username')
+                                    firstID = user1.id
+                                    first_name = user1.name
                             else:
                                 if playa not in ['tableCard' + str(n+1) for n in range(3)]: #Določim ID igralca, ki ga menjam
-                                    user = catchLovric(ww.findUser(static, wolfy, playa, method='by_username'), wolfy) 
-                                    secondID = user.id
-                                    second_name = user.name
+                                    user2 = ww.findUser(static, wolfy, playa, method='by_username')
+                                    secondID = user2.id
+                                    second_name = user2.name
 
                         dynamic, switch_msg = ww.switch(dynamic, firstID, secondID)   #menjam
                         #print('\nstatic >>>\n', static)

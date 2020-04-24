@@ -372,9 +372,10 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1, listOrder):
         if nextrole == None:
             pass
         elif nextrole == active_roles_order[0]: #naslednja dejansko aktivna vloga
-            print('...is active')
+            print('...is actively used by ', end='')
             for player in game:
                 if nextrole == player['role'].split(' ')[0]:
+                    print(player['name'])
                     nextRole = nextrole #small become large eventually
                     player['played'] = True #ta igralec je zdaj zabeležen, kot da je že odigral
                     roleStatus = True
@@ -383,7 +384,7 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1, listOrder):
         else:#if nextrole == all_roles_order[0]:  #fake aktivna vloga
             for playa in game:
                 if nextrole == playa['role'].split(' ')[0]:
-                    print('...waiting for playa')
+                    print('...waiting for fake playa')
                     all_roles_order[i] = None #odstranim ta element, ne smem spremenit dolžine seznama
                     #print('\nall_roles_order.pop(0) >>>', all_roles_order)
                     nextRole = nextrole #nima veze kdo je ta vloga, ker itak fejkam aktivnost
@@ -447,7 +448,7 @@ async def msg4whos_next(message, game, channel, wolfy, data, t1, listOrder):
         #time.sleep(uniform(short, long))
         status = await msg4all(uids, wolfy, 'Everybody')
         await table.send('```yaml\nDiscussion: start discussing and when you are finished it\'s vote o\'clock ⏰\n```')
-    print('msg4whos_next >>', status) #Na konc zbudim vse
+        print('msg4whos_next >>', status) #Na konc zbudim vse
     
     startTime = time.time()  #nov start time
 

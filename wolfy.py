@@ -116,7 +116,7 @@ def catchLovric(iID, wolfy):
     else:
         print('>>>>>>>>>>>>>> freePassFor >>', wolfy.get_user(iID))
         woofUser = wolfy.get_user(iID)
-    print('catchLovric >>', iID, woofUser)   
+    print('wolfy.get_user >>', iID, woofUser)   
     return woofUser
 
 def msg4user(game, game_player, wolfy):
@@ -131,7 +131,7 @@ def msg4user(game, game_player, wolfy):
         oUser...objekt s katerim lahko pošljemo direktno sporočilo igralcu
     '''
     game_playerID = game_player['user_id']
-    oUser = catchLovric(game_playerID, wolfy)  #user - samo njemu pošiljam sporočila v tej funkciji - funkcija pa se iterira čez vse igralce
+    oUser = wolfy.get_user(game_playerID)  #user - samo njemu pošiljam sporočila v tej funkciji - funkcija pa se iterira čez vse igralce
     
     # PRILAGODIM IMENA IGRALCEV, da lepše izgleda na discordu
     game_player['name'] = oUser.name #priredim ime v slovarju game, da bo lažje naprej delat
@@ -224,7 +224,7 @@ async def msg4seer(message, game, channel, wolfy, active):
     '''
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
-    seer = catchLovric(ww.findUser(game, wolfy, 'SEER', method='by_rolename'), wolfy)
+    seer = wolfy.get_user(ww.findUser(game, wolfy, 'SEER', method='by_rolename'))
     print('msg4seer >>', seer)
     table = wolfy.get_channel(channel)
     table_msg = '```prolog\nSEER, open your  👀\n```'
@@ -239,7 +239,7 @@ async def msg4robber(message, game, channel, wolfy, active):
     '''
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
-    robber = catchLovric(ww.findUser(game, wolfy, 'ROBBER', method='by_rolename'), wolfy)
+    robber = wolfy.get_user(ww.findUser(game, wolfy, 'ROBBER', method='by_rolename'))
     print('msg4robber >>', robber)
     table = wolfy.get_channel(channel)
     table_msg = '```prolog\nROBBER, open your  👀\n```'
@@ -254,7 +254,7 @@ async def msg4troublemaker(message, game, channel, wolfy, active):
     '''
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
-    troublemaker = catchLovric(ww.findUser(game, wolfy, 'TROUBLEMAKER', method='by_rolename'), wolfy)
+    troublemaker = wolfy.get_user(ww.findUser(game, wolfy, 'TROUBLEMAKER', method='by_rolename'))
     print('msg4troublemaker >>', troublemaker)
     table = wolfy.get_channel(channel)
     table_msg = '```prolog\nTROUBLEMAKER, open your  👀\n```'
@@ -269,7 +269,7 @@ async def msg4drunk(message, game, channel, wolfy, active):
     '''
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
-    drunk = catchLovric(ww.findUser(game, wolfy, 'DRUNK', method='by_rolename'), wolfy)
+    drunk = wolfy.get_user(ww.findUser(game, wolfy, 'DRUNK', method='by_rolename'))
     table = wolfy.get_channel(channel)
     table_msg = '```prolog\nDRUNK, open your  👀\n```'
     if drunk != None and active:
@@ -283,7 +283,7 @@ async def msg4insomniac(message, game, channel, wolfy, active):
     '''
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     '''
-    insomniac = catchLovric(ww.findUser(game, wolfy, 'INSOMNIAC', method='by_rolename'), wolfy)
+    insomniac = wolfy.get_user(ww.findUser(game, wolfy, 'INSOMNIAC', method='by_rolename'), wolfy)
     table = wolfy.get_channel(channel)
     table_msg = '```prolog\nINSOMNIAC, open your  👀\n```'
     if insomniac != None and active:
@@ -575,7 +575,7 @@ async def on_message(message):
         else:
             await message.channel.send(f'Can\'t do that! Game is currently active on **{gameguild}** in **{gameroom}**. Maybe later...')
     elif message.content.startswith('w.help'): #Wolfy pomagaj!
-        user = catchLovric(message.author.id, wolfy) # povsod moram preverit, če je to LOVRIČ in potem pošljem sporočilo
+        user = wolfy.get_user(message.author.id) # povsod moram preverit, če je to LOVRIČ in potem pošljem sporočilo
 
         msg = 'Basics:\n'
         basic = commands['basic']
@@ -602,7 +602,7 @@ async def on_message(message):
         await wolfy.close()
     elif message.content == 'w.id':  #vsak lahko izve svoj id
         # to je spet LOVRIČ jebemu mast haha #
-        user = catchLovric(message.author.id, wolfy)
+        user = wolfy.get_user(message.author.id)
         ######################################
         await user.send('Your ID is: ' + str(message.author.id))
     elif message.content.startswith('w.status'):
@@ -630,7 +630,7 @@ async def on_message(message):
         elif not static: #if game is nonexistent, only then a new game can begin
             await gameroom.send('...erewolfes?')  
             ADMIN = message.author.id   # Edino un, ki začne igro jo lahko konča - to je ADMIN
-            admin = catchLovric(ADMIN, wolfy)
+            admin = wolfy.get_user(ADMIN)
 
             #Uvozim json podatke o igri in igralcih
             data = json.load(open('.gameData.json', 'r'))
@@ -668,7 +668,7 @@ async def on_message(message):
                         flag = False
                         for player_i in static:
                             if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
-                                werewolf = catchLovric(player_i['user_id'], wolfy);
+                                werewolf = wolfy.get_user(player_i['user_id']);
                                 if werewolf != user:
                                     flag = True
                                     await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF                       
@@ -680,7 +680,7 @@ async def on_message(message):
                         for player_i in static:
                             if (player_i['role'].split(' ')[0] == 'WEREWOLF') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
                                 flag = True
-                                werewolf = catchLovric(player_i['user_id'], wolfy);
+                                werewolf = wolfy.get_user(player_i['user_id']);
                                 await user.send(f'> - **`{werewolf.name}`** is a WEREWOLF')  #POVEM KDO JE WEREWOLF
                         if not flag:
                             await user.send('> You have no friends or WEREWOLFES, MINION\nhahaha...little piece of shit, Dumbkopf!')
@@ -689,7 +689,7 @@ async def on_message(message):
                         flag = False #davem, če sem našel kakega masona
                         for player_i in static:
                             if (player_i['role'].split(' ')[0] == 'MASON') and (not (player_i['user_id'] in [(n+1) for n in range(3)])):
-                                mason = catchLovric(player_i['user_id'], wolfy);
+                                mason = wolfy.get_user(player_i['user_id']);
                                 if mason != user:
                                     flag = True
                                     await user.send(f'> - **`{mason.name}`** is a MASON')
@@ -720,7 +720,7 @@ async def on_message(message):
     elif message.content.startswith('w.seer'):      ### SEER
         print('\n>>> seer-start:',next_one)
         id_seer = message.author.id
-        seer = catchLovric(id_seer, wolfy)
+        seer = wolfy.get_user(id_seer)
         _bljak, players4seer = ww.list4role(static, 'SEER', wolfy) #_bljak is list4msg, which we don't need anymore, but still need for function output
         #print(players4seer)
         
@@ -737,7 +737,7 @@ async def on_message(message):
                     else:
                         hiddenPlaya = look[0];  
                         hiddenUserID = ww.findUser(static, wolfy, hiddenPlaya, method='by_username')
-                        hiddenUser = catchLovric(hiddenUserID, wolfy)
+                        hiddenUser = wolfy.get_user(hiddenUserID)
                         for playa in static:
                             if playa['user_id'] == hiddenUser.id:
                                 hiddenRole = playa['role']
@@ -768,7 +768,7 @@ async def on_message(message):
     elif message.content.startswith('w.robber'):    ### ROBBER
         print('\n>>> robber-start', next_one)                                                                            
         id_robber = message.author.id
-        robber = catchLovric(id_robber, wolfy);
+        robber = wolfy.get_user(id_robber);
         _bljak, players4robber = ww.list4role(static, 'ROBBER', wolfy)
 
         safe = await safetyNet(static, robber, next_one, 'ROBBER') #da še kdo drug kot robber ne izvaja ukazov              
@@ -807,7 +807,7 @@ async def on_message(message):
     if message.content.startswith('w.trouble'):       ### TROUBLEMAKER
         print('\n>>> troublemaker-start', next_one)                                                                            
         id_trouble = message.author.id
-        troublemaker = catchLovric(id_trouble, wolfy);
+        troublemaker = wolfy.get_user(id_trouble);
         _bljak, players4trouble = ww.list4role(static, 'TROUBLEMAKER', wolfy)
         firstID = None; secondID = None #id-ja ki ju moram zamenjat
 
@@ -852,7 +852,7 @@ async def on_message(message):
     if message.content.startswith('w.drunk'):   ### DRUNK
         print('\n>>> drunk-start', next_one)                                                                            
         id_drunk = message.author.id
-        drunk = catchLovric(id_drunk, wolfy);
+        drunk = wolfy.get_user(id_drunk);
         _bljak, players4drunk = ww.list4role(static, 'DRUNK', wolfy)
 
         safe = await safetyNet(static, drunk, next_one, 'DRUNK') #da še kdo drug kot robber ne izvaja ukazov              
@@ -888,7 +888,7 @@ async def on_message(message):
     if message.content.startswith('w.insomniac'):   ### INSOMNIAC
         print('\n>>> insomniac-start', next_one)                                                                            
         id_insomniac = message.author.id
-        insomniac = catchLovric(id_insomniac, wolfy);
+        insomniac = wolfy.get_user(id_insomniac);
         _bljak, players4insomniac = ww.list4role(static, 'INSOMNIAC', wolfy)
 
         safe = await safetyNet(static, insomniac, next_one, 'INSOMNIAC') #da še kdo drug kot robber ne izvaja ukazov              
@@ -923,7 +923,7 @@ async def on_message(message):
     if message.content.startswith('w.abstain'):
         print('\n>>> abstain-start', next_one)                                                                            
         id_abstain = message.author.id
-        abstain = catchLovric(id_abstain, wolfy)
+        abstain = wolfy.get_user(id_abstain)
         await abstain.send('> Abstinence is your choice.') #role-pass
         # Send message to next role - his turn 
         next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime)
@@ -959,11 +959,11 @@ async def on_message(message):
     elif message.content == 'w.end':
         try:        #preveri, če je ADMIN ... to bi moral pomenit, da se igra še ni začela
             gameroom = wolfy.get_channel(message.channel.id)
-            user = catchLovric(message.author.id, wolfy)
-            admin = catchLovric(ADMIN, wolfy)
+            user = wolfy.get_user(message.author.id)
+            admin = wolfy.get_user(ADMIN)
             print('table, user, admin >>>', table, user, admin)
         except: #če ne pozna channel poščje v NoFunAllowed
-            user = catchLovric(message.author.id, wolfy)
+            user = wolfy.get_user(message.author.id)
             gameguild = wolfy.get_guild(GUILD)
             gameroom = wolfy.get_channel(CHANNEL)
         print('\n>>> w.end-start ' + user.name + ' in #', end='')
@@ -1008,7 +1008,7 @@ async def on_message(message):
     elif message.content == '.wolfy #iwannawin': #to bo na konc drugačen klic - GAME OVER
         loosers = ww.list_active_id(game)
         winner_name = message.author.name
-        winner_id = catchLovric(message.author.id, wolfy)
+        winner_id = wolfy.get_user(message.author.id)
         #dobim aktualen seznam igralcev, ki igrajo in njihove vloge
         
         for looser in loosers:

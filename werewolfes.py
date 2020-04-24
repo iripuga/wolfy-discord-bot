@@ -203,13 +203,7 @@ def list4role(game, rolename, wolfy):
                 pass
         else:
             if (player['role'].split(' ')[0] != rolename) and (rolename != 'DRUNK'):  #vloga, ki je na vrsti ne sme bit na tem seznamu
-                # catching Lovric again #
-                uid = checkID(player['user_id'])
-                if uid == 702488609478934630:
-                    usr = wolfy.get_channel(uid)
-                else:
-                    usr = wolfy.get_user(uid)
-                ##########################
+                uid = player['user_id']
 
                 list4msg = list4msg + ' - '+ str(usr.name) + '\n'
                 players4role[usr.name] = usr.id  #samo ime je dovolj za pošiljat
@@ -256,16 +250,7 @@ def checkID(user_id):
     Output:
         objectID...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
     '''
-    lovricID = 702488609478934630# TODO - 548304226988720149: 
-
-    if lovricID != user_id:
-        other = user_id
-        #print("checkID >> ITS SOMEONE ELSE")
-        return other
-    else:
-        lovric = lovricID #channel "no_hello" na #L
-        #print("checkID >> ITS LOVRIC")
-        return lovric
+    return
 
 def findUser(igame, wolfy, searchPar, method='by_rolename'):
     '''
@@ -292,7 +277,7 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         for player in game:
             print('findUser >>', player['name'])
             if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
-                userID = checkID(player['user_id'])
+                userID = player['user_id']
                 break
             else:
                 userID = None
@@ -301,7 +286,7 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         username = searchPar
         for player in game:
             if (player['name'] == username) and (player['user_id'] not in tableID):
-                userID = checkID(player['user_id'])
+                userID = player['user_id']
                 break
             else:
                 userID = None

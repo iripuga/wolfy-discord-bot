@@ -203,9 +203,16 @@ def list4role(game, rolename, wolfy):
                 pass
         else:
             if (player['role'].split(' ')[0] != rolename) and (rolename != 'DRUNK'):  #vloga, ki je na vrsti ne sme bit na tem seznamu
-                user = wolfy.get_user(player['user_id'])
-                list4msg = list4msg + ' - '+ str(user.name) + '\n'
-                players4role[user.name] = user.id  #samo ime je dovolj za pošiljat
+                # catching Lovric again #
+                uid = checkID(player['user_id'])
+                if uid == 702488609478934630:
+                    usr = wolfy.get_channel(uid)
+                else:
+                    usr = wolfy.get_user(uid)
+                ##########################
+
+                list4msg = list4msg + ' - '+ str(usr.name) + '\n'
+                players4role[usr.name] = usr.id  #samo ime je dovolj za pošiljat
     #prettier output 
     #nice = '```yaml\n---------------------------------------------------------------------------------------\n```' 
     if rolename == 'SEER':
@@ -238,7 +245,7 @@ def list4role(game, rolename, wolfy):
     msg = msg1 + msg2
     return msg, players4role
 
-def checkID(game, user_id):
+def checkID(user_id):
     '''
     POSEBEJ ZA LOVRIČA, da dosežem njegov server!!!
     funkcija preveri vrsto id-ja in definira temu primeren objekt\n
@@ -249,16 +256,14 @@ def checkID(game, user_id):
     Output:
         objectID...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
     '''
-    lovricID = 548304226988720149
-    lovric = lovricID
-            
+    lovricID = 702488609478934630# TODO - 548304226988720149: 
 
     if lovricID != user_id:
         other = user_id
         #print("checkID >> ITS SOMEONE ELSE")
         return other
     else:
-        lovric = 702488609478934630 #channel "no_hello" na #L
+        lovric = lovricID #channel "no_hello" na #L
         #print("checkID >> ITS LOVRIC")
         return lovric
 
@@ -287,7 +292,7 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         for player in game:
             print('findUser >>', player['name'])
             if (player['role'].split(' ')[0] == rolename) and (player['user_id'] not in tableID):
-                userID = checkID(game, player['user_id'])
+                userID = checkID(player['user_id'])
                 break
             else:
                 userID = None
@@ -296,7 +301,7 @@ def findUser(igame, wolfy, searchPar, method='by_rolename'):
         username = searchPar
         for player in game:
             if (player['name'] == username) and (player['user_id'] not in tableID):
-                userID = checkID(game, player['user_id'])
+                userID = checkID(player['user_id'])
                 break
             else:
                 userID = None

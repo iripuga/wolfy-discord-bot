@@ -84,7 +84,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN') #password to get acces to login bot into discord
 wolfy = Bot(command_prefix='.') #connection to discord bot, same and more than Client
 
-# Which GUILD to use??? Guild je server v discord jeziku. Za nov server moraš v server najprej prijavit bota preko developers strani
+### Which GUILD to use??? Guild je server v discord jeziku. Za nov server moraš v server najprej prijavit bota preko developers strani
 print('Which guild? ', end=' ')
 server = input()
 if server.upper() == 'NFA':
@@ -499,24 +499,8 @@ async def throwError(errors):
 @wolfy.event   #@ je event handler - ko se vzpostavi povezava se izvede ta funkcija
 async def on_ready():
     channel = wolfy.get_channel(CHANNEL)
+    guild = wolfy.get_guild(GUILD)
 
-    '''
-    # TODO - FINDING lovrič #
-    print(wolfy.private_channels)
-    for ch in wolfy.private_channels:
-        print(ch)
-    lovric = wolfy.get_user(689399469090799848)
-    print('>>> LOVRIČ', lovric.name, lovric.id)
-    try:
-        await lovric.send('jel radi?')
-    except:
-        await channel.send('ne radi!')
-    ##################
-    '''
-
-    for guild in wolfy.guilds:      #Na katerem serverju sem in...
-        if int(guild.id) == GUILD:
-            break
     print(
         f'{wolfy.user} is connected to the following guild:\n'
         f'{guild.name}(id: {guild.id})'
@@ -527,7 +511,16 @@ async def on_ready():
     await wolfy.change_presence(status=discord.Status('online'), 
                                 #game=discord.Game(name="Werewolfes"),
                                 activity=discord.Activity(type=discord.ActivityType.listening, name="w.help")) # da vsi vidijo ukaz za pomoč
-    await channel.send('Hallo, ich möchte ein Spiel zu spielen!')    
+    
+    hello = ['Hallo...was geht ab?',
+             'Hallo, ich möchte ein Spiel zu spielen!', 
+             'Joooou!',
+             'Party, party, ja, ja!',
+             'Waza waza waza wazaaaaaaaaaaaaap!!!'
+            ] 
+    #for mix in range(10):
+    #   shuffle(hello)
+    await channel.send(hello[randint(0, 4)])    
 ##################################################################################################
 
 '''
@@ -783,11 +776,11 @@ async def on_message(message):
                             shortName = tableCard['name'][0] + tableCard['name'][-1]
                             if shortName == card:
                                 if first == '':
-                                    first = card + ' is a ' + tableCard['role']
+                                    first = '```' + card + '``` is a ' + tableCard['role']
                                 else:
-                                    second = card + ' is a ' + tableCard['role']
+                                    second = '```' + card + '``` is a ' + tableCard['role']
                                     break
-                    await seer.send(first + '\n' + second);
+                    await seer.send('> ' + first + '\n' + second);
                     # Send message to next role - his turn 
                     next_one, startTime = await msg4whos_next(message, static, CHANNEL, wolfy, data, startTime, listOrder)
                     break

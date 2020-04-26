@@ -17,6 +17,7 @@ data = {
           'played': False}, 
          {'name': '5ra404', 'user_id': 314081364414562325, 'status': 'off', 'played': False},
          {'name': 'polona', 'user_id': 703244126363320440, 'status': 'off', 'played': False},
+         {'name': 'jaka_blaz404', 'user_id': 637610613849194496, 'status': 'off', 'played': False},
          {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': False},  #tri karte na sredini mize - vse morajo navidezno igrati igro
          {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': False},
          {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': False}],

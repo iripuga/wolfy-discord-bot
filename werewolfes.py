@@ -47,7 +47,7 @@ def assign_roles(idata=data, desires=None):
     r_idx = []
     for num in range(len(players)):   
         r_idx.append(num)
-    for mix in range(1351):   #every day i'm shuffling...premiksam, da je izbira vlog naključna
+    for mix in range(3351):   #every day i'm shuffling...premiksam, da je izbira vlog naključna
         shuffle(r_idx)  
     
     masons = 0;     #Števec MASONov poskrbim, da sta v igri dva MASONA al pa noben, ker drugač ta vloga nima smisla

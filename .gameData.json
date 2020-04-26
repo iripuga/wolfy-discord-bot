@@ -45,6 +45,12 @@
         {
             "name": "polona",
             "user_id": 703244126363320440,
+            "status": "on",
+            "played": false
+        },
+        {
+            "name": "jaka_blaz404",
+            "user_id": 637610613849194496,
             "status": "off",
             "played": false
         },

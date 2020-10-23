@@ -1,5 +1,5 @@
 '''
-Modul za igro werewolfes preko discorda.
+Module for werewolfes game on discord.
 '''
 from random import shuffle, randint
 from numpy import linspace
@@ -239,19 +239,6 @@ def list4role(game, rolename, wolfy):
     msg = msg1 + msg2
     return msg, players4role
 
-def checkID(user_id):
-    '''
-    POSEBEJ ZA LOVRIČA, da dosežem njegov server!!!
-    funkcija preveri vrsto id-ja in definira temu primeren objekt\n
-    Input:
-        game...trenutna igra(json) v kateri se nahajajo aktivni igralci
-        user_id...id uporabnika, ki trenutno igra igro
-        wolfy...ma men za kreiranje novih objektov
-    Output:
-        objectID...vrnem objekt, ki ga uporabim kasneje za pošijanje sporočil uporabnikom
-    '''
-    return
-
 def findUser(igame, wolfy, searchPar, method='by_rolename'):
     '''
     Finds role in active game data, by searching for its rolename. Returns user ID\n
@@ -461,13 +448,6 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
             if c['name'] == username:
                 karta = c
                 break
-        '''
-        if karta['name'] in ['tableCard' + str(n+1) for n in range(3)]:
-            role_name = karta['role'].split(' ')[0]
-            table_cards = table_cards + ' - ' + karta['name'] + ' ' + role_name + '\n'
-            term = term + 'tableCard' + str(karta['user_id']) + ' ' + role_name + '\n'
-        else:
-        '''
         player_name = karta['name']
         if player_name == 'tableCard1':
             msg = msg + table_cards
@@ -476,140 +456,3 @@ def openCards(cards, wolfy, listOrder, tip='dynamic'):
         term = term + ' - ' + player_name + ' ' + role_name + '\n'
 
     return term, msg
-
-
-
-
-
-
-
-
-
-
-
-### For testing
-testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'INSOMNIAC - ', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'WEREWOLF - ', 'played':False},
-                #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'ROBBER - ', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'MASON - ', 'played':False}, 
-                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'ROBBER - ', 'played':False}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'TROUBLEMAKER - ', 'played':False}]
-endgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'ROBBER - ', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'DRUNK - ', 'played':False},
-                {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
-                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
-
-usr_id = 689399469090799848
-victim_id = 593722710706749441
-#static = testgame#ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
-#dynamic = transcribe(static) #ta se bo spreminjala
-
-#TODO
-
-
-
-
-
-
-igra = [{'name': 'columbo55', 'user_id': 689072253002186762, 'status': 'on', 'played': True, 'role': 'WEREWOLF - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.'}, {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': False, 'role': 'INSOMNIAC - The Insomniac wakes up and looks at their card (to see if it has changed).'}, {'name': 'JanezDobrivnik', 'user_id': 593722710706749441, 'status': 'on', 'played': False, 'role': 'TROUBLEMAKER - At night the Troublemaker may switch the cards of two other players without looking at those cards.'}, {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': False, 'role': 'ROBBER - At night, the Robber may choose to rob a card from another player and place his Robber card where the other card was. Then the Robber looks at his new role card.'}, {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': True, 'role': 'MASON - The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.'}, {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'played': True, 'role': 'SEER - At night, the Seer may look eighter at one other players card or at two of the center cards, but does not move them.'}] 
-listOd = ['iripuga', 'JanezDobrivnik', 'columbo55', 'tableCard1', 'tableCard2', 'tableCard3'] #to moram uredit, tko da bo vedno isti vrstni red izpisa v discordu
-term, msg = openCards(igra, wolfy, listOd, tip='static')
-term1, msg1 = openCards(igra, wolfy, listOd)
-'''
-print(term)
-print()
-print(msg)
-print()
-print(term1)
-print()
-print(msg1)
-'''
-#n = whos_next(testgame, data)
-#print(n)
-
-
-
-
-####################################################### DUMP #####################################################
-'''
-choice = 't1'
-for c in static:
-    shortName = c['name'][0] + c['name'][-1]
-    if shortName == choice:
-        print(choice, '>>>', c['name'])
-        choice = c['name']
-        print(choice)
-        break
-card_id = findUser(static, wolfy, choice, method='on_table')
-print(card_id)
-
-choice = 'JanezDobrivnik'
-print('\nstatic is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
-print('dynamic >>>\n', id(dynamic), dynamic)
-print('\nDO STUFF!\n')
-#victim = findUser(dynamic, wolfy, choice, method='by_username')
-dynamic, switch_msg = switch(dynamic, robber_id, victim_id)   #rob the victim
-print('static is dynamic?', static is dynamic, '\nstatic >>>\n', id(static), static)
-print('dynamic >>>\n', id(dynamic), dynamic)
-print('MSG: ' + switch_msg)
-
-def _assign_roles0(idata=data, desires=None):   
-    
-    Shuffle new roles for another game of werewolfes
-    Input:
-        idata...role and members data dictionary(look up)
-        desires...list of desired roles which must match len(players)
-    Output:
-        assigned...dict of reshuffled 'roles with ther description' in one string. Format is {'user_id': 'role-description'}.
-    
-    #init variables
-    assigned = {}
-    playersID = activate(data['members']) #get list of active player id's which need role assignment
-    roles = data['roles']
-    r_idx = []
-    
-    #določim indexe za vloge iz seznama members. samo toliko kot je igralcev v igri
-    for num in range(len(playersID)):   
-        r_idx.append(num)
-    for i in range(1351):   #every day i'm shuffling...premiksam, da je izbira vlog naključna
-        shuffle(r_idx)  
-        
-    #Če ma kdo kake želje katere vloge naj bodo v igri, je zdaj čas, da pove    
-    if desires == None:
-        i = 0
-        for playerID in playersID:
-            get_role = int(r_idx[i]) #poiščem vlogo glede na index v seznamu premešanih indeksov
-            i = i + 1
-            ROLE = roles[get_role]['name'] + ' - ' + roles[get_role]['description']
-            assigned[str(playerID)] =  ROLE    #sproti dodajam nove elemente v slovar 
-    else:
-        raise NotImplementedError('No desires!') #Tukaj pridejo želje
-        
-    return assigned  #dodeljene vloge
-
-def at_night(game, data): #lahko bi dodal, da samo vprašam kdo je naslednji
-    Vrne seznam vlog, ki se po vrsti prebujajo ponoči. Izpustim, tiste ki
-    so že porihtane ob začetku igre(villager-None, werewolf-1, minion-2 in mason-3) 
-    Vars:
-        active_roles_order...seznam vlog, za ponoč v vrstnem redu
-        night...slovar {'rolename':'night_order'}
-    night = {}
-    active_roles_order = []
-    cards = data['roles'] #role cards
-    for player in game:
-        if player['played'] == False:   #samo če še ni igral bo v končnem seznamu
-            active_role = player['role'].split(' ')[0]
-            for card in cards: #izpuščam statične vloge in sestavljam slovar vlog {'rolename':night_order}
-                if (card['night_order'] != None) and (card['night_order'] > 3):# and (card['night_order'] != 1) and (card['night_order'] != 2) and (card['night_order'] != 3):
-                    if card['name'] == active_role:
-                        night[card['name']] = card['night_order']
-    nightOrder = collections.OrderedDict(sorted(night.items(), key=lambda t:t[1]))
-    for active in nightOrder:
-        active_roles_order.append(active)
-    return night, active_roles_order
-    '''
-##################################################################################################################

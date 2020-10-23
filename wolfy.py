@@ -1,3 +1,6 @@
+'''
+    Main script to run werewolfes discord bot
+'''
 global data #.gameData.json
 global static #ta se definira na začetku in po njej vloge igrajo
 global dynamic #v tej se odražajo dejanja vlog - this will be my main game dict in which all will happen - TA JE NUJNA, ostale niti ne tolk
@@ -27,22 +30,14 @@ import time
 
 ### heci... ################################################################################
 vic = 'Sprehajala sem se po Hoferju, pa je en kurac pred menoj celo paleto wc papirja vleko!!! Pa sem ga natulila in mu rekla "kaj vi samo serjete doma???" Pa mi je rekel: gospa jaz delam tukaj...'
-'''
-# Če bom hotu kake evente spreminjat moram bota definirat s tem razredom
-class Custom(discord.Client):
-    async def overridden_fun():
-        return
-'''
 errors = [  'Mission failed succesfully!',  #za tiste, ki ne znajo vnašat wolfy ukaze - izbiram random
-            'Well done! Somehow you fucked up...',
+            'Well done! Somehow you screwed up...',
             'As\' si mau duška dau?!',
-            'Ma goni se!',
+            'Aj mrš!',
             'Bemti nanule, kristusove opanke...',
             'Pišuka Polde, ni to prava komanda',
             'Pejt v maloro klamfe srat, hudič sakramenski.',
-            'Ka zaj te bom jaz učil komande pisat? Nea mi ga seri, lepo te prosim.',
             'Ahhh, das ist unglaublich...']
-specialError = ['Prideta Mujo in Haso...', '...pa ti rečeta: "Ajoj, baš ni ne znaš komandirat, jarane."']  #najprej prvi msg, počakam 3s, pošljem drugi error
 
 # Dictionary of commands {'command_name':'description'}
 commands = {
@@ -62,10 +57,6 @@ commands = {
             "'w.end'":'everybodys roles are revealed, only person who started the game can end it'
         }
 } 
-'''   
-Enkrat mi bo ratal sporočilo za pozdrav - lahko je random nemška fraza iz seznama(http://streettalksavvy.com/street-talk-german-slang/german-slang-phrases/) 
-Ne rabi bit sporočilo na začetku logina, lohk je sam ena fora, ki je sprogramirana v bota. Kličeš z eno frazo in bot odgovori iz random knjižnice nemških fraz.    
-''' 
 #############################################################################################
 
 
@@ -92,24 +83,6 @@ CHANNEL = int(CHANNEL)
 ##################################################################################################
 
 ### FUNKCIJE #####################################################################################
-def catchLovric(iID, wolfy):
-    '''
-    function to find Lovrič and change his id to #wolfy channel id in server #Lovrič so that he doesn't cause any errors\n
-    Input
-        iID...input player id
-    Output
-        woofUser...returns wolfy object(if lovrič returns wolfy channel)
-    '''
-    woofUser = None
-    if iID == 702488609478934630:# TODO - 548304226988720149: 
-        print('>>>>>>>>>>>>>> catchingLovric >>', wolfy.get_channel(702488609478934630))
-        woofUser = wolfy.get_channel(702488609478934630)
-    else:
-        print('>>>>>>>>>>>>>> freePassFor >>', wolfy.get_user(iID))
-        woofUser = wolfy.get_user(iID)
-    print('wolfy.get_user >>', iID, woofUser)   
-    return woofUser
-
 def msg4user(game, game_player, wolfy):
     '''
     Funkcija sestavi sporočilo, ki ga ob začetku igre pošljem vsakemu uporabniku\n
@@ -507,31 +480,13 @@ async def on_ready():
              'Hallo, ich möchte ein Spiel zu spielen!', 
              'Joooou!',
              'Party, party, ja, ja!',
-             'Waza waza waza wazaaaaaaaaaaaaap!!!'
-            ] 
-    #for mix in range(10):
-    #   shuffle(hello)
-    await channel.send(hello[randint(0, 4)])    
+             'Waza waza waza wazaaaaaaaaaaaaap!!!',
+             'Woof!',
+             'Juuuhu...'] 
+   
+    await channel.send(hello[randint(0, len(hello))])    
 ##################################################################################################
 
-'''
-woof
-Ja, wolf!
-
-# TODO - FINDING Lovrič #
-@wolfy.event
-async def in_msg(msg):
-    user = msg.author
-    for ch in client.private_channels:
-        print(ch)
-        if user in recipients and len(recipients) == 2:
-            await doSomethingWithChannel(ch, user)
-            return
-    # user doesn't have a PM channel yet if we got here
-    ch = await client.start_private_message(user)
-    await firstMessageToUser(ch, user)
-##################
-'''
 
 ############################################## MAIN ##############################################
 @wolfy.event
@@ -617,8 +572,7 @@ async def on_message(message):
         await message.channel.send(str(msg))   
     elif message.content.startswith('w.game'):
         # Display who is in the game by displaying players status
-        #Uvozim json podatke o igri in igralcih
-        gameData = json.load(open('.gameData.json', 'r'))
+        gameData = json.load(open('.gameData.json', 'r')) # Uvozim json podatke o igri in igralcih
         response = ''
         for gameMember in gameData['members']:
             if gameMember['user_id'] not in [1, 2, 3]:
@@ -964,7 +918,7 @@ async def on_message(message):
         pass
 
 ###  MID GAME - Wolfy waits for players to discuss who to kill  #########
-    #detajli
+    # TODO - timer functionality, if needed implement
 
 ###  VOTING - Players send private message to Wolfy  ####################
     elif message.content == 'w.vote':
@@ -982,7 +936,6 @@ async def on_message(message):
             gameguild = wolfy.get_guild(GUILD)
             gameroom = wolfy.get_channel(CHANNEL)
         print('\n>>> w.end-start ' + user.name + ' in #', end='')
-        #print(gameroom, type(message.channel.id), type(CHANNEL))
 
         if  CHANNEL != message.channel.id:
             someroom = wolfy.get_channel(message.channel.id)
@@ -1044,43 +997,3 @@ async def on_message(message):
 
 # run everything
 wolfy.run(TOKEN)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-NOBENA KOMANDA NE DELA!?      in niimam pojma zakva!  
-        
-@wolfy.command(name = 'werewolfes')
-async def wolfs(ctx):
-    await ctx.send('55') 
-        
-@wolfy.command(name='99')
-async def nine_nine(ctx):
-    brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
-    response = random.choice(brooklyn_99_quotes)
-    await ctx.send(response)
-    
-@wolfy.command() #define the first command and set prefix to '!'
-async def testt(ctx):
-    await ctx.send('Hello!!')
-# PRIVATE COMMUNICATION with members
-        await message.author.send('👋')   #Tut dela, sam ni primerna za mojo aplikacijo
-'''

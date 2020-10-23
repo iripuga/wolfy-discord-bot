@@ -21,8 +21,8 @@ A simple discord bot to help you play werewolfes on discord.
     elif server.upper() == 'YOUR_GUILD_NAME':
         GUILD = os.getenv('YOUR_GUILD_ID')
         CHANNEL = os.getenv('YOUR_GUILD_CHANNEL_ID')
-    ```\n
-- From git repository run `python wolfy.py`.\n
+    ```
+- From git repository run `python wolfy.py`.
 - Enter name of your GUILD into terminal and wait for wolfy to log on. At anytime you can check whether bot is present in guild by typing `woof` in the channel. You can also call wolfy to another guild by typing `woof`in desired guild.
 
 # How to play

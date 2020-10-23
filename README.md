@@ -4,8 +4,7 @@ A simple discord bot to help you play werewolfes on discord.
 *WARNING!!!* This is **not plug&play** so prepare yourself to do some setup steps. 
 
 # Requirements
-- run `pip install discord`
-- run `pip install dotenv`
+- run `pip install discord` and `pip install dotenv`
 - if you run in issues with ssl certificate try [this thread](https://stackoverflow.com/questions/62108183/discord-py-bot-dont-have-certificate)
     (*Basically navigate to your Applications/Python 3.8/ folder and double click the Install Certificates.command.*)
 - I can't include environment and game data, since they contain private information. To make it work you will need a discord bot and save login credentials(**DISCORD_BOT_TOKEN, GUILD_ID, GUILC_CHANNEL_ID**) of the bot into **.env** file. As a reference use .env_example file.
@@ -17,14 +16,14 @@ A simple discord bot to help you play werewolfes on discord.
 - From here on you can follow instructions on [how to add you discord bot to server](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#creating-and-using-your-own-invite-link)
 
 # How to run the bot
-1. In wolfy.py add `elif` statement for your discord server like it is presented in the code.
+**1.** In wolfy.py add `elif` statement for your discord server like it is presented in the code.
     ```
     elif server.upper() == 'YOUR_GUILD_NAME':
         GUILD = os.getenv('YOUR_GUILD_ID')
         CHANNEL = os.getenv('YOUR_GUILD_CHANNEL_ID')
     ```
-2. From git repository run `python wolfy.py`.
-3. Enter name of your GUILD into terminal and wait for wolfy to log on. At anytime you can check whether bot is present in guild by typing `woof` in the channel.
+**2.** From git repository run `python wolfy.py`.
+**3.** Enter name of your GUILD into terminal and wait for wolfy to log on. At anytime you can check whether bot is present in guild by typing `woof` in the channel. You can also call wolfy to another guild by typing `woof`in desired guild.
 
 # How to play
 To learn all the commands run `w.help` in discord server and wolfy will send you commands list into direct message. 

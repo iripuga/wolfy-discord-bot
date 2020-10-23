@@ -4,7 +4,7 @@
 # - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
 # - nočna navodila se vsa pošiljajo v DM posameznim igralcem...zvem id-je od igralcev in jih fliknem v en list. pol ko pošiljam sporočilo iteriram čez ta list
 # *- pogruntat čas fake timinga, da bo igra hitreje tekla. Mogoče uporabim random.gauss(mu, sigma).si
-# - w.vote kjer vsak napiše wolfyju koga bi ustrelil, wolfy počaka da vsi volijo in pol objavi v gameroom kod je umrl. Mora tut povedat kako je kdo volil.
+# - w.vote kjer vsak napiše wolfyju koga bi ustrelil, wolfy počaka da vsi volijo in pol objavi v gameroom kdo je umrl. Mora tut povedat kako je kdo volil.
 # # # # # # # #
 
 global data #.gameData.json
@@ -660,7 +660,7 @@ async def on_message(message):
             #definiram igro in preverim, če sta kazalca od slovarjev različna
             static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
             dynamic = ww.transcribe(static) #ta se bo spreminjala
-            print(f'>>> .w-start NEW GAME on {gameguild} in {gameroom}: \n - static is dynamic?', static is dynamic)
+            print(f'>>> .w-start NEW GAME on {gameguild} in {gameroom}: \n - static is dynamic(this should be False)?', static is dynamic)
             
             #adding nicknames
             justroles = ww.listRoles(static)  #katere vloge so v igri
@@ -676,12 +676,12 @@ async def on_message(message):
             for player in static:
                 playerID = player['user_id']
                 playersRole = player['role'].split(' ')[0]
-                #TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
+                # TUKI GRE FUNKCIJA ZA ŠTETJE MASONOV, če je samo eden moram zamenjat vloge
                 if playerID in [(n+1) for n in range(3)]:
                     print(' - ' + player['name'] + ' ' + str(player['role'].split(' ')[0]))  #don't send message to tableCards
                 else:   
                     init_msg, user = msg4user(static, player, wolfy) #lovrič me je blokiral!!! no_hello ne morem pošiljat
-                    print(user.name, player['role'].split(' ')[0])
+                    print(' # ' + user.name, player['role'].split(' ')[0])
                     await user.send(init_msg)   #sporočim vsakemu igralcu njegovo vlogo/karto
 
                     ### .w NIGHT GAME - for static roles to know each other 

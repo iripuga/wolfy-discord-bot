@@ -11,10 +11,10 @@ data = {
          {'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'off', 'played': False},
          {'name': 'kristof', 'user_id': 689072253002186762, 'status': 'off', 'played': False},
          {'name': 'klemzo', 'user_id': 641347330804678667, 'status': 'off', 'played': False},
-         {'name': 'lovric', 
-          'user_id': 702488609478934630,# TODO - 548304226988720149: 548304226988720149, #za lovriča je 'user_id' v resnici id od channelja "#wolfy" na serverju "#Lovric", ker pač mora bit neki posebnega
-          'status': 'off', 
-          'played': False}, 
+        #  {'name': 'lovric', 
+        #   'user_id': 702488609478934630,# TODO - 548304226988720149: 548304226988720149, #za lovriča je 'user_id' v resnici id od channelja "#wolfy" na serverju "#Lovric", ker pač mora bit neki posebnega
+        #   'status': 'off', 
+        #   'played': False}, 
          {'name': '5ra404', 'user_id': 314081364414562325, 'status': 'off', 'played': False},
          {'name': 'polona', 'user_id': 703244126363320440, 'status': 'off', 'played': False},
          {'name': 'jaka_blaz404', 'user_id': 637610613849194496, 'status': 'off', 'played': False},

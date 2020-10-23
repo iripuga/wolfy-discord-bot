@@ -1,7 +1,7 @@
 # Wolfy
 A simple discord bot to help you play werewolfes on discord.
 
-*WARNING!!!* This is **not plug&play** so prepare yourself to do some terminal magic ;). 
+*WARNING!!!* This is **not plug&play** so prepare yourself to do some setup steps. 
 
 # Requirements
 - run `pip install discord`
@@ -29,7 +29,7 @@ A simple discord bot to help you play werewolfes on discord.
 # How to play
 To learn all the commands run `w.help` in discord server and wolfy will send you commands list into direct message. 
 
-*IMPORTANT* All players must turn on their status with `w.status` command and then one of them starts the game with `.w` command. When Voting is done only the person who started the game can finish it with `w.end`.
+*IMPORTANT* All players must turn on their status with `w.status` command and then one of them starts the game with `.w` command. When game is finished only the person who started the game can finish it with `w.end`.
 
 You can find explanation of werewolfes game rules [here](https://www.youtube.com/watch?v=XsP6LvZQpLk). 
 

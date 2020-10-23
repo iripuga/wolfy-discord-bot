@@ -1,5 +1,5 @@
 # Wolfy
-A simple discord bot to help you play werewolfes on discord.
+A simple discord bot to help you play werewolfes on discord during quarantine.
 
 **WARNING!!!** This is **not plug&play** so prepare yourself to do some setup steps. 
 

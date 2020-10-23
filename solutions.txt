@@ -59,6 +59,7 @@ Bugs and TODO:
     - funkcija msg4whos_next ne dela dobro...primer testgame v werewolfes.py
     - w.seer no_hello ne dela
     - v no_hello channel ne pošilja navodil za vlogo
+    - rabim desires
 
 Dodatki za špil:
     - prevedi igrico v slovenščino zaradi copyright - a 

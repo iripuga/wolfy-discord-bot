@@ -308,7 +308,7 @@ async def msg4insomniac(message, game, channel, wolfy, listOrder, active):
     active...bool, ki pove ali je ta vloga dejansko aktivna ponoči(True) al se sam dela da je aktivna ponoči(False)
     listOrder...seznam igralcev po nočnih vlogah, ki ga wolfy rabi za lepo izpisovanje v discord
     '''
-    insomniac = wolfy.get_user(ww.findUser(game, wolfy, 'INSOMNIAC', method='by_rolename'), wolfy)
+    insomniac = wolfy.get_user(ww.findUser(game, wolfy, 'INSOMNIAC', method='by_rolename'))
     table = wolfy.get_channel(channel)
     
     uids = ww.getIDs(listOrder, game)

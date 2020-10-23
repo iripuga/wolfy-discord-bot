@@ -18,16 +18,20 @@ data = {
          {'name': '5ra404', 'user_id': 314081364414562325, 'status': 'off', 'played': False},
          {'name': 'polona', 'user_id': 703244126363320440, 'status': 'off', 'played': False},
          {'name': 'jaka_blaz404', 'user_id': 637610613849194496, 'status': 'off', 'played': False},
+         {'name': 'NinaPorovne', 'user_id': 691703927023992842, 'status': 'off', 'played': False},
+         {'name': 'AleksGameNight', 'user_id': 291537703835795456, 'status': 'off', 'played': False},
+         {'name': 'AdriGameNight', 'user_id': 691698406456033340, 'status': 'off', 'played': False},
+         {'name': 'LanaGameNight', 'user_id': 691701213313499137, 'status': 'off', 'played': False},
          {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'played': False},  #tri karte na sredini mize - vse morajo navidezno igrati igro
          {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'played': False},
          {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'played': False}],
     'roles':
        [#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': None},  #lohk jih kr tuki razporediš po zaporednih številkah. Če se nč z vlogo ne zgodi je order 0
-       	#{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': None},
+       	{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': None},
         #{'name': 'VILLAGER', 'description': 'The Villager has no special ability, but he is definitely not a werewolf.', 'night_order': None},
-        #{'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
+        {'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
 	    {'name': 'WEREWOLF', 'description': 'At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'night_order': 1},
-        #{'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3}, 
+        {'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3}, 
 	    {'name': 'MASON', 'description': 'The Mason wakes up at night and looks for the other Mason. If the Mason doesnt see another Mason, it means the other Mason is in the center.', 'night_order': 3},
 	    {'name': 'ROBBER', 'description': 'At night, the Robber may choose to rob a card from another player and place his Robber card where the other card was. Then the Robber looks at his new role card.', 'night_order': 5},
 	    {'name': 'TROUBLEMAKER', 'description': 'At night the Troublemaker may switch the cards of two other players without looking at those cards.', 'night_order': 6},

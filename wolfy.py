@@ -1,12 +1,3 @@
-###   TODO  ###
-# - ko zajebe mu vrnem random error message
-# - rabim funkcijo errorHandler
-# - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
-# - nočna navodila se vsa pošiljajo v DM posameznim igralcem...zvem id-je od igralcev in jih fliknem v en list. pol ko pošiljam sporočilo iteriram čez ta list
-# *- pogruntat čas fake timinga, da bo igra hitreje tekla. Mogoče uporabim random.gauss(mu, sigma).si
-# - w.vote kjer vsak napiše wolfyju koga bi ustrelil, wolfy počaka da vsi volijo in pol objavi v gameroom kdo je umrl. Mora tut povedat kako je kdo volil.
-# # # # # # # #
-
 global data #.gameData.json
 global static #ta se definira na začetku in po njej vloge igrajo
 global dynamic #v tej se odražajo dejanja vlog - this will be my main game dict in which all will happen - TA JE NUJNA, ostale niti ne tolk
@@ -490,7 +481,7 @@ async def throwError(errors):
     '''
     Randomly returns one error from collection of errors.
     '''
-    error='no error'
+    error='Not implemented'
     return error
 
 ##################################################################################################
@@ -560,17 +551,7 @@ async def on_message(message):
     global startTime, endTime
     #Če nista dve definiciji sta static in dynamic skos isti - pointerji na pomnilniški prostor so isti, samo ime je drugo
 
-    '''
-    testgame = [#{'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'SEER - At night all Werewolves open their eyes and look for other werewolves. If no one else opens their eyes, the other werewolves are in the center.', 'played':False}, 
-                #{'name': 'zorkoporko', 'user_id': 593722710706749441, 'status': 'on', 'role': 'DRUNK - ', 'played':False}, 
-                {'name': 'iripuga', 'user_id': 689399469090799848, 'status': 'on', 'role': 'INSOMNIAC - ', 'played':False},
-                #{'name': 'kristof', 'user_id': 689072253002186762, 'status': 'on', 'role': 'VILLAGER - ', 'played':False}, 
-                {'name': 'tableCard1', 'user_id': 1, 'status': 'on', 'role': 'SEER - ', 'played':True}, 
-                {'name': 'tableCard2', 'user_id': 2, 'status': 'on', 'role': 'WEREWOLF - ', 'played':True}, 
-                {'name': 'tableCard3', 'user_id': 3, 'status': 'on', 'role': 'MINION - ', 'played':True}]
-    '''
-
-### other COM stuff
+### ALL COMMUNICATION STUFF ###
     #print('>>> PRIVATE CHANNELS >>>', wolfy.private_channels)
     #-------------------------------------------------------------------------------------------#
     if message.author == wolfy.user:    # ignore bot messages in chat - tko se bot ne bo pogovarjal sam s sabo!
@@ -628,19 +609,29 @@ async def on_message(message):
         ######################################
         await user.send('Your ID is: ' + str(message.author.id))
     elif message.content.startswith('w.status'):
-        #Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
+        # Tole je za vpis/izpis iz igre - menjava statusa v glavnem slovarju
         user_id = message.author.id
         nickname = message.author.name
         klik = ww.change_status(user_id)        #menjava statusa
-        #with open('.gameData.json', 'w', encoding='utf-8') as f:
-        #    json.dump(data, f, ensure_ascii=False, indent=4)
         msg = nickname + ' status: ' + klik
         await message.channel.send(str(msg))   
+    elif message.content.startswith('w.game'):
+        # Display who is in the game by displaying players status
+        #Uvozim json podatke o igri in igralcih
+        gameData = json.load(open('.gameData.json', 'r'))
+        response = ''
+        for gameMember in gameData['members']:
+            if gameMember['user_id'] not in [1, 2, 3]:
+                memberName = wolfy.get_user(gameMember['user_id'])
+                response = response + memberName.name + ' is ' + gameMember['status'] + '\n'
+            else:
+                pass
+        await message.channel.send(str(response)) 
     #-------------------------------------------------------------------------------------------#
     
-    ### WEREWOLFES GAME
+    ### WEREWOLFES GAME ###
     #-------------------------------------------------------------------------------------------#
-### .w START GAME - send msg to players
+### .w START GAME - send msg to players ###
     elif message.content == '.w':
         gameroom = wolfy.get_channel(CHANNEL)   #global CHANNEL kamor pošiljam splošne info o igri
         gameguild = wolfy.get_guild(GUILD)
@@ -660,7 +651,7 @@ async def on_message(message):
             #definiram igro in preverim, če sta kazalca od slovarjev različna
             static = ww.assign_roles(data)  #dobim list vseh članov, ki so v igri -> To je dinamična igra, ki se skos spreminja
             dynamic = ww.transcribe(static) #ta se bo spreminjala
-            print(f'>>> .w-start NEW GAME on {gameguild} in {gameroom}: \n - static is dynamic(this should be False)?', static is dynamic)
+            print(f'>>> .w-start NEW GAME on {gameguild} in {gameroom}: \n - static is dynamic (should be False)?', static is dynamic)
             
             #adding nicknames
             justroles = ww.listRoles(static)  #katere vloge so v igri

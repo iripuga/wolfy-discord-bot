@@ -61,6 +61,15 @@ Bugs and TODO:
     - v no_hello channel ne pošilja navodil za vlogo
     - rabim desires
 
+###   TODO  ###
+# - ko zajebe mu vrnem random error message
+# - rabim funkcijo errorHandler
+# - desires je nujno treba sprogramirat, da lohk zbiramo tiste vloge, ki hočemo
+# - nočna navodila se vsa pošiljajo v DM posameznim igralcem...zvem id-je od igralcev in jih fliknem v en list. pol ko pošiljam sporočilo iteriram čez ta list
+# *- pogruntat čas fake timinga, da bo igra hitreje tekla. Mogoče uporabim random.gauss(mu, sigma).si
+# - w.vote kjer vsak napiše wolfyju koga bi ustrelil, wolfy počaka da vsi volijo in pol objavi v gameroom kdo je umrl. Mora tut povedat kako je kdo volil.
+# # # # # # # #
+
 Dodatki za špil:
     - prevedi igrico v slovenščino zaradi copyright - a 
     - funkcija za villagerja -> Masovna depresija: vsi villagerji so tannerji

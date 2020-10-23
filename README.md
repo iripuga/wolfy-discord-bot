@@ -7,7 +7,7 @@ A simple discord bot to help you play werewolfes on discord during quarantine.
 - run `pip install discord` and `pip install dotenv`
 - if you run in issues with ssl certificate try [this thread](https://stackoverflow.com/questions/62108183/discord-py-bot-dont-have-certificate)
     (Basically navigate to your `Applications/Python 3.8/` folder and double click the `Install Certificates.command`.)
-- I can't include environment and game data, since they contain private information. To make it work you will need a discord bot and save login credentials(**DISCORD_BOT_TOKEN, GUILD_ID, GUILC_CHANNEL_ID**) of the bot into **.env** file. As a reference use .env_example file.
+- I can't include environment and game data, since they contain private information. To make it work you will need a discord bot and save login credentials(**DISCORD_BOT_TOKEN, GUILD_ID, GUILD_CHANNEL_ID**) of the bot into **.env** file. As a reference use .env_example file.
 - For game you also need to generate **.gameData.json** which includes game rules, data about players etc. like demonstrated in .gameData_example.json. You can do that by adding players discord data in **.genGameData.py**(line 9) and then run `python .genGameData.py`.
 # Authorize wolfy bot to your server...
 - create new discord bot on [developer portal](https://discord.com/login?redirect_to=%2Fdevelopers).
